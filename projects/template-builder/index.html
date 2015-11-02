@@ -1,0 +1,99 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="assets/css/main.css">
+	</head>
+	<body>
+		<div class="row">
+			<div class="container">
+				<div class="col-md-4">
+					<div id="add-controls-container">
+						<h2>Add components</h2>
+						<ul class="list-group" id="">
+							<li class="list-group-item">
+								<button class="btn btn-default add-el-control" data-targetel="text-area-control">Add Text Area</button>
+							</li>
+							<li class="list-group-item">
+								<button class="btn btn-default add-el-control" data-targetel="image-control">Add Image</button>
+							</li>
+						</ul>
+					</div>
+
+					<ul class="list-group">
+						<li id="text-area-control" class="list-group-item add-element-control">
+							<button class="btn btn-sm btn-primary close-control">X</button>
+							<!-- at- id prefix is for add text elements -->
+							<h3>Enter text</h3>
+							<textarea id="at-text-body" class="form-control" rows="" cols="" placeholder="Enter text component text here..." value="text example"></textarea>
+
+							<h3>Font Face</h3>
+							<button class="btn btn-default" data-type="reg">Regular</button>
+							<button class="btn btn-default" data-type="med">Medium</button>
+							<button class="btn btn-default" data-type="bol">Bold</button>
+
+							<h3>Select Font Size</h3>
+							<button class="btn btn-default" data-size="16">Small</button>
+							<button class="btn btn-default" data-size="20">Medium</button>
+							<button class="btn btn-default" data-size="24">Large</button>
+
+							<!-- <h3>Bullet lists</h3>
+							<button class="btn btn-default" data-bullet="ol">Order List</button>
+							<button class="btn btn-default" data-bullet="ul">Un-ordered List</button> -->
+
+							<h3>Alignment</h3>
+							<button class="btn btn-default" data-align="l">Left</button>
+							<button class="btn btn-default" data-align="c">Center</button>
+							<button class="btn btn-default" data-align="r">Right</button>
+
+							<h3>Select Colour</h3>
+							<button class="btn btn-default color-option color-red">Red</button>
+							<button class="btn btn-default color-option color-yellow">Yellow</button>
+							<button class="btn btn-default color-option color-pink">Pink</button>
+							<button class="btn btn-default color-option color-blue">Blue</button>
+							<button class="btn btn-default color-option color-purple">Purple</button>
+
+							<!-- <h3>Layer comp</h3>
+							<button class="btn btn-default">Increase layer</button> -->
+
+							<br><hr>
+
+							<button class="btn btn-primary" id="add-text-area">Add</button>
+						</li>
+
+						<li id="image-control" class="list-group-item add-element-control">
+							<button class="btn btn-sm btn-primary close-control">X</button>
+
+							<h3>Select Image</h3>
+							<div>
+								...Image Library
+							</div>
+							<h3>Upload Image</h3>
+							<form action="">
+								<input type="file">
+								<button class="btn btn-default"></button>
+							</form>
+							<button class="btn btn-default">Increase layer</button>
+						</li>
+					</ul>
+
+					<div class="image-preview">
+						<div id="i"></div>
+					</div>
+				</div>
+				<div class="col-md-7 col-md-offset-1">
+					<input type="text" class="form-control canvas-name-field" placeholder="Name of template...">
+					<canvas id="c" width="600" height="600"></canvas>
+					<button class="btn btn-default" id="toggle-grid">Toggle grid</button>
+					<button class="btn btn-default" id="save-thumb">Save thumbnail</button>
+					<a class="btn btn-default" id="dl-thumb" download="template-thumbnail.png">Download thumbnail</a>
+					<button class="btn btn-default" id="dl-pdf" href=>Generate PDF</button>
+				</div>
+			</div>
+		</div>
+		<script src="assets/js/libs/jquery-1.11.3.js"></script>
+		<script src="assets/js/libs/fabrics.js"></script>
+		<script src="assets/js/libs/reimg.js"></script>
+		<script src="assets/js/libs/jspdf.js"></script>
+		<script src="assets/js/main.js"></script>
+	</body>
+</html>

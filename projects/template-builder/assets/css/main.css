@@ -1,0 +1,73 @@
+/*Resets*/
+.list-group-item{
+	list-style: none;
+}
+textarea{
+	resize:vertical;
+	min-height: 100px;
+}
+
+.container{
+	margin-top: 50px;
+}
+#c{
+	border: dashed 3px blue;
+	background: white;
+}
+.canvas-container{
+	margin-bottom: 20px;
+}
+
+.image-preview img{
+	width: 100%;
+	height: auto;
+	display: block;
+	margin: 20px 0;
+}
+
+.canvas-name-field{
+	margin-bottom: 20px;
+	max-width: 600px;
+}
+#i img{
+	box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.1)
+}
+
+.close-control{
+	position: absolute;
+	right: 15px;
+	top: 15px;
+}
+
+.add-element-control,
+.hidden-el{
+	display: none;
+}
+.color-red{
+	background: red;
+}
+.color-yellow{
+	background: yellow;
+}
+.color-pink{
+	background: pink;
+}
+.color-blue{
+	background: blue;
+}
+.color-purple{
+	background: purple;
+}
+.color-option{
+	width: 30px;
+    height: 30px;
+    text-indent: -9999em;
+    border-radius: 50%;
+    border: none;
+    box-shadow: none;
+}
+.color-option:hover,
+.color-option:focus,
+.color-option:active{
+	background: auto;
+}
