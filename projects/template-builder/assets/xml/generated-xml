@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc>
+   <page width="210" height="297">
+      <pdf lowresfilename="" highresfilename="" align="left" verticalalign="top" id="bglayer" mandatory="False" editable="False" title="Background" lowerleftx="0" lowerlefty="0" upperrightx="210" upperrighty="297" width="210" height="297" fitmethod="auto" orientate="north" />
+      <image lowresfilename="http://discovery.macmillan.org.uk/discovery/BeMac/assets/img/demo.jpg" highresfilename="http://discovery.macmillan.org.uk/discovery/BeMac/assets/img/demo.jpg" align="left" verticalalign="top" id="" mandatory="False" editable="False" title="" lowerleftx="79" lowerlefty="179" upperrightx="118" upperrighty="179" fitmethod="auto" orientate="north" width="52" height="52" />
+   </page>
+</doc>

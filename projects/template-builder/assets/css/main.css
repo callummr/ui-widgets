@@ -39,6 +39,12 @@ textarea{
 	top: 15px;
 }
 
+.option-selected{
+	color: #fff;
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
+
 .add-element-control,
 .hidden-el{
 	display: none;
@@ -70,4 +76,7 @@ textarea{
 .color-option:focus,
 .color-option:active{
 	background: auto;
+}
+.color-option.option-selected{
+	outline: solid 3px #46b8da;
 }

@@ -9,6 +9,41 @@
 				<div class="col-md-4">
 					<div id="add-controls-container">
 						<h2>Add components</h2>
+						<form>
+							<span class="input-group-addon">
+								<span class="badge">A1</span>
+				            	<input type="radio" name="doc-size" value="a1">
+				          	</span>
+				          	<span class="input-group-addon">
+				          		<span class="badge">A2</span>
+				            	<input type="radio" name="doc-size" value="a2">
+				          	</span>
+				          	<span class="input-group-addon">
+				          		<span class="badge">A3</span>
+				            	<input type="radio" name="doc-size" value="a3">
+				          	</span>
+				          	<span class="input-group-addon">
+				          		<span class="badge">A4</span>
+				            	<input type="radio" name="doc-size" value="a4" checked>
+				          	</span>
+				          	<span class="input-group-addon">
+				          		<span class="badge">A5</span>
+				            	<input type="radio" name="doc-size" value="a5">
+				          	</span>
+
+				          	<hr>
+				          	<span class="input-group-addon">
+								<span class="badge">Portrait</span>
+				            	<input type="radio" name="doc-orientation" value="p" checked>
+				          	</span>
+				          	<span class="input-group-addon">
+								<span class="badge">Landscape</span>
+				            	<input type="radio" name="doc-orientation" value="p">
+				          	</span>
+				          	<hr>
+				          	<input type="text" class="form-control canvas-name-field" placeholder="Name of template...">
+						</form>
+
 						<ul class="list-group" id="">
 							<li class="list-group-item">
 								<button class="btn btn-default add-el-control" data-targetel="text-area-control">Add Text Area</button>
@@ -24,33 +59,44 @@
 							<button class="btn btn-sm btn-primary close-control">X</button>
 							<!-- at- id prefix is for add text elements -->
 							<h3>Enter text</h3>
-							<textarea id="at-text-body" class="form-control" rows="" cols="" placeholder="Enter text component text here..." value="text example"></textarea>
+							<textarea id="at-text-body" class="form-control" rows="" cols="" placeholder="Enter text component text here...">text example</textarea>
 
 							<h3>Font Face</h3>
-							<button class="btn btn-default" data-type="reg">Regular</button>
-							<button class="btn btn-default" data-type="med">Medium</button>
-							<button class="btn btn-default" data-type="bol">Bold</button>
+							<div id="at-font-face" class="text-editor-option">
+								<button class="btn btn-default option-selected" data-type="reg">Regular</button>
+								<button class="btn btn-default" data-type="med">Medium</button>
+								<button class="btn btn-default" data-type="bol">Bold</button>
+							</div>
 
 							<h3>Select Font Size</h3>
-							<button class="btn btn-default" data-size="16">Small</button>
-							<button class="btn btn-default" data-size="20">Medium</button>
-							<button class="btn btn-default" data-size="24">Large</button>
+							<div id="at-font-size" class="text-editor-option">
+								<button class="btn btn-default option-selected" data-size="24">Small</button>
+								<button class="btn btn-default" data-size="30">Medium</button>
+								<button class="btn btn-default" data-size="36">Large</button>
+							</div>
+							
 
 							<!-- <h3>Bullet lists</h3>
-							<button class="btn btn-default" data-bullet="ol">Order List</button>
-							<button class="btn btn-default" data-bullet="ul">Un-ordered List</button> -->
+							<div class="text-editor-option">
+								<button class="btn btn-default" data-bullet="ol">Order List</button>
+								<button class="btn btn-default" data-bullet="ul">Un-ordered List</button> 
+							</div>-->
 
 							<h3>Alignment</h3>
-							<button class="btn btn-default" data-align="l">Left</button>
-							<button class="btn btn-default" data-align="c">Center</button>
-							<button class="btn btn-default" data-align="r">Right</button>
+							<div id="at-alignment" class="text-editor-option">
+								<button class="btn btn-default option-selected" data-align="left">Left</button>
+								<button class="btn btn-default" data-align="center">Center</button>
+								<button class="btn btn-default" data-align="right">Right</button>
+							</div>
 
 							<h3>Select Colour</h3>
-							<button class="btn btn-default color-option color-red">Red</button>
-							<button class="btn btn-default color-option color-yellow">Yellow</button>
-							<button class="btn btn-default color-option color-pink">Pink</button>
-							<button class="btn btn-default color-option color-blue">Blue</button>
-							<button class="btn btn-default color-option color-purple">Purple</button>
+							<div id="at-font-color" class="text-editor-option">
+								<button class="btn btn-default option-selected color-option color-red" data-rgb="255,0,0">Red</button>
+								<button class="btn btn-default color-option color-yellow" data-rgb="255,252,0">Yellow</button>
+								<button class="btn btn-default color-option color-pink" data-rgb="255,0,187">Pink</button>
+								<button class="btn btn-default color-option color-blue" data-rgb="0,0,255">Blue</button>
+								<button class="btn btn-default color-option color-purple" data-rgb="222,0,255">Purple</button>
+							</div>							
 
 							<!-- <h3>Layer comp</h3>
 							<button class="btn btn-default">Increase layer</button> -->
@@ -80,9 +126,8 @@
 						<div id="i"></div>
 					</div>
 				</div>
-				<div class="col-md-7 col-md-offset-1">
-					<input type="text" class="form-control canvas-name-field" placeholder="Name of template...">
-					<canvas id="c" width="600" height="600"></canvas>
+				<div class="col-md-7 col-md-offset-1">					
+					<canvas id="c" width="630" height="891"></canvas>
 					<button class="btn btn-default" id="toggle-grid">Toggle grid</button>
 					<button class="btn btn-default" id="save-thumb">Save thumbnail</button>
 					<a class="btn btn-default" id="dl-thumb" download="template-thumbnail.png">Download thumbnail</a>
@@ -94,6 +139,7 @@
 		<script src="assets/js/libs/fabrics.js"></script>
 		<script src="assets/js/libs/reimg.js"></script>
 		<script src="assets/js/libs/jspdf.js"></script>
+		<script src="assets/js/libs/xml2json.js"></script>
 		<script src="assets/js/main.js"></script>
 	</body>
 </html>

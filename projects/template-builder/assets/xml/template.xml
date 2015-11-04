@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc>
+   <page width="297" height="420">
+      <pdf lowresfilename="" highresfilename="" align="left" verticalalign="top" id="back" mandatory="False" editable="False" title="Background Silhouette" lowerleftx="0" lowerlefty="0"upperrightx="297" upperrighty="420" width="297" height="420" fitmethod="auto" orientate="north" />
+      <image lowresfilename="" highresfilename="" align="right" verticalalign="top" id="partnerlogodigital1" mandatory="False" editable="True" title="Partner Logo" lowerleftx="123" lowerlefty="22"
+        upperrightx="174"
+        upperrighty="60" width="51" height="38" fitmethod="auto" orientate="north" />
+      <image lowresfilename="" highresfilename="" align="right" verticalalign="top" id="partnerlogodigital2" mandatory="False" editable="True" title="Partner Logo" lowerleftx="179" lowerlefty="22" upperrightx="230" upperrighty="60" width="51" height="38" fitmethod="auto" orientate="north" />
+      <image lowresfilename="" highresfilename="" align="right" verticalalign="top" id="partnerlogodigital3" mandatory="False" editable="True" title="Partner Logo" lowerleftx="234" lowerlefty="22" upperrightx="285" upperrighty="60" width="51" height="38" fitmethod="auto" orientate="north" />
+      <text-block font-family="Calibri" font-size="9" source="E:\Web\Be Macmillan\be.store.sso.1.1\Assets\Terms.txt" textmode="singleline" maxlen="" colour="94,0,100,0" align="left" verticalalign="bottom" leading="100%" id="Terms" mandatory="False" editable="False" title="Terms and Conditions" lowerleftx="14" lowerlefty="14" upperrightx="283" upperrighty="21" width="269" height="7" fitmethod="auto" orientate="north" />
+   </page>
+</doc>
