@@ -5,7 +5,7 @@
 	</head>
 	<body>
 		<div class="row">
-			<div class="container" data-template="build-template">
+			<div class="container" data-template="edit-template">
 				<div class="col-md-4">
 					<div id="add-controls-container">
 						<h2>Add components</h2>
@@ -50,9 +50,6 @@
 							</li>
 							<li class="list-group-item">
 								<button class="btn btn-default add-el-control" data-targetel="image-control">Add Image</button>
-							</li>
-							<li class="list-group-item">
-								<button class="btn btn-default add-el-control" data-targetel="template-control">Add Template Area</button>
 							</li>
 						</ul>
 					</div>
@@ -122,23 +119,6 @@
 								<button class="btn btn-default"></button>
 							</form>
 							<button class="btn btn-default">Increase layer</button>
-						</li>
-
-						<li id="template-control" class="list-group-item add-element-control">
-							<button class="btn btn-sm btn-primary close-control">X</button>
-							<!-- adt- id prefix is for add template elements -->
-							<h3>Customise Component</h3>
-							<div id="adt-fill" class="text-editor-option">
-								<button class="btn btn-default option-selected color-option color-red" data-rgb="255,0,0">Red</button>
-								<button class="btn btn-default color-option color-yellow" data-rgb="255,252,0">Yellow</button>
-								<button class="btn btn-default color-option color-pink" data-rgb="255,0,187">Pink</button>
-								<button class="btn btn-default color-option color-blue" data-rgb="0,0,255">Blue</button>
-								<button class="btn btn-default color-option color-purple" data-rgb="222,0,255">Purple</button>
-							</div>
-					
-							<br><hr>
-
-							<button class="btn btn-primary" id="add-template-area">Add</button>
 						</li>
 					</ul>
 

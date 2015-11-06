@@ -10,3 +10,35 @@
       <text-block font-family="Calibri" font-size="9" source="E:\Web\Be Macmillan\be.store.sso.1.1\Assets\Terms.txt" textmode="singleline" maxlen="" colour="94,0,100,0" align="left" verticalalign="bottom" leading="100%" id="Terms" mandatory="False" editable="False" title="Terms and Conditions" lowerleftx="14" lowerlefty="14" upperrightx="283" upperrighty="21" width="269" height="7" fitmethod="auto" orientate="north" />
    </page>
 </doc>
+
+<doc>
+  <page width='297' height='420'>
+    <text-block-group align='left' verticalalign='bottom' spacing='10' id='Group1' mandatory='False' editable='True' title='Group 1' lowerleftx='14' lowerlefty='313' upperrightx='300' upperrighty='450' width='158.2' height='93.75' fitmethod='auto' orientate='north'>
+      <text-block font-family='FuturaBT-Heavy' font-size='40' source='' textmode='multiline' maxlen='150' colour='94,0,100,0' align='left' verticalalign='top' leading='125%' id='Small' mandatory='False' editable='True' title='Small Text' fitmethod='auto' orientate='north'>Signed_______ Date________</text-block>
+    </text-block-group>
+  </page>
+</doc>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<doc assetspath="C:\Home\Play\PdfCreator1\Assets\268" scalex="0.707070707070707" scaley="0.707142857142857">
+   <page width="297" height="420">
+      <pdf lowresfilename="Marathon_4_aw.pdf" highresfilename="Marathon_4_aw.pdf" align="left" verticalalign="top" id="back" mandatory="False" editable="False" title="Background Silhouette" lowerleftx="0" lowerlefty="0" upperrightx="297" upperrighty="420" width="297" height="420" fitmethod="auto" orientate="north" />
+      <text-block-group align="left" verticalalign="bottom" spacing="10" id="Group1" mandatory="False" editable="True" title="Group 1" lowerleftx="14" lowerlefty="313" upperrightx="300" upperrighty="450" width="158.2" height="93.75" fitmethod="auto" orientate="north">
+         <text-block font-family="FuturaBT-Heavy" font-size="40" source="" textmode="multiline" maxlen="150" colour="94,0,100,0" align="left" verticalalign="top" leading="125%" id="Small" mandatory="False" editable="True" title="Small Text" fitmethod="auto" orientate="north">Signed_______ Date________</text-block>
+      </text-block-group>
+   </page>
+</doc>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<doc assetspath="E:\be.macmillan.org.uk store\App_Data\Uploads\2594" scalex="1" scaley="1">
+   <page width="297" height="420">
+      <image lowresfilename="cancer-factfile-icon.jpg" highresfilename="cancer-factfile-icon.jpg" align="right" verticalalign="top" id="partnerlogo" mandatory="False" editable="True" title="Partner logo" lowerleftx="15" lowerlefty="347" upperrightx="282" upperrighty="405" width="267" height="58" fitmethod="auto" orientate="north" />
+      <pdf lowresfilename="" highresfilename="" align="left" verticalalign="top" id="logo" mandatory="False" editable="False" title="Logo" lowerleftx="244.167" lowerlefty="165" upperrightx="282" upperrighty="339" width="37.833" height="174" fitmethod="auto" orientate="north" />
+      <text-block font-family="Macmillan Headline" font-size="135" source="" textmode="multiline" maxlen="100" colour="50,0,100,0" align="left" verticalalign="top" leading="100%" id="heading" mandatory="False" editable="True" title="Heading" lowerleftx="15" lowerlefty="165" upperrightx="236.167" upperrighty="339" width="221.167" height="174" fitmethod="auto" orientate="north">This is sample text</text-block>
+      <text-block-group align="left" verticalalign="bottom" spacing="0" id="Group1" mandatory="False" editable="True" title="Group 1" lowerleftx="15" lowerlefty="43" upperrightx="236.167" upperrighty="157" width="221.167" height="114" fitmethod="auto" orientate="north">
+         <text-block font-family="FuturaBT-Heavy" font-size="24" source="" textmode="multiline" maxlen="200" colour="50,0,100,0" align="left" verticalalign="top" leading="125%" id="Details" mandatory="False" editable="True" title="Details" fitmethod="auto" orientate="north">This is just a sample text to show you how your  resource will look. Please replace it with your own  copy, keeping it as brief as possible.    We are:  Persons Name, Another Person, Persons Name    You can find us at:  Location Name  Tel 01234 567890  Fax 01234 567 891</text-block>
+      </text-block-group>
+      <text-block font-family="FuturaBT-Heavy" font-size="24" source="E:\Websites\beMacmillan\Assets\CancerLine.txt" textmode="singleline" maxlen="" colour="50,0,100,0" align="left" verticalalign="bottom" leading="100%" id="cancerline" mandatory="False" editable="False" title="CancerLine" lowerleftx="15" lowerlefty="15" upperrightx="236.167" upperrighty="35" width="221.167" height="20" fitmethod="auto" orientate="north" />
+      <text-block font-family="FuturaBT-Medium" font-size="9" source="E:\Websites\beMacmillan\Assets\Terms.txt" textmode="singleline" maxlen="" colour="94,0,100,0" align="left" verticalalign="bottom" leading="100%" id="Terms" mandatory="False" editable="False" title="Terms and Conditions" lowerleftx="244.167" lowerlefty="15" upperrightx="282" upperrighty="157" width="37.833" height="142" fitmethod="auto" orientate="west" />
+   </page>
+</doc>
