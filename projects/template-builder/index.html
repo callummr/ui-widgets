@@ -11,15 +11,7 @@
 						<h2>Add components</h2>
 						<form>
 							<span class="input-group-addon">
-								<span class="badge">A1</span>
-				            	<input type="radio" name="doc-size" value="a1">
-				          	</span>
-				          	<span class="input-group-addon">
-				          		<span class="badge">A2</span>
-				            	<input type="radio" name="doc-size" value="a2">
-				          	</span>
-				          	<span class="input-group-addon">
-				          		<span class="badge">A3</span>
+								<span class="badge">A3</span>
 				            	<input type="radio" name="doc-size" value="a3">
 				          	</span>
 				          	<span class="input-group-addon">
@@ -30,6 +22,14 @@
 				          		<span class="badge">A5</span>
 				            	<input type="radio" name="doc-size" value="a5">
 				          	</span>
+				          	<span class="input-group-addon">
+				          		<span class="badge">A6</span>
+				            	<input type="radio" name="doc-size" value="a6">
+				          	</span>
+				          	<span class="input-group-addon">
+				          		<span class="badge">A7</span>
+				            	<input type="radio" name="doc-size" value="a7">
+				          	</span>
 
 				          	<hr>
 				          	<span class="input-group-addon">
@@ -38,7 +38,7 @@
 				          	</span>
 				          	<span class="input-group-addon">
 								<span class="badge">Landscape</span>
-				            	<input type="radio" name="doc-orientation" value="p">
+				            	<input type="radio" name="doc-orientation" value="l">
 				          	</span>
 				          	<hr>
 				          	<input type="text" class="form-control canvas-name-field" placeholder="Name of template...">
@@ -64,20 +64,31 @@
 							<h3>Enter text</h3>
 							<textarea id="at-text-body" class="form-control" rows="" cols="" placeholder="Enter text component text here...">text example</textarea>
 
-							<h3>Font Face</h3>
+							<h2>From template?</h2>
+							<span class="input-group-addon">
+								<span class="badge">Yes</span>
+				            	<input type="radio" name="from-template" value="yes" id="at-src-ctrl" checked>
+				          	</span>
+				          	<span class="input-group-addon">
+				          		<span class="badge">No</span>
+				            	<input type="radio" name="from-template" value="no">
+				          	</span>
+
+				          	<input type="text" class="form-control" id="at-src" value="assets/terms.txt">
+
+							<!-- <h3>Font Face</h3>
 							<div id="at-font-face" class="text-editor-option">
 								<button class="btn btn-default option-selected" data-type="reg">Regular</button>
 								<button class="btn btn-default" data-type="med">Medium</button>
 								<button class="btn btn-default" data-type="bol">Bold</button>
-							</div>
+							</div> -->
 
 							<h3>Select Font Size</h3>
 							<div id="at-font-size" class="text-editor-option">
 								<button class="btn btn-default option-selected" data-size="24">Small</button>
 								<button class="btn btn-default" data-size="30">Medium</button>
 								<button class="btn btn-default" data-size="36">Large</button>
-							</div>
-							
+							</div>							
 
 							<!-- <h3>Bullet lists</h3>
 							<div class="text-editor-option">
@@ -147,11 +158,14 @@
 					</div>
 				</div>
 				<div class="col-md-7 col-md-offset-1">					
-					<canvas id="c" width="630" height="891"></canvas>
 					<button class="btn btn-default" id="toggle-grid">Toggle grid</button>
 					<button class="btn btn-default" id="save-thumb">Save thumbnail</button>
 					<a class="btn btn-default" id="dl-thumb" download="template-thumbnail.png">Download thumbnail</a>
 					<button class="btn btn-default" id="dl-pdf" href=>Generate PDF</button>
+					<hr>
+					<!-- Size of canvas is relative to A4: 210mm x 297mm (px > mm = 0.376065) -->
+					<!-- Canvas is half than pixel to mm -->
+					<canvas id="c" width="396.85" height="561.25"></canvas>
 				</div>
 			</div>
 		</div>
@@ -160,6 +174,6 @@
 		<script src="assets/js/libs/reimg.js"></script>
 		<script src="assets/js/libs/jspdf.js"></script>
 		<script src="assets/js/libs/xml2json.js"></script>
-		<script src="assets/js/main.js"></script>
+		<script src="assets/js/create.js"></script>
 	</body>
 </html>

@@ -1,0 +1,21 @@
+<doc assetspath='C:\Projects\bemac_discovery\Assets\268' scalex='1' scaley='1'>
+  <page width='297' height='420'><pdf lowresfilename='Marathon_4_aw.pdf' highresfilename='Marathon_4_aw.pdf' align='left' verticalalign='top' id='back' mandatory='False' editable='False' title='Background Silhouette' lowerleftx='0' lowerlefty='0' upperrightx='297' upperrighty='420' width='297' height='420' fitmethod='auto' orientate='north' />
+    <text-block-group align='left' verticalalign='bottom' spacing='10' id='Group1' mandatory='False' editable='True' title='Group 1' lowerleftx='14' lowerlefty='313' upperrightx='300' upperrighty='450' width='158.2' height='93.75' fitmethod='auto' orientate='north'>
+      <text-block font-family='FuturaBT-Heavy' font-size='40' source='' textmode='multiline' maxlen='150' colour='94,0,100,0' align='left' verticalalign='top' leading='125%' id='Small' mandatory='False' editable='True' title='Small Text' fitmethod='auto' orientate='north'>Signed_______ Date________</text-block>
+    </text-block-group>
+    <image lowresfilename='demo.jpg' highresfilename='demo.jpg' align='right' verticalalign='top' id='partnerlogo' mandatory='False' editable='True' title='Partner logo' lowerleftx='15' lowerlefty='347' upperrightx='282' upperrighty='405' width='267' height='58' fitmethod='auto' orientate='north' />
+  </page>
+</doc>
+
+<!-- 
+  PICA's 1/72
+  A3: 595 x 842
+  A4: 420 x 595
+-->
+
+<doc assetspath='C:\Projects\bemac_discovery\Assets\268' scalex='0' scaley='0'>
+  <page width='420' height="595">
+    <pdf lowresfilename='template-test.pdf' highresfilename='template-test.pdf' align='left' verticalalign='top' id='bglayer' mandatory='False' editable='False' title='background' lowerleftx='0' lowerlefty='0' upperrightx='420' upperrighty='595' width='420' height='595' fitmethod='auto' orientate='north'/>
+    <image lowresfilename='demo.jpg' highresfilename='demo.jpg' align='left' verticalalign='top' id='image' mandatory='False' editable='False' title='image 0' lowerleftx='0' lowerlefty='0' upperrightx='105' upperrighty='54' fitmethod='auto' orientate='north' width='105' height='52'/>
+  </page>
+</doc>

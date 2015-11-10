@@ -5,7 +5,7 @@
       <image lowresfilename="" highresfilename="" align="right" verticalalign="top" id="partnerlogodigital1" mandatory="False" editable="True" title="Partner Logo" lowerleftx="123" lowerlefty="22"
         upperrightx="174"
         upperrighty="60" width="51" height="38" fitmethod="auto" orientate="north" />
-      <image lowresfilename="" highresfilename="" align="right" verticalalign="top" id="partnerlogodigital2" mandatory="False" editable="True" title="Partner Logo" lowerleftx="179" lowerlefty="22" upperrightx="230" upperrighty="60" width="51" height="38" fitmethod="auto" orientate="north" />
+      <image lowresfilename="" highresfilename="" align="right" verticalalign="top" id="partnerlogodigital2" mandatory="False" editable="True" title="Partner Logo" lowerleftx="179" lowerlefty="22" upperrightx="12" upperrighty="12" width="51" height="38" fitmethod="auto" orientate="north" />
       <image lowresfilename="" highresfilename="" align="right" verticalalign="top" id="partnerlogodigital3" mandatory="False" editable="True" title="Partner Logo" lowerleftx="234" lowerlefty="22" upperrightx="285" upperrighty="60" width="51" height="38" fitmethod="auto" orientate="north" />
       <text-block font-family="Calibri" font-size="9" source="E:\Web\Be Macmillan\be.store.sso.1.1\Assets\Terms.txt" textmode="singleline" maxlen="" colour="94,0,100,0" align="left" verticalalign="bottom" leading="100%" id="Terms" mandatory="False" editable="False" title="Terms and Conditions" lowerleftx="14" lowerlefty="14" upperrightx="283" upperrighty="21" width="269" height="7" fitmethod="auto" orientate="north" />
    </page>
@@ -29,7 +29,6 @@
    </page>
 </doc>
 
-<?xml version="1.0" encoding="UTF-8"?>
 <doc assetspath="E:\be.macmillan.org.uk store\App_Data\Uploads\2594" scalex="1" scaley="1">
    <page width="297" height="420">
       <image lowresfilename="cancer-factfile-icon.jpg" highresfilename="cancer-factfile-icon.jpg" align="right" verticalalign="top" id="partnerlogo" mandatory="False" editable="True" title="Partner logo" lowerleftx="15" lowerlefty="347" upperrightx="282" upperrighty="405" width="267" height="58" fitmethod="auto" orientate="north" />

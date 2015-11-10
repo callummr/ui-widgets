@@ -44,17 +44,17 @@
       return filename + extension
     },
     closeElementControls: function(){
-      $('.add-element-control').fadeOut(300, function(){
+      $('.add-element-control').fadeOut(100, function(){
         app.$addElControls.removeClass('toggle-active');
-        $('#add-controls-container').fadeIn(300);
+        $('#add-controls-container').fadeIn(100);
       }); 
     },
     constrainGridMovement: function(e){
       // Snap to grid
-      e.target.set({
-        left: Math.round(e.target.left / app.gridSquare) * app.gridSquare,
-        top: Math.round(e.target.top / app.gridSquare) * app.gridSquare
-      });
+      // e.target.set({
+      //   left: Math.round(e.target.left / app.gridSquare) * app.gridSquare,
+      //   top: Math.round(e.target.top / app.gridSquare) * app.gridSquare
+      // });
 
       // Only allow movement inside the canvas
       var obj = e.target;
@@ -79,15 +79,15 @@
     },
     pdfDocumentSize: function(documentName){
       switch(documentName) {
-        case 'a0':
-            return [841,1189]
-            break;
-        case 'a1':
-            return [594, 841]
-            break;
-        case 'a2':
-            return [420,594]
-            break;
+        // case 'a0':
+        //     return [841,1189]
+        //     break;
+        // case 'a1':
+        //     return [594, 841]
+        //     break;
+        // case 'a2':
+        //     return [420,594]
+        //     break;
         case 'a3':
             return [420,594]
             break;
@@ -103,9 +103,9 @@
         case 'a7':
             return [74,105]
             break;
-        case 'a8':
-              return [52,74]
-              break;
+        // case 'a8':
+        //       return [52,74]
+        //       break;
       }
     },
     rgbToCMYK: function(rgb){
@@ -181,14 +181,14 @@
         app.$addElControls.removeClass('toggle-active');
         $this.addClass('toggle-active');
         if($('.add-element-control:visible').length){
-          $('.add-element-control:visible').fadeOut(300, function(){
-            $('#add-controls-container').fadeOut(300, function(){
-              $('#' + targetElName).fadeIn(300);
+          $('.add-element-control:visible').fadeOut(100, function(){
+            $('#add-controls-container').fadeOut(100, function(){
+              $('#' + targetElName).fadeIn(100);
             });
           });
         }else{
-          $('#add-controls-container').fadeOut(300, function(){
-            $('#' + targetElName).fadeIn(300);
+          $('#add-controls-container').fadeOut(100, function(){
+            $('#' + targetElName).fadeIn(100);
           });
         }
       }
@@ -206,68 +206,74 @@
     
     // Functions needed to prepare template for export
     generateJSON: function(){
-      var canvasData = app._canvas.toDatalessJSON();
+      var canvasData = app._canvas.toDatalessJSON(['stringSrc']);
       if ( localStorage.getItem('canvasDataJSON') === null ){
         localStorage.removeItem('canvasDataJSON');
       }
       localStorage.setItem('canvasDataJSON', JSON.stringify(canvasData));
       // Remove the grid element group from data
+      console.log(canvasData.objects);
       canvasData.objects.shift();
+      // canvasData.objects.push()
       return canvasData.objects
     },
     generateCords: function(canvasData){
-      // All based of fixed values of 1:3 of canvas_size:print_size(A4)
-      var canvasScale     = 3, // Create function to make this dyanmic based on canvas/document size ratio
+      // All based of fixed values of of canvas_size:print_size(A4) a scale will need to be passed to the DOC property if larger/smaller
+      // The canvas doesnt allow percentage decimal values. The coordinates need to be 2.0174 times bigger than the canvas
+      var canvasScale     = 2.0174, // Create function to make this dyanmic based on canvas/document size ratio
           cordData        = [],
-          baseTxtGroupObj = {},
           baseObj         = {},
-          destDocWidth    = app.c.pdfDocumentSize($('input[name=doc-size]:checked').val())[0], // Size of target document WIDTH in MM
-          destDocHeight   = app.c.pdfDocumentSize($('input[name=doc-size]:checked').val())[1], // Size of target document HEIGHT in MM
-          pdfbaseJSON =   {
-                            doc : {               
-                              page : {
-                                _width: destDocWidth,
-                                _height: destDocHeight,
-                                pdf: {
-                                  _lowresfilename: '',
-                                  _highresfilename: '',
-                                  _align: 'left',
-                                  _verticalalign: 'top',
-                                  _id: 'bglayer',
-                                  _mandatory: 'False',
-                                  _editable: 'False',
-                                  _title: 'background',
-                                  _lowerleftx: '0',
-                                  _lowerlefty: '0',
-                                  _upperrightx: destDocWidth,
-                                  _upperrighty: destDocHeight,
-                                  _width: destDocWidth,
-                                  _height: destDocHeight,
-                                  _fitmethod: 'auto',
-                                  _orientate: 'north'
+          destDocWidth    = 210, //app.c.pdfDocumentSize($('input[name=doc-size]:checked').val())[0], // Size of target document WIDTH in MM
+          destDocHeight   = 297, // app.c.pdfDocumentSize($('input[name=doc-size]:checked').val())[1], // Size of target document HEIGHT in MM
+          pdfbaseJSON     =   {
+                                doc : {     
+                                  _scalex: 1, // Based from an a4
+                                  _scaley: 1, // Based from an a4
+                                  _assetspath: 'C:\\Projects\\bemac_discovery\\BeMacDiscovery\\Assets\\268',
+                                  // Path to asset root, may need to come from hidden field    
+                                  page : {
+                                    _width: destDocWidth,
+                                    _height: destDocHeight,
+                                    pdf: {
+                                      _lowresfilename: 'Marathon_4_aw.pdf',
+                                      _highresfilename: 'Marathon_4_aw.pdf',
+                                      _align: 'left',
+                                      _verticalalign: 'top',
+                                      _id: 'bglayer',
+                                      _mandatory: 'False',
+                                      _editable: 'False',
+                                      _title: 'background',
+                                      _lowerleftx: '0',
+                                      _lowerlefty: '0',
+                                      _upperrightx: destDocWidth,
+                                      _upperrighty: destDocHeight,
+                                      _width: destDocWidth,
+                                      _height: destDocHeight,
+                                      _fitmethod: 'auto',
+                                      _orientate: 'north'
+                                    }
+                                  }
                                 }
-                              }
-                            }
-                          };
-
-      console.log( destDocWidth, destDocHeight );
+                              };
+      console.log(canvasScale);
 
       // Create collection of objects for the XML file
       canvasData.forEach(function(el, i) {
-        //console.log(el);
+        console.log(el);
         var elDimensions = [
-                            app.c.convertUnit(el.width, app.mmSize),  
-                            app.c.convertUnit(el.height, app.mmSize),
-                            app.c.convertUnit(el.top, app.mmSize),
-                            app.c.convertUnit(el.left, app.mmSize),
+                            app.c.convertUnit(el.width * canvasScale, app.mmSize),
+                            app.c.convertUnit(el.height * canvasScale, app.mmSize),
+                            app.c.convertUnit(el.top * canvasScale, app.mmSize),
+                            app.c.convertUnit(el.left * canvasScale, app.mmSize),
                             destDocWidth,
                             destDocHeight
                           ];
+        console.log(elDimensions);
 
-        if(el.type === 'i-text'){        
+        if(el.type === 'i-text' && typeof(el.stringSrc) === 'undefined'){  
           var textBlockGroupName  = 'text-block-group_' + i
           // Create <text-block-group>
-          baseTxtGroupObj[textBlockGroupName] = {
+          baseObj[textBlockGroupName] = {
             '_align': el.textAlign,
             '_editable': 'True',
             '_fitmethod': 'auto',
@@ -285,40 +291,69 @@
             '_width': elDimensions[0],
             // Create <text-block>
             'text-block': {
-                              '_align': el.textAlign,
-                              '_colour': '94,0,100,0', // rgbToCMYK(el.fill),
-                              '_editable': 'True', // Need to add to initial form
-                              '_fitmethod': 'auto',
-                              '_font-family': 'FuturaBT-Heavy', // el.fontFamily,
-                              '_font-size': app.c.convertUnit(el.fontSize, app.ptSize),
-                              '_height': elDimensions[1],
-                              '_id': 'Block ' + i, // Need to add to initial form
-                              '_leading': '125%', // Need to add to initial form,
-                              '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
-                              '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
-                              '_mandatory': 'False', // Need to add to initial form
-                              '_maxlen': '100', // Need to add to initial form
-                              '_orientate': 'north',
-                              '_source': '', // Need to add to initial form
-                              '_textmode': 'multiline', // Need to add to initial form
-                              '_title': 'Block ' + i, // Need to add to initial form
-                              '_upperrightx': app.c.calcUpperRightX(elDimensions),
-                              '_upperrighty': app.c.calcUpperRightY(elDimensions),
-                              '_width': elDimensions[0],
-                              '_verticalalign': 'top',                        
-                              '__text': el.text
-                            }
+                            '_align': el.textAlign,
+                            '_colour': '94,0,100,0', // rgbToCMYK(el.fill),
+                            '_editable': 'True', // Need to add to initial form
+                            '_fitmethod': 'auto',
+                            '_font-family': 'FuturaBT-Heavy', // el.fontFamily,
+                            '_font-size': app.c.convertUnit(el.fontSize, app.ptSize),
+                            '_height': elDimensions[1],
+                            '_id': 'Block ' + i, // Need to add to initial form
+                            '_leading': '125%', // Need to add to initial form,
+                            '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
+                            '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
+                            '_mandatory': 'False', // Need to add to initial form
+                            '_maxlen': '100', // Need to add to initial form
+                            '_orientate': 'north',
+                            '_source': 'C:\\Projects\\bemac_discovery\\BeMacDiscovery\\Assets\\terms.txt', // Need to add to initial form
+                            '_textmode': 'multiline', // Need to add to initial form
+                            '_title': 'Block ' + i, // Need to add to initial form
+                            '_upperrightx': app.c.calcUpperRightX(elDimensions),
+                            '_upperrighty': app.c.calcUpperRightY(elDimensions),
+                            '_width': elDimensions[0],
+                            '_verticalalign': 'top',                        
+                            '__text': el.text
+                          }
           }
-          console.log(baseTxtGroupObj);
-          cordData.push(baseTxtGroupObj);
+          console.log(baseObj);
+          cordData.push(baseObj);
+        }else if(el.type === 'i-text' && typeof(el.stringSrc) !== 'undefined'){
+          var textBlockName  = 'text-block' + i
+          // Create <text-block-group>
+          baseObj[textBlockName] = {
+                                    '_align': el.textAlign,
+                                    '_colour': '94,0,100,0', // rgbToCMYK(el.fill),
+                                    '_editable': 'True', // Need to add to initial form
+                                    '_fitmethod': 'auto',
+                                    '_font-family': 'FuturaBT-Heavy', // el.fontFamily,
+                                    '_font-size': app.c.convertUnit(el.fontSize, app.ptSize),
+                                    '_height': elDimensions[1],
+                                    '_id': 'Block ' + i, // Need to add to initial form
+                                    '_leading': '125%', // Need to add to initial form,
+                                    '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
+                                    '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
+                                    '_mandatory': 'False', // Need to add to initial form
+                                    '_maxlen': '100', // Need to add to initial form
+                                    '_orientate': 'north',
+                                    '_source': el.stringSrc, // Need to add to initial form
+                                    '_textmode': 'multiline', // Need to add to initial form
+                                    '_title': 'Block ' + i, // Need to add to initial form
+                                    '_upperrightx': app.c.calcUpperRightX(elDimensions),
+                                    '_upperrighty': app.c.calcUpperRightY(elDimensions),
+                                    '_width': elDimensions[0],
+                                    '_verticalalign': 'top',                        
+                                    '__text': el.text
+                                  }
+          cordData.push(baseObj);
         }else{
+          console.log('Called')
           var imgBlockName = 'image_' + i;
           baseObj[imgBlockName] = {
-                                    '_lowresfilename': el.src,
-                                    '_highresfilename': el.src,
-                                    '_align': app.c.setDefaultVal(el.alignX, 'none', 'left'),      // Need to add option for this
-                                    '_verticalalign': app.c.setDefaultVal(el.alignY, 'none', 'top'),  // Need to add option for this
-                                    '_id': 'image ' + i,
+                                    '_lowresfilename': 'demo1.jpg',  //el.src
+                                    '_highresfilename': 'demo1.jpg', //el.src
+                                    '_align': 'left',         // Need to add option for this
+                                    '_verticalalign': 'top',  // Need to add option for this
+                                    '_id': 'image_' + i,
                                     '_mandatory': 'False',
                                     '_editable': 'False',
                                     '_title': 'image ' + i,
@@ -346,6 +381,7 @@
           xmlOutput = x2js.json2xml_str(cordData);
       // Need to update the object names so they dont contain the _[number] prefix so the XML is correct
       xmlOutput = xmlOutput.replace(/text-block-group_[0-9]/g, 'text-block-group');
+      xmlOutput = xmlOutput.replace(/text-block_[0-9]/g, 'text-block');
       xmlOutput = xmlOutput.replace(/image_[0-9]/g, 'image');
       console.log(xmlOutput);
     },
@@ -364,23 +400,24 @@
     // elWidth[0], elHeight[1], top[2], left[3], docWidth[4], docHeight[5]
     calcLowerLeftX: function(elDimensions){
       // left
-      console.log(elDimensions[3]);
+      //console.log(elDimensions[3]);
       return elDimensions[3]
     },
     calcLowerLeftY: function(elDimensions){
       // docHeight - (top + height)
-      console.log( elDimensions[5] - (elDimensions[2] + elDimensions[1]) );
+      // console.log( elDimensions[5], elDimensions[2], elDimensions[1] );
+      // console.log( elDimensions[5] - (elDimensions[2] + elDimensions[1]) );
       return elDimensions[5] -(elDimensions[2] + elDimensions[1])
     },
     calcUpperRightX: function(elDimensions){
-      // left + width
-      console.log(elDimensions[2] + elDimensions[0]);
-      return elDimensions[2] + elDimensions[0]
+      // documentWidth - (left + width)
+      // console.log( elDimensions[3] + elDimensions[0] );
+      return elDimensions[3] + elDimensions[0]
     },
     calcUpperRightY: function(elDimensions){
-      // docHeight - (left + width) 
-      console.log(elDimensions[5] - (elDimensions[3] + elDimensions[0]));
-      return elDimensions[5] - (elDimensions[2] + elDimensions[0])
+      // docHeight - top 
+      // console.log(elDimensions[5] - elDimensions[2]);
+      return elDimensions[5] - elDimensions[2]
     },  
 
     // Click elements
@@ -429,11 +466,17 @@
       // Remove selected states and grid before saving img
       app.c.cleanCanvas();
 
-      var requiredPrintSize = app.c.pdfDocumentSize( $('input[name=doc-size]:checked').val() );
+      var requiredPrintSize   = app.c.pdfDocumentSize( $('input[name=doc-size]:checked').val() ),
+          documentOrientation = $('input[name=doc-orientation]:checked').val();
 
-      // Get the canvas dimensions
-      // var canvasDimensions = [app._canvas.getWidth(), app._canvas.getHeight()];
-      // Find out how big that is in mm
+      // Check the orientation of the document
+      // If is landscape,  reverse the document sizes
+      if( documentOrientation === 'l' ){
+        var x = requiredPrintSize[1],
+            y = requiredPrintSize[0]
+        requiredPrintSize = [x,y];
+      }
+      console.log(requiredPrintSize);
 
       // Then make the canvas relative to the size 
 
@@ -446,35 +489,48 @@
       app.c.toggleCanvasGrid(true);
     },
     createTextArea: function(){ 
-      var textString = $('#at-text-body').val(),
-        _textComponent;
+      var _textComponent;
 
-      if(textString.length && textString !== null){
+      // if(textString.length && textString !== null){
         // Disable the add button after it has been added.
         // $(this).attr('disabled', 'disabled');
-        _textComponent = new fabric.IText( textString, {
-          editable: true,
-          editingBorderColor: 'rga(0,255,0)',
-          // exitEditing: ''// Bind to the textarea
-          fill: 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')',
-          // fontFamily: '',
-          fontSize: $('#at-font-size .option-selected').attr('data-size'),
-          // fontStyle: '',
-          // fontWeight: '',
-          hasBorders: true,
-          hasControls: false,
-          hasRotatingPoint: false,
-          isEditing : true,
-          left: 100,
-          lineHeight: 1.4,
-          lockRotation: true,
-          textAlign: $('#at-alignment .option-selected').attr('data-align'),
-          // textDecoration: '',
-          top: 100         
+      _textComponent = new fabric.IText( '', {
+        editable: true,
+        editingBorderColor: 'rga(0,255,0)',
+        // exitEditing: ''// Bind to the textarea
+        fill: 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')',
+        // fontFamily: '',
+        fontSize: $('#at-font-size .option-selected').attr('data-size'),
+        // fontStyle: '',
+        // fontWeight: '',
+        hasBorders: true,
+        hasControls: false,
+        hasRotatingPoint: false,
+        isEditing : true,
+        left: 60,
+        lineHeight: 1,
+        lockRotation: true,
+        textAlign: $('#at-alignment .option-selected').attr('data-align'),
+        // textDecoration: '',
+        top: 99         
+      });
+
+      // Check whether the text is being loaded by a source.
+      if( $('#at-src-ctrl').is(':checked') ){
+        _textComponent['stringSrc'] = $('#at-src').val();
+        $.get( $('#at-src').val(), function(data) {
+        }, 'text').done(function(data) {
+          _textComponent.set('text', data);
+          app._canvas.add(_textComponent);
+          app._canvas.renderAll();
         });
-        // Add further text settings
+      }else{
+       _textComponent.set('text', $('#at-text-body').val());
         app._canvas.add(_textComponent);
+        app._canvas.renderAll();
       }
+     
+      // }
     },
     createTempBlock: function(){
       var _tempBlock = new fabric.Rect({
@@ -484,36 +540,43 @@
         height: 100,
         left: 0,
         lockRotation: true,
+        // lockScalingX: true,
+        // lockScalingY: true,
         top: 0,
-        width: 200
-      });
+        width: 100
+      });    
       app._canvas.add(_tempBlock);
     },
     drawDemoItems: function(){
       // Draw the grid
       app.c.drawGrid(600);
-      var _el1 = new fabric.IText( 'textString', {
-            left: 100,
-            top: 100,
-            lockRotation: true,
-            hasRotatingPoint: false,
-            hasBorders: true,
-            isEditing : true,
-            editable: true,
-            editingBorderColor: 'rga(0,255,0)',
-            hasControls: true,
-            fill: 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')',
-            // fontFamily: '',
-            fontSize: $('#at-font-size .option-selected').attr('data-size'),
-            lineHeight: 1.4,
-            // fontStyle: '',
-            // fontWeight: '',
-            textAlign: $('#at-alignment .option-selected').attr('data-align'),
-            lockUniScaling: true
-            // textDecoration: '',
-            // exitEditing: ''// Bind to the textarea
-          });
-      app._canvas.add(_el1);
+      // var _el1 = new fabric.IText( 'textString', {
+      //       left: 60,
+      //       top: 99,
+      //       // lockRotation: true,
+      //       // hasRotatingPoint: false,
+      //       hasBorders: true,
+      //       isEditing : true,
+      //       editable: true,
+      //       editingBorderColor: 'rga(0,255,0)',
+      //       hasControls: false,
+      //       fill: 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')',
+      //       // fontFamily: '',
+      //       fontSize: $('#at-font-size .option-selected').attr('data-size'),
+      //       lineHeight: 1.4,
+      //       // fontStyle: '',
+      //       // fontWeight: '',
+      //       textAlign: $('#at-alignment .option-selected').attr('data-align'),
+      //       // lockUniScaling: true,
+      //       lockScalingX: true,
+      //       lockScalingY: true,            
+      //       // textDecoration: '',
+      //       // exitEditing: ''// Bind to the textarea
+      //     });
+      // console.log(_el1);
+      // _el1['stringSrc'] = 'C:\\Projects\\bemac_discovery\\BeMacDiscovery\\Assets\\terms.txt'; // need to add this property dynamically based on if this element has an option checked
+      // console.log(_el1);
+      // app._canvas.add(_el1);
 
       // var _el2 = new fabric.IText( 'text String 2', {
       //       left: 250,
