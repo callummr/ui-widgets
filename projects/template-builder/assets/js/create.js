@@ -8,9 +8,11 @@
 
   app._canvas;
   app._grid;
-  app.gridSquare = 24;
-  app.ptSize = 0.75;
-  app.mmSize = 0.2645833333333;
+  app.gridSquare    = 24;
+  app.ptSize        = 0.75;
+  app.mmSize        = 0.2645833333333;
+  app.orientation;
+  app.templateType  = 'default';
 
   app.c = {
     initCreate: function(){
@@ -43,29 +45,15 @@
     convertUnit: function(unit, targetUnit){
       return parseInt( parseFloat(unit * targetUnit).toFixed(2) );
     },
-    pdfDocumentSize: function(documentName){
-      switch(documentName) {
-        case 'a2':
-            return [420,594]
-            break;
-        case 'a3':
-            return [420,594]
-            break;
-        case 'a4':
-            return [210,297]
-            break;
-        case 'a5':
-            return [148,210]
-            break;
-        case 'a6':
-            return [105,148]
-            break;
-        case 'a7':
-            return [74,105]
-            break;
-        case 'business':
-              return [88,55]
-              break;
+    setDocumentSize: function(){
+      if(app.templateType === 'default'){
+        if(app.orientation === 'p'){
+          return [210,297]  // A4 Portrait
+        }else{  
+          return [297,210]  // A4 Landscape
+        }
+      }else{
+        return [88,55]      // Business Card 
       }
     },
     rgbToCMYK: function(rgb){
@@ -101,9 +89,10 @@
 
     // Canvas Controls and Events
     createCanvas: function(){
+      // The canvas needs to be created this way: For more details:
+      // (http://stackoverflow.com/questions/5034529/size-of-html5-canvas-via-css-versus-element-attributes)
       var canvasEl = document.createElement('canvas'),
           size;
-
       canvasEl.setAttribute('id', 'c');
 
       // Check if the document size desired template should be a regular paper size or business card.
@@ -112,18 +101,22 @@
         // Check if the template should be portrait or landscape
         // The canvas needs to be set to a specific size based on the 2 checks above.
         if( $('input[name=doc-orientation]:checked').val() === 'p' ){
-          canvasEl.width  = 396;
-          canvasEl.height = 561;
+          app.orientation   = 'p'; // Potrait
+          canvasEl.width    = 396;
+          canvasEl.height   = 561;
         }else{
-          canvasEl.width  = 561;
-          canvasEl.height = 396;
+          app.orientation   = 'l'; // Landscape
+          canvasEl.width    = 561;
+          canvasEl.height   = 396;
         }
       }else{
-        canvasEl.width(); // 88mm
-        canvasEl.height(); // 55mm
+        // Only update the templateType when it is not a the default size of A4 being used
+        app.templateType  = 'business';
+        canvasEl.width();   // 88mm
+        canvasEl.height();  // 55mm
       }
-      document.getElementById('canvas-container').appendChild(canvasEl);
 
+      document.getElementById('canvas-container').appendChild(canvasEl);
       app._canvas = new fabric.Canvas('c', { selection: false, backgroundColor: '#FFF' });
       app.c.bindCanavsEvents();
       app.c.drawGrid(396); // Pass in the width dynamically so the whole grid is covered
@@ -233,26 +226,6 @@
     },
 
     // UI Specific Functions
-    // toggleEl: function(){
-    //   var $this = $(this),
-    //       targetElName = $this.attr('data-targetel');
-
-    //   if(!$this.hasClass('toggle-active')){
-    //     app.$addElControls.removeClass('toggle-active');
-    //     $this.addClass('toggle-active');
-    //     if($('.add-element-control:visible').length){
-    //       $('.add-element-control:visible').fadeOut(100, function(){
-    //         $('#add-controls-container').fadeOut(100, function(){
-    //           $('#' + targetElName).fadeIn(100);
-    //         });
-    //       });
-    //     }else{
-    //       $('#add-controls-container').fadeOut(100, function(){
-    //         $('#' + targetElName).fadeIn(100);
-    //       });
-    //     }
-    //   }
-    // },
     setSelectedOption: function(){
       var $this = $(this);
       $this.siblings().removeClass('option-selected').end()
@@ -300,20 +273,22 @@
     generateCords: function(canvasData){
       // All based of fixed values of of canvas_size:print_size(A4) a scale will need to be passed to the DOC property if larger/smaller
       // The canvas doesnt allow percentage decimal values. The coordinates need to be 2.0174 times bigger than the canvas
-      var canvasScale     = 2.0174, // Create function to make this dyanmic based on canvas/document size ratio
+
+      var docSettings     = app.c.setDocumentSize(),
+          canvasScale     = 2.0174, // Create function to make this dyanmic based on canvas/document size ratio
           cordData        = [],
           baseObj         = {},
-          destDocWidth    = 210, //app.c.pdfDocumentSize($('input[name=doc-size]:checked').val())[0], // Size of target document WIDTH in MM
-          destDocHeight   = 297, // app.c.pdfDocumentSize($('input[name=doc-size]:checked').val())[1], // Size of target document HEIGHT in MM
+          destDocWidth    = docSettings[0],
+          destDocHeight   = docSettings[1],
           pdfbaseJSON     =   {
                                 doc : {     
-                                  _scalex: 1, // Based from an a4
+                                  _scalex: 1, // Based from an a4 
                                   _scaley: 1, // Based from an a4
                                   _assetspath: 'C:\\Projects\\bemac_discovery\\BeMacDiscovery\\Assets\\268',
                                   // Path to asset root, may need to come from hidden field    
                                   page : {
-                                    _width: destDocWidth,
-                                    _height: destDocHeight,
+                                    _width: docSettings[0],
+                                    _height: docSettings[1],
                                     pdf: {
                                       _lowresfilename: 'Marathon_4_aw.pdf',
                                       _highresfilename: 'Marathon_4_aw.pdf',
@@ -327,8 +302,8 @@
                                       _lowerlefty: '0',
                                       _upperrightx: destDocWidth,
                                       _upperrighty: destDocHeight,
-                                      _width: destDocWidth,
-                                      _height: destDocHeight,
+                                      _width: docSettings[0],
+                                      _height: docSettings[1],
                                       _fitmethod: 'auto',
                                       _orientate: 'north'
                                     }
@@ -440,11 +415,11 @@
                                     '_fillcolor': app.c.rgbToCMYK(el.fill),
                                     '_fitmethod': 'auto',
                                     '_height': elDimensions[1],
-                                    '_highresfilename': 'demo-100.jpg', //el.src
+                                    '_highresfilename': 'demo-800.jpg', //el.src
                                     '_id': 'image_' + i,
                                     '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
                                     '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
-                                    '_lowresfilename': 'demo-100.jpg',  //el.src
+                                    '_lowresfilename': 'demo-800.jpg',  //el.src
                                     '_mandatory': 'False',
                                     '_orientate': 'north',
                                     '_title': 'image ' + i,
@@ -472,10 +447,6 @@
       xmlOutput = xmlOutput.replace(/image_[0-9]/g, 'image');
       console.log(xmlOutput);
     },
-    // function calcFontSize(fontSize){
-    //   // To do
-    //   return fontSize
-    // }
     setDefaultVal: function(val, expression, defaultVal){
       if(val === expression){
         return defaultVal
@@ -549,32 +520,6 @@
       var dt = app._canvas.toDataURL('image/png');
       console.log(dt);
       this.href = dt;
-      app.c.toggleCanvasGrid(true);
-    },
-    covertCanvasToPDFDownload: function(){
-      // Remove selected states and grid before saving img
-      app.c.cleanCanvas();
-
-      var requiredPrintSize   = app.c.pdfDocumentSize( $('input[name=doc-size]:checked').val() ),
-          documentOrientation = $('input[name=doc-orientation]:checked').val();
-
-      // Check the orientation of the document
-      // If is landscape,  reverse the document sizes
-      if( documentOrientation === 'l' ){
-        var x = requiredPrintSize[1],
-            y = requiredPrintSize[0]
-        requiredPrintSize = [x,y];
-      }
-      console.log(requiredPrintSize);
-
-      // Then make the canvas relative to the size 
-
-      // only jpeg is supported by jsPDF
-      var imgData = $('#c')[0].toDataURL('image/jpeg',  1.0),
-          pdf     = new jsPDF($('input[name=doc-orientation]:checked').val(), 'mm', requiredPrintSize);
-
-      pdf.addImage(imgData, 'JPEG', 0, 0);
-      pdf.save( app.c.createFileName('.pdf') );
       app.c.toggleCanvasGrid(true);
     },
     createTextArea: function(){ 
