@@ -8,16 +8,13 @@
 
   app._canvas;
   app._grid;
-  app.gridSquare = 25;
+  app.gridSquare = 24;
   app.ptSize = 0.75;
   app.mmSize = 0.2645833333333;
 
   app.c = {
     initCreate: function(){
-      app._canvas = new fabric.Canvas('c', { selection: false, backgroundColor: '#FFF' });
       app.c.bindClickEvents();
-      app.c.drawDemoItems();
-      app.c.bindCanavsEvents();
     },
 
     // if( $('.container').data('template') === 'build-template' ){
@@ -43,51 +40,14 @@
       var filename = $('.canvas-name-field').val() || 'template-download';
       return filename + extension
     },
-    closeElementControls: function(){
-      $('.add-element-control').fadeOut(100, function(){
-        app.$addElControls.removeClass('toggle-active');
-        $('#add-controls-container').fadeIn(100);
-      }); 
-    },
-    constrainGridMovement: function(e){
-      // Snap to grid
-      // e.target.set({
-      //   left: Math.round(e.target.left / app.gridSquare) * app.gridSquare,
-      //   top: Math.round(e.target.top / app.gridSquare) * app.gridSquare
-      // });
-
-      // Only allow movement inside the canvas
-      var obj = e.target;
-      // if object is too big ignore
-      if(obj.currentHeight > obj.canvas.height || obj.currentWidth > obj.canvas.width){
-          return;
-      }        
-      obj.setCoords();        
-      // top-left  corner
-      if(obj.getBoundingRect().top < 0 || obj.getBoundingRect().left < 0){
-          obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top);
-          obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left);
-      }
-      // bot-right corner
-      if(obj.getBoundingRect().top+obj.getBoundingRect().height  > obj.canvas.height || obj.getBoundingRect().left+obj.getBoundingRect().width  > obj.canvas.width){
-          obj.top = Math.min(obj.top, obj.canvas.height-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top);
-          obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
-      }
-    },
     convertUnit: function(unit, targetUnit){
       return parseInt( parseFloat(unit * targetUnit).toFixed(2) );
     },
     pdfDocumentSize: function(documentName){
       switch(documentName) {
-        // case 'a0':
-        //     return [841,1189]
-        //     break;
-        // case 'a1':
-        //     return [594, 841]
-        //     break;
-        // case 'a2':
-        //     return [420,594]
-        //     break;
+        case 'a2':
+            return [420,594]
+            break;
         case 'a3':
             return [420,594]
             break;
@@ -103,9 +63,9 @@
         case 'a7':
             return [74,105]
             break;
-        // case 'a8':
-        //       return [52,74]
-        //       break;
+        case 'business':
+              return [88,55]
+              break;
       }
     },
     rgbToCMYK: function(rgb){
@@ -140,12 +100,42 @@
     },
 
     // Canvas Controls and Events
+    createCanvas: function(){
+      var canvasEl = document.createElement('canvas'),
+          size;
+
+      canvasEl.setAttribute('id', 'c');
+
+      // Check if the document size desired template should be a regular paper size or business card.
+      // All regular paper sizes use the same bases size (A4), but business cards are different.
+      if( $('input[name=doc-size]:checked').val() !== 'business'){
+        // Check if the template should be portrait or landscape
+        // The canvas needs to be set to a specific size based on the 2 checks above.
+        if( $('input[name=doc-orientation]:checked').val() === 'p' ){
+          canvasEl.width  = 396;
+          canvasEl.height = 561;
+        }else{
+          canvasEl.width  = 561;
+          canvasEl.height = 396;
+        }
+      }else{
+        canvasEl.width(); // 88mm
+        canvasEl.height(); // 55mm
+      }
+      document.getElementById('canvas-container').appendChild(canvasEl);
+
+      app._canvas = new fabric.Canvas('c', { selection: false, backgroundColor: '#FFF' });
+      app.c.bindCanavsEvents();
+      app.c.drawGrid(396); // Pass in the width dynamically so the whole grid is covered
+      // /app.c.drawDemoItems();
+    },
     drawGrid: function(gSize){
       var gridLines = [];
-      for (var i = 0; i < 20; i++) {
+      for (var i = 0; i < 50; i++) {
         gridLines.push(new fabric.Line([ i * app.gridSquare, 0, i * app.gridSquare, gSize], { stroke: '#ccc'}));
         gridLines.push(new fabric.Line([ 0, i * app.gridSquare, gSize, i * app.gridSquare], { stroke: '#ccc'}));
       }
+      //console.log(gridLines);
       app._grid = new fabric.Group(gridLines, {
                   left: 0,
                   top: 0,
@@ -153,9 +143,39 @@
                 });
       app._canvas.add(app._grid);
     },
+    constrainGridMovement: function(e){
+      // Snap to grid
+      // e.target.set({
+      //   left: Math.round(e.target.left / app.gridSquare) * app.gridSquare,
+      //   top: Math.round(e.target.top / app.gridSquare) * app.gridSquare
+      // });
+
+      // Only allow movement inside the canvas
+      var obj = e.target;
+      // if object is too big ignore
+      if(obj.currentHeight > obj.canvas.height || obj.currentWidth > obj.canvas.width){
+          return;
+      }        
+      obj.setCoords();        
+      // top-left  corner
+      if(obj.getBoundingRect().top < 0 || obj.getBoundingRect().left < 0){
+          obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top);
+          obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left);
+      }
+      // bot-right corner
+      if(obj.getBoundingRect().top+obj.getBoundingRect().height  > obj.canvas.height || obj.getBoundingRect().left+obj.getBoundingRect().width  > obj.canvas.width){
+          obj.top = Math.min(obj.top, obj.canvas.height-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top);
+          obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
+      }
+    },
     cleanCanvas: function(){
       app._grid['visible'] = false;
       app._canvas.deactivateAll().renderAll();
+    },
+    deactiveCanvasControls: function(e){
+      if(!$(e.target).hasClass('upper-canvas')){
+        app._canvas.deactivateAll().renderAll();
+      }
     },
     toggleCanvasGrid: function(toggle){
       var $this = $(this);
@@ -173,46 +193,106 @@
       }
       app._canvas.renderAll();
     },
-    toggleEl: function(){
-      var $this = $(this),
-          targetElName = $this.attr('data-targetel');
+    setAspectRatio: function(aspectRatio){
+      switch(aspectRatio) {
+        case '1:1':
+            // return [200, 200, true]
+            return [100, 100, true]
+            break;
+        case '1:2':
+            return [50, 100, true]
+            break;
+        case '2:1':
+            return [100, 50, true]
+            break;
+        case '3:1':
+            return [100, 33.3, true]
+            break;
+        case '1:3':
+            return [33.3, 100, true]
+            break;
+        case '3:2':
+            return [100, 66.6, true]
+            break;
+        case '2:3':
+            return [66.6, 100, true]
+            break;
+        case '3:4':
+            return [75, 100, true]
+            break;
+        case '4:3':
+            return [100, 75, true]
+            break;
+        case '16:9':
+            return [100, 56, true]
+            break;
+        case '0':
+            return [100, 100, false]
+            break;
+      }
+    },
 
-      if(!$this.hasClass('toggle-active')){
-        app.$addElControls.removeClass('toggle-active');
-        $this.addClass('toggle-active');
-        if($('.add-element-control:visible').length){
-          $('.add-element-control:visible').fadeOut(100, function(){
-            $('#add-controls-container').fadeOut(100, function(){
-              $('#' + targetElName).fadeIn(100);
-            });
-          });
-        }else{
-          $('#add-controls-container').fadeOut(100, function(){
-            $('#' + targetElName).fadeIn(100);
-          });
-        }
-      }
-    },
-    deactiveCanvasControls: function(e){
-      if(!$(e.target).hasClass('upper-canvas')){
-        app._canvas.deactivateAll().renderAll();
-      }
-    },
+    // UI Specific Functions
+    // toggleEl: function(){
+    //   var $this = $(this),
+    //       targetElName = $this.attr('data-targetel');
+
+    //   if(!$this.hasClass('toggle-active')){
+    //     app.$addElControls.removeClass('toggle-active');
+    //     $this.addClass('toggle-active');
+    //     if($('.add-element-control:visible').length){
+    //       $('.add-element-control:visible').fadeOut(100, function(){
+    //         $('#add-controls-container').fadeOut(100, function(){
+    //           $('#' + targetElName).fadeIn(100);
+    //         });
+    //       });
+    //     }else{
+    //       $('#add-controls-container').fadeOut(100, function(){
+    //         $('#' + targetElName).fadeIn(100);
+    //       });
+    //     }
+    //   }
+    // },
     setSelectedOption: function(){
       var $this = $(this);
       $this.siblings().removeClass('option-selected').end()
            .addClass('option-selected');
     },
+    handleSteppedForm: function(){
+      var $this             = $(this),
+          $activeContainer  = $('.active-option'),
+          activeStep        = $activeContainer.data('step'),
+          btnAction         = $this.data('step-action');
+
+      $activeContainer.fadeOut(100, function(){
+        $activeContainer.removeClass('active-option');
+        if( btnAction === 'forward' ){
+          activeStep++;
+        }else{
+          activeStep--;
+        }
+        var $newActiveEl = $('[data-step=' + activeStep + ']');
+        $newActiveEl.fadeIn(100, function(){
+          $newActiveEl.addClass('active-option')
+        });
+      });
+    },
+    closeElementControls: function(){
+      $('.add-element-control').fadeOut(100, function(){
+        app.$addElControls.removeClass('toggle-active');
+        $('#add-controls-container').fadeIn(100);
+      }); 
+    },
     
     // Functions needed to prepare template for export
     generateJSON: function(){
-      var canvasData = app._canvas.toDatalessJSON(['stringSrc']);
+      var canvasData = app._canvas.toDatalessJSON(['stringSrc', 'halign', 'valign']);
       if ( localStorage.getItem('canvasDataJSON') === null ){
         localStorage.removeItem('canvasDataJSON');
       }
       localStorage.setItem('canvasDataJSON', JSON.stringify(canvasData));
       // Remove the grid element group from data
-      console.log(canvasData.objects);
+      // console.log(JSON.stringify(canvasData));
       canvasData.objects.shift();
       // canvasData.objects.push()
       return canvasData.objects
@@ -255,14 +335,21 @@
                                   }
                                 }
                               };
-      console.log(canvasScale);
 
       // Create collection of objects for the XML file
       canvasData.forEach(function(el, i) {
         console.log(el);
+        var scalex, 
+            scaley;
+        // Check if the element has been scaled. If it has then get the scaled value
+        el.scaleX === 1 ? scalex = 1 : scalex = el.scaleX;
+        el.scaleY === 1 ? scaley = 1 : scaley = el.scaleY;
+
+        console.log( scalex, scaley);
+
         var elDimensions = [
-                            app.c.convertUnit(el.width * canvasScale, app.mmSize),
-                            app.c.convertUnit(el.height * canvasScale, app.mmSize),
+                            app.c.convertUnit( (el.width * scalex) * canvasScale, app.mmSize),
+                            app.c.convertUnit( (el.height * scaley) * canvasScale, app.mmSize),
                             app.c.convertUnit(el.top * canvasScale, app.mmSize),
                             app.c.convertUnit(el.left * canvasScale, app.mmSize),
                             destDocWidth,
@@ -346,25 +433,25 @@
                                   }
           cordData.push(baseObj);
         }else{
-          console.log('Called')
           var imgBlockName = 'image_' + i;
           baseObj[imgBlockName] = {
-                                    '_lowresfilename': 'demo1.jpg',  //el.src
-                                    '_highresfilename': 'demo1.jpg', //el.src
-                                    '_align': 'left',         // Need to add option for this
-                                    '_verticalalign': 'top',  // Need to add option for this
-                                    '_id': 'image_' + i,
-                                    '_mandatory': 'False',
+                                    '_align': el.halign,
                                     '_editable': 'False',
-                                    '_title': 'image ' + i,
+                                    '_fillcolor': app.c.rgbToCMYK(el.fill),
+                                    '_fitmethod': 'auto',
+                                    '_height': elDimensions[1],
+                                    '_highresfilename': 'demo-100.jpg', //el.src
+                                    '_id': 'image_' + i,
                                     '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
                                     '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
+                                    '_lowresfilename': 'demo-100.jpg',  //el.src
+                                    '_mandatory': 'False',
+                                    '_orientate': 'north',
+                                    '_title': 'image ' + i,
                                     '_upperrightx': app.c.calcUpperRightX(elDimensions),
                                     '_upperrighty': app.c.calcUpperRightY(elDimensions),
-                                    '_fitmethod': 'auto',
-                                    '_orientate': 'north',
-                                    '_width': elDimensions[0],
-                                    '_height': elDimensions[1] 
+                                    '_verticalalign': el.valign,
+                                    '_width': elDimensions[0]
                                   };
           cordData.push(baseObj);
         }
@@ -427,22 +514,23 @@
       app.$downloadPDF      = $('#dl-pdf');
       app.$toggleGrid       = $('#toggle-grid');
       app.$closeBtns        = $('.close-control');
-      app.$addElControls    = $('.add-el-control');
       app.$addTextArea      = $('#add-text-area');
       app.$addTempArea      = $('#add-template-area');
       app.$textComponentOpt = $('.text-editor-option button');
+      app.$stepBtns         = $('.step-option-btn');
+      app.$createCanvas     = $('#at-create-canvas');
 
       // Bind event listeners to dom elements
-        app.$saveThumb.on('click', app.c.convertCanvasToImgElement);
-        app.$downloadThumb.on('click', app.c.covertCanvasToImgDownload);
-        app.$downloadPDF.on('click', app.c.covertCanvasToPDFDownload);
-        app.$toggleGrid.on('click', app.c.toggleCanvasGrid);
-        app.$closeBtns.on('click', app.c.closeElementControls);
-        app.$addElControls.on('click', app.c.toggleEl);
-        app.$addTextArea.on('click', app.c.createTextArea);
-        app.$addTempArea.on('click', app.c.createTempBlock)
-        $('body').on('click', app.c.deactiveCanvasControls);
-        app.$textComponentOpt.on('click', app.c.setSelectedOption);
+      app.$saveThumb.on('click', app.c.convertCanvasToImgElement);
+      app.$downloadThumb.on('click', app.c.covertCanvasToImgDownload);
+      app.$downloadPDF.on('click', app.c.covertCanvasToPDFDownload);
+      app.$toggleGrid.on('click', app.c.toggleCanvasGrid);
+      app.$closeBtns.on('click', app.c.closeElementControls);
+      app.$addTextArea.on('click', app.c.createTextArea);
+      app.$addTempArea.on('click', app.c.createTempBlock)
+      app.$textComponentOpt.on('click', app.c.setSelectedOption);
+      app.$stepBtns.on('click', app.c.handleSteppedForm);
+      app.$createCanvas.on('click', app.c.createCanvas);
     },
 
     // Creation tool end points
@@ -459,6 +547,7 @@
       // Remove selected states and grid before saving img
       app.c.cleanCanvas();
       var dt = app._canvas.toDataURL('image/png');
+      console.log(dt);
       this.href = dt;
       app.c.toggleCanvasGrid(true);
     },
@@ -533,19 +622,29 @@
       // }
     },
     createTempBlock: function(){
-      var _tempBlock = new fabric.Rect({
-        fill: 'rgb(' + $('#adt-fill .option-selected').attr('data-rgb') + ')',
-        hasBorders: true,
-        hasRotatingPoint: false,
-        height: 100,
-        left: 0,
-        lockRotation: true,
-        // lockScalingX: true,
-        // lockScalingY: true,
-        top: 0,
-        width: 100
-      });    
-      app._canvas.add(_tempBlock);
+      // Pass through the selected aspect ratio of the element
+      // Add the RGB Value to the settings
+      var blockSettings = app.c.setAspectRatio( $('input[name=block-ratio]:checked').val() );
+          blockSettings.push('rgb(' + $('#adt-fill .option-selected').attr('data-rgb') + ')');
+          blockSettings.push($('input[name=h-pos]:checked').val());
+          blockSettings.push($('input[name=v-pos]:checked').val());
+
+      // Create the fabric js element on the canvas
+      // Use the settings from 'blockSettings' variable
+      var _block = new fabric.Rect({
+                                    fill: blockSettings[3],
+                                    hasBorders: true,
+                                    hasRotatingPoint: false,
+                                    height: blockSettings[1],
+                                    left: 0,
+                                    lockRotation: true,
+                                    lockUniScaling: blockSettings[2],
+                                    top: 0,
+                                    width: blockSettings[0]
+                                  });
+      _block['halign'] = blockSettings[4];
+      _block['valign'] = blockSettings[5];
+      app._canvas.add(_block);
     },
     drawDemoItems: function(){
       // Draw the grid
@@ -607,12 +706,33 @@
       // });
     },
     bindCanavsEvents: function(){
+      // This event handler stops elements being moved outside of the canvas element when moving an element on the canvas
       app._canvas.on('object:moving', function(e) {
         app.c.constrainGridMovement(e);
       });
+      // This event handler stops elements being moved outside of the canvas element when and element is being modified (resized)
       app._canvas.on('object:modified', function(e) {
         app.c.constrainGridMovement(e);
       });
+      // This event handler deletes the selected object from the canvas when DEL or BACKSPACE is pressed
+      app._canvas.on('object:selected', function(e) {
+        var _activeElement = app._canvas.getActiveObject();
+        // console.log(app._canvas.getObjects());
+        // console.log(_activeElement);
+        // console.log(_activeElement.item);
+        $('html').keydown(function(e){
+            if(e.keyCode == 46 || e.keyCode === 8) {
+              e.preventDefault();
+              _activeElement.remove();
+              // app._canvas.fxRemove(_activeElement, onComplete({
+              //     app._canvas.renderAll();
+              // });
+            }
+        });
+        // e.remove();
+      });
+
+      // $('body').on('click', app.c.deactiveCanvasControls);
     }
   };
 

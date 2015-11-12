@@ -11,8 +11,7 @@ textarea{
 	margin-top: 50px;
 }
 #c{
-	border: dashed 3px blue;
-	background: white;
+	box-shadow: 0 0 10px 5px rgba(0,0,0,0.1);
 }
 .canvas-container{
 	margin-bottom: 20px;
@@ -79,4 +78,13 @@ textarea{
 }
 .color-option.option-selected{
 	outline: solid 3px #46b8da;
+}
+
+
+/* Stepped options */
+.stepped-option{
+	display: none;
+}
+.active-option{
+	display: block;
 }

@@ -7,12 +7,6 @@
   </page>
 </doc>
 
-<!-- 
-  PICA's 1/72
-  A3: 595 x 842
-  A4: 420 x 595
--->
-
 <doc assetspath='C:\Projects\bemac_discovery\Assets\268' scalex='0' scaley='0'>
   <page width='420' height="595">
     <pdf lowresfilename='template-test.pdf' highresfilename='template-test.pdf' align='left' verticalalign='top' id='bglayer' mandatory='False' editable='False' title='background' lowerleftx='0' lowerlefty='0' upperrightx='420' upperrighty='595' width='420' height='595' fitmethod='auto' orientate='north'/>
