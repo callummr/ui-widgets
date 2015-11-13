@@ -1,300 +1,301 @@
 <html>
-	<head>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-		<link rel="stylesheet" href="assets/css/main.css">
-	</head>
-	<body>
-		<div class="row">
-			<div class="container" data-template="build-template">
-				<h1>Template Creator</h1>
-				<hr>
-				<div class="col-md-4">
-					<div id="add-controls-container">
-						<div class="stepped-option active-option" data-step="0">
-							<h3>Name of template</h3>
-							<input type="text" class="form-control canvas-name-field" placeholder="Name of template...">
-							
-							<hr>
+<head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+	<div class="row">
+		<div class="container" data-template="build-template">
+			<h1>Template Creator</h1>
+			<hr>
+			<div class="stepped-option active-option" data-step="0">
+				<button type="button" class="btn btn-lg btn-info step-option-btn" data-step-action="forward" data-step-secondaction="1">Create new template</button>
+				<span>or</span>
+				<button type="button" class="btn btn-lg btn-info step-option-btn" data-step-action="forward" data-step-secondaction="2">Load from existing template?</button>			
+			</div>
+			
 
-							<h3>Select document sizes</h3>
-							<span class="input-group-addon">
-								<span class="badge">A2</span>
-				            	<input type="checkbox" name="doc-size" value="a2">
-				          	</span>
-							<span class="input-group-addon">
-								<span class="badge">A3</span>
-				            	<input type="checkbox" name="doc-size" value="a3">
-				          	</span>
-				          	<span class="input-group-addon">
-				          		<span class="badge">A4</span>
-				            	<input type="checkbox" name="doc-size" value="a4" checked>
-				          	</span>
-				          	<span class="input-group-addon">
-				          		<span class="badge">A5</span>
-				            	<input type="checkbox" name="doc-size" value="a5">
-				          	</span>
-				          	<br>
-				          	<span class="input-group-addon">
-				          		<span class="badge">A6</span>
-				            	<input type="checkbox" name="doc-size" value="a6">
-				          	</span>
-				          	<span class="input-group-addon">
-				          		<span class="badge">A7</span>
-				            	<input type="checkbox" name="doc-size" value="a7">
-				          	</span>
-				          	<span class="input-group-addon">
-				          		<span class="badge">Business Card</span>
-				            	<input type="checkbox" name="doc-size" value="business">
-				          	</span>
-
-				          	<hr>
-
-				          	<span class="input-group-addon">
-								<span class="badge">Portrait</span>
-				            	<input type="radio" name="doc-orientation" value="p" checked>
-				          	</span>
-				          	<span class="input-group-addon">
-								<span class="badge">Landscape</span>
-				            	<input type="radio" name="doc-orientation" value="l">
-				          	</span>
-
-				          	<h2>Load from existing template?</h2>
-			          		<span class="badge">Yes</span>
-			            	<input type="radio" name="from-exisiting-template" value="yes">
-			          		<span class="badge">No</span>
-			            	<input type="radio" name="from-exisiting-template" value="no" checked>
-
-			            	<hr>
-
-				          	<ul class="list-group" id="at-template-list">
-				          		<li class="list-group-item">
-				          			<button type="button" class="btn btn default">Template 1 block</button>
-				          			<img src="" alt="">
-				          		</li>
-				          		<li class="list-group-item">
-				          			<button type="button" class="btn btn default">Template 2 block</button>
-				          		</li>
-				          	</ul>
-
-				          	<hr>
-
-				          	<button type="button" id="at-create-canvas" class="btn btn-lg btn-primary step-option-btn" data-step-action="forward">Create</button>
-						</div>
-
-						<div class="stepped-option" data-step="1">
-							<h2>Add component</h2>							
-							<div class="">
-								<!-- adt- id prefix is for add template elements -->
-								<h3>Template block background</h3>
-								<div id="adt-fill" class="text-editor-option">
-									<button class="btn btn-default option-selected color-option color-red" data-rgb="255,0,0">Red</button>
-									<button class="btn btn-default color-option color-yellow" data-rgb="255,252,0">Yellow</button>
-									<button class="btn btn-default color-option color-pink" data-rgb="255,0,187">Pink</button>
-									<button class="btn btn-default color-option color-blue" data-rgb="0,0,255">Blue</button>
-									<button class="btn btn-default color-option color-purple" data-rgb="222,0,255">Purple</button>
-								</div>
-
-								<hr>
-
-								<h3>Select Ratio</h3>
-								<span class="input-group-addon">
-								<span class="badge">1:1</span>
-					            	<input type="radio" name="block-ratio" value="1:1" checked>
-					          	</span>
-								<span class="input-group-addon">
-									<span class="badge">1:2</span>
-					            	<input type="radio" name="block-ratio" value="1:2">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">2:1</span>
-					            	<input type="radio" name="block-ratio" value="2:1">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">3:1</span>
-					            	<input type="radio" name="block-ratio" value="3:1">
-					          	</span>
-					          	<br>
-					          	<span class="input-group-addon">
-					          		<span class="badge">1:3</span>
-					            	<input type="radio" name="block-ratio" value="1:3">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">3:2</span>
-					            	<input type="radio" name="block-ratio" value="3:2">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">2:3</span>
-					            	<input type="radio" name="block-ratio" value="2:3">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">3:4</span>
-					            	<input type="radio" name="block-ratio" value="3:4">
-					          	</span>
-					          	<br>
-					          	<span class="input-group-addon">
-					          		<span class="badge">4:3</span>
-					            	<input type="radio" name="block-ratio" value="4:3">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">16:9</span>
-					            	<input type="radio" name="block-ratio" value="16:9">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">No Ratio</span>
-					            	<input type="radio" name="block-ratio" value="0">
-					          	</span>
+			<div class="col-md-4">
+				<div class="stepped-option" data-step="1">
+					<h2>Test</h2>
+					<div class="stepped-option-2 hidden" data-step-target="1">
+						<h3>Name of template</h3>
+						<input type="text" class="form-control canvas-name-field" placeholder="Name of template...">
 						
-								<hr>
+						<hr>
 
-								<h3>Horizontal positioning</h3>
-								<span class="input-group-addon">
-					          		<span class="badge">left</span>
-					            	<input type="radio" name="h-pos" value="left" checked>
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">Center</span>
-					            	<input type="radio" name="h-pos" value="center">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">Right</span>
-					            	<input type="radio" name="h-pos" value="right">
-					          	</span>
-					          	<br>
-					          	<h3>Vertical positioning</h3>
-								<span class="input-group-addon">
-					          		<span class="badge">Top</span>
-					            	<input type="radio" name="v-pos" value="top" checked>
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">Middle</span>
-					            	<input type="radio" name="v-pos" value="center">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<span class="badge">Bottom</span>
-					            	<input type="radio" name="v-pos" value="bottom">
-					          	</span>
-									
-								<hr>
+						<h3>Select document sizes</h3>
+						<span class="input-group-addon">
+							<span class="badge">A2</span>
+			            	<input type="checkbox" name="doc-size" value="A2">
+			          	</span>
+						<span class="input-group-addon">
+							<span class="badge">A3</span>
+			            	<input type="checkbox" name="doc-size" value="A3">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">A4</span>
+			            	<input type="checkbox" name="doc-size" value="A4" checked>
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">A5</span>
+			            	<input type="checkbox" name="doc-size" value="A5">
+			          	</span>
+			          	<br>
+			          	<span class="input-group-addon">
+			          		<span class="badge">A6</span>
+			            	<input type="checkbox" name="doc-size" value="A6">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">A7</span>
+			            	<input type="checkbox" name="doc-size" value="A7">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">Business Card</span>
+			            	<input class="doc-size-business" type="checkbox" name="doc-size" value="Business Card">
+			          	</span>
 
-								<button class="btn btn-primary" id="add-template-area">Add</button>
-							</div>
-							<!--
-							<ul class="list-group" id="">
-								 
-								<li class="list-group-item">
-									<button class="btn btn-default add-el-control" data-targetel="text-area-control">Add Text Area</button>
-								</li>
-								<li class="list-group-item">
-									<button class="btn btn-default add-el-control" data-targetel="image-control">Add Image</button>
-								</li>
-								
-								<li class="list-group-item">
-									<button class="btn btn-default add-el-control" data-targetel="template-control">Add Template Area</button>
-								</li>
-							</ul>
-							-->
-						</div>
+			          	<hr>
+
+			          	<span class="input-group-addon">
+							<span class="badge">Portrait</span>
+			            	<input type="radio" name="doc-orientation" value="p" checked>
+			          	</span>
+			          	<span class="input-group-addon">
+							<span class="badge">Landscape</span>
+			            	<input type="radio" name="doc-orientation" value="l">
+			          	</span>
+
+			          	<hr>
+
+			          	<button id="at-new-template" type="button" class="btn btn-lg btn-primary step-option-btn" data-step-action="forward">Create Template</button>
 					</div>
 
-					<ul class="list-group">						
-						<li id="text-area-control" class="list-group-item add-element-control">
-							<button class="btn btn-sm btn-primary close-control">X</button>
-							<span>at- id prefix is for add text elements</span>
-							<h3>Enter text</h3>
-							<textarea id="at-text-body" class="form-control" rows="" cols="" placeholder="Enter text component text here...">text example</textarea>
+					<div class="stepped-option-2 hidden" data-step-target="2">
+						<ul class="list-group">
+		          			<li class="list-group-item">Template 1 <input type="radio" name="doc-orientation" value="data/data.1-block.json"></li>
+		          			<li class="list-group-item">Template 2 <input type="radio" name="doc-orientation" value="data/data.2-block.json"></li>
+		          		</ul>
 
-							<h2>From template?</h2>
-							<span class="input-group-addon">
-								<span class="badge">Yes</span>
-				            	<input type="radio" name="from-template" value="yes">
-				          	</span>
-				          	<span class="input-group-addon">
-				          		<span class="badge">No</span>
-				            	<input type="radio" name="from-template" value="no">
-				          	</span>
+		          		<button type="button" id="at-from-template" class="btn btn-lg btn-primary step-option-btn" data-step-action="forward">Add</button>
+					</div>
+				</div>
 
-				          	<input type="text" class="form-control" id="at-src" value="assets/terms.txt" checked>
+				<div class="stepped-option" data-step="2">
+					<h2>Add component</h2>							
+					<div class="">
+						<!-- adt- id prefix is for add template elements -->
+						<h3>Template block background</h3>
+						<div id="adt-fill" class="text-editor-option">
+							<button class="btn btn-default option-selected color-option color-red" data-rgb="255,0,0">Red</button>
+							<button class="btn btn-default color-option color-yellow" data-rgb="255,252,0">Yellow</button>
+							<button class="btn btn-default color-option color-pink" data-rgb="255,0,187">Pink</button>
+							<button class="btn btn-default color-option color-blue" data-rgb="0,0,255">Blue</button>
+							<button class="btn btn-default color-option color-purple" data-rgb="222,0,255">Purple</button>
+						</div>
 
-							<h3>Font Face</h3>
-							<div id="at-font-face" class="text-editor-option">
-								<button class="btn btn-default option-selected" data-type="reg">Regular</button>
-								<button class="btn btn-default" data-type="med">Medium</button>
-								<button class="btn btn-default" data-type="bol">Bold</button>
-							</div>
+						<hr>
 
-							<h3>Select Font Size</h3>
-							<div id="at-font-size" class="text-editor-option">
-								<button class="btn btn-default option-selected" data-size="24">Small</button>
-								<button class="btn btn-default" data-size="30">Medium</button>
-								<button class="btn btn-default" data-size="36">Large</button>
-							</div>							
+						<h3>Select Ratio</h3>
+						<span class="input-group-addon">
+						<span class="badge">1:1</span>
+			            	<input type="radio" name="block-ratio" value="1:1" checked>
+			          	</span>
+						<span class="input-group-addon">
+							<span class="badge">1:2</span>
+			            	<input type="radio" name="block-ratio" value="1:2">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">2:1</span>
+			            	<input type="radio" name="block-ratio" value="2:1">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">3:1</span>
+			            	<input type="radio" name="block-ratio" value="3:1">
+			          	</span>
+			          	<br>
+			          	<span class="input-group-addon">
+			          		<span class="badge">1:3</span>
+			            	<input type="radio" name="block-ratio" value="1:3">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">3:2</span>
+			            	<input type="radio" name="block-ratio" value="3:2">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">2:3</span>
+			            	<input type="radio" name="block-ratio" value="2:3">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">3:4</span>
+			            	<input type="radio" name="block-ratio" value="3:4">
+			          	</span>
+			          	<br>
+			          	<span class="input-group-addon">
+			          		<span class="badge">4:3</span>
+			            	<input type="radio" name="block-ratio" value="4:3">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">16:9</span>
+			            	<input type="radio" name="block-ratio" value="16:9">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">No Ratio</span>
+			            	<input type="radio" name="block-ratio" value="0">
+			          	</span>
+				
+						<hr>
 
-							 <h3>Bullet lists</h3>
-							<div class="text-editor-option">
-								<button class="btn btn-default" data-bullet="ol">Order List</button>
-								<button class="btn btn-default" data-bullet="ul">Un-ordered List</button> 
-							</div>
+						<h3>Horizontal positioning</h3>
+						<span class="input-group-addon">
+			          		<span class="badge">left</span>
+			            	<input type="radio" name="h-pos" value="left" checked>
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">Center</span>
+			            	<input type="radio" name="h-pos" value="center">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">Right</span>
+			            	<input type="radio" name="h-pos" value="right">
+			          	</span>
+			          	<h3>Vertical positioning</h3>
+						<span class="input-group-addon">
+			          		<span class="badge">Top</span>
+			            	<input type="radio" name="v-pos" value="top" checked>
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">Middle</span>
+			            	<input type="radio" name="v-pos" value="center">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">Bottom</span>
+			            	<input type="radio" name="v-pos" value="bottom">
+			          	</span>
+							
+						<hr>
 
-							<h3>Alignment</h3>
-							<div id="at-alignment" class="text-editor-option">
-								<button class="btn btn-default option-selected" data-align="left">Left</button>
-								<button class="btn btn-default" data-align="center">Center</button>
-								<button class="btn btn-default" data-align="right">Right</button>
-							</div>
-
-							<h3>Select Colour</h3>
-							<div id="at-font-color" class="text-editor-option">
-								<button class="btn btn-default option-selected color-option color-red" data-rgb="255,0,0">Red</button>
-								<button class="btn btn-default color-option color-yellow" data-rgb="255,252,0">Yellow</button>
-								<button class="btn btn-default color-option color-pink" data-rgb="255,0,187">Pink</button>
-								<button class="btn btn-default color-option color-blue" data-rgb="0,0,255">Blue</button>
-								<button class="btn btn-default color-option color-purple" data-rgb="222,0,255">Purple</button>
-							</div>							
-
-							<h3>Layer comp</h3>
-							<button class="btn btn-default">Increase layer</button>
-
-							<br><hr>
-
-							<button class="btn btn-primary" id="add-text-area">Add</button>
+						<button class="btn btn-primary" id="add-template-area">Add</button>
+					</div>
+					<!--
+					<ul class="list-group" id="">
+						 
+						<li class="list-group-item">
+							<button class="btn btn-default add-el-control" data-targetel="text-area-control">Add Text Area</button>
 						</li>
-
-						<li id="image-control" class="list-group-item add-element-control">
-							<button class="btn btn-sm btn-primary close-control">X</button>
-
-							<h3>Select Image</h3>
-							<div>...Image Library</div>
-							<h3>Upload Image</h3>
-							<form action="">
-								<input type="file">
-								<button class="btn btn-default"></button>
-							</form>
-							<button class="btn btn-default">Increase layer</button>
+						<li class="list-group-item">
+							<button class="btn btn-default add-el-control" data-targetel="image-control">Add Image</button>
+						</li>
+						
+						<li class="list-group-item">
+							<button class="btn btn-default add-el-control" data-targetel="template-control">Add Template Area</button>
 						</li>
 					</ul>
-
-					<div class="image-preview">
-						<div id="i"></div>
-					</div>
+					-->
 				</div>
-				<div class="col-md-7 col-md-offset-1 stepped-option" data-step="1">					
-					<button class="btn btn-default" id="toggle-grid">Toggle grid</button>
-					<button class="btn btn-default" id="save-thumb">Save thumbnail</button>
-					<a class="btn btn-default" id="dl-thumb" download="template-thumbnail.png">Download thumbnail</a>
-					<button class="btn btn-default" id="dl-pdf" href=>Generate PDF</button>
-					<hr>
-					<!-- Size of canvas is relative to A4: 210mm x 297mm (px > mm = 0.376065) -->
-					<!-- Canvas is half than pixel to mm -->
-					<div id="canvas-container"></div>
-					<!-- <canvas id="c" width="396.85" height="561.25"></canvas> -->
+
+				<!-- <ul class="list-group">						
+					<li id="text-area-control" class="list-group-item add-element-control">
+						<button class="btn btn-sm btn-primary close-control">X</button>
+						<span>at- id prefix is for add text elements</span>
+						<h3>Enter text</h3>
+						<textarea id="at-text-body" class="form-control" rows="" cols="" placeholder="Enter text component text here...">text example</textarea>
+
+						<h2>From template?</h2>
+						<span class="input-group-addon">
+							<span class="badge">Yes</span>
+			            	<input type="radio" name="from-template" value="yes">
+			          	</span>
+			          	<span class="input-group-addon">
+			          		<span class="badge">No</span>
+			            	<input type="radio" name="from-template" value="no">
+			          	</span>
+
+			          	<input type="text" class="form-control" id="at-src" value="assets/terms.txt" checked>
+
+						<h3>Font Face</h3>
+						<div id="at-font-face" class="text-editor-option">
+							<button class="btn btn-default option-selected" data-type="reg">Regular</button>
+							<button class="btn btn-default" data-type="med">Medium</button>
+							<button class="btn btn-default" data-type="bol">Bold</button>
+						</div>
+
+						<h3>Select Font Size</h3>
+						<div id="at-font-size" class="text-editor-option">
+							<button class="btn btn-default option-selected" data-size="24">Small</button>
+							<button class="btn btn-default" data-size="30">Medium</button>
+							<button class="btn btn-default" data-size="36">Large</button>
+						</div>							
+
+						 <h3>Bullet lists</h3>
+						<div class="text-editor-option">
+							<button class="btn btn-default" data-bullet="ol">Order List</button>
+							<button class="btn btn-default" data-bullet="ul">Un-ordered List</button> 
+						</div>
+
+						<h3>Alignment</h3>
+						<div id="at-alignment" class="text-editor-option">
+							<button class="btn btn-default option-selected" data-align="left">Left</button>
+							<button class="btn btn-default" data-align="center">Center</button>
+							<button class="btn btn-default" data-align="right">Right</button>
+						</div>
+
+						<h3>Select Colour</h3>
+						<div id="at-font-color" class="text-editor-option">
+							<button class="btn btn-default option-selected color-option color-red" data-rgb="255,0,0">Red</button>
+							<button class="btn btn-default color-option color-yellow" data-rgb="255,252,0">Yellow</button>
+							<button class="btn btn-default color-option color-pink" data-rgb="255,0,187">Pink</button>
+							<button class="btn btn-default color-option color-blue" data-rgb="0,0,255">Blue</button>
+							<button class="btn btn-default color-option color-purple" data-rgb="222,0,255">Purple</button>
+						</div>							
+
+						<h3>Layer comp</h3>
+						<button class="btn btn-default">Increase layer</button>
+
+						<br><hr>
+
+						<button class="btn btn-primary" id="add-text-area">Add</button>
+					</li>
+
+					<li id="image-control" class="list-group-item add-element-control">
+						<button class="btn btn-sm btn-primary close-control">X</button>
+
+						<h3>Select Image</h3>
+						<div>...Image Library</div>
+						<h3>Upload Image</h3>
+						<form action="">
+							<input type="file">
+							<button class="btn btn-default"></button>
+						</form>
+						<button class="btn btn-default">Increase layer</button>
+					</li>
+				</ul> -->
+
+				<div class="image-preview">
+					<div id="i"></div>
 				</div>
 			</div>
+
+			<div class="col-md-7 col-md-offset-1 stepped-option" data-step="2">
+
+				<button class="btn btn-danger" id="reset-create-template" data-step-action="back">Reset</button>
+				<button class="btn btn-default " id="toggle-grid" style="margin-right: 20px">Toggle grid</button>
+				<button class="btn btn-info" id="save-thumb">Create template</button>
+				<a class="btn btn-warning" id="dl-thumb" download="template-thumbnail.png">Download thumbnail</a>
+				
+				<hr>
+				<!-- Size of canvas is relative to A4: 210mm x 297mm (px > mm = 0.376065) -->
+				<!-- Canvas is half than pixel to mm -->
+				<div id="canvas-container"></div>
+				<!-- <canvas id="c" width="396.85" height="561.25"></canvas> -->
+			</div>
 		</div>
-		<script src="assets/js/libs/jquery-1.11.3.js"></script>
-		<script src="assets/js/libs/fabrics.js"></script>
-		<script src="assets/js/libs/reimg.js"></script>
-		<script src="assets/js/libs/jspdf.js"></script>
-		<script src="assets/js/libs/xml2json.js"></script>
-		<script src="assets/js/create.js"></script>
-	</body>
+	</div>
+	<script src="assets/js/libs/jquery-1.11.3.js"></script>
+	<script src="assets/js/libs/fabrics.js"></script>
+	<script src="assets/js/libs/reimg.js"></script>
+	<script src="assets/js/libs/jspdf.js"></script>
+	<script src="assets/js/libs/xml2json.js"></script>
+	<script src="assets/js/create.js"></script>
+</body>
 </html>
