@@ -1,4 +1,12 @@
 /*Resets*/
+.template-container{
+	margin-bottom: 40px;
+}
+@media (max-width: 991px ){
+	.new-template-container{
+		margin-top: 40px;
+	}	
+}
 .list-group-item{
 	list-style: none;
 }
@@ -82,5 +90,14 @@ textarea{
 	display: none;
 }
 .active-option{
+	display: block;
+}
+
+
+/* Template type options */
+.template-block-type-options{
+	display: none;
+}
+input[name="template-block-type"]:checked + .template-block-type-options{
 	display: block;
 }

@@ -86,11 +86,8 @@
     },
 
     // app.$addTextArea      = $('#add-text-area');
-    // app.$textComponentOpt = $('.text-editor-option button');
     // app.$addTextArea.on('click', app.c.createTextArea);
-      //app.$textComponentOpt.on('click', app.c.setSelectedOption);
-
-    createTextArea: function(){ 
+        createTextArea: function(){ 
       var _textComponent;
 
       // if(textString.length && textString !== null){
@@ -135,13 +132,134 @@
       // }
     },
 
-    app.$downloadThumb    = $('#dl-thumb');
-    app.$downloadThumb.on('click', app.c.covertCanvasToImgDownload);
-    covertCanvasToImgDownload: function(){
-      // Remove selected states and grid before saving img
-      app.c.cleanCanvas();
-      app.imagedata = app._canvas.toDataURL('image/png');
-      console.log(app.imagedata);
-      this.href = app.imagedata;
-      app.c.toggleCanvasGrid(true);
-    }
+
+
+
+
+
+
+
+
+
+    // Create collection of objects for the JSON, which will be converted to XML
+      canvasData.forEach(function(el, i) {
+        console.log(el);
+        // Check if the element has been scaled. If it has then get the scaled value
+        var scalex        = el.scaleX === 1 ? 1 : el.scaleX,
+            scaley        = el.scaleY === 1 ? 1 : el.scaleY,
+            elDimensions  = [
+                            app.c.convertUnit( (el.width * scalex) * canvasScale, app.mmSize),
+                            app.c.convertUnit( (el.height * scaley) * canvasScale, app.mmSize),
+                            app.c.convertUnit(el.top * canvasScale, app.mmSize),
+                            app.c.convertUnit(el.left * canvasScale, app.mmSize),
+                            destDocWidth,
+                            destDocHeight
+                          ];
+        // console.log(scalex, scaley)
+        //console.log(elDimensions);
+
+        // Check if the canvas object is a text element, and if the text for it is coming from an external source (.txt file for example)
+        // If it is a regular text element, then it needs to be wrapped in a 'text-group-block'
+        if(el.type === 'i-text' && typeof(el.stringSrc) === 'undefined'){  
+          var textBlockGroupName  = 'text-block-group_' + i
+          // Create <text-block-group>
+          baseObj[textBlockGroupName] = {
+            '_align': el.textAlign,
+            '_editable': 'True',
+            '_fitmethod': 'auto',
+            '_height': elDimensions[1],
+            '_id': 'Group '+ i,
+            '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
+            '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
+            '_mandatory': 'False',
+            '_orientate': 'north',
+            '_spacing': '0',
+            '_title': 'Group '+ i,
+            '_upperrightx': app.c.calcUpperRightX(elDimensions),
+            '_upperrighty': app.c.calcUpperRightY(elDimensions),
+            '_verticalalign': 'top',  
+            '_width': elDimensions[0],
+            // Create <text-block>
+            'text-block': {
+                            '_align': el.textAlign,
+                            '_colour': '94,0,100,0', // rgbToCMYK(el.fill),
+                            '_editable': 'True', // Need to add to initial form
+                            '_fitmethod': 'auto',
+                            '_font-family': 'FuturaBT-Heavy', // el.fontFamily,
+                            '_font-size': app.c.convertUnit(el.fontSize, app.ptSize),
+                            '_height': elDimensions[1],
+                            '_id': 'Block ' + i, // Need to add to initial form
+                            '_leading': '125%', // Need to add to initial form,
+                            '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
+                            '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
+                            '_mandatory': 'False', // Need to add to initial form
+                            '_maxlen': '100', // Need to add to initial form
+                            '_orientate': 'north',
+                            '_source': 'C:\\Projects\\bemac_discovery\\BeMacDiscovery\\Assets\\terms.txt', // Need to add to initial form
+                            '_textmode': 'multiline', // Need to add to initial form
+                            '_title': 'Block ' + i, // Need to add to initial form
+                            '_upperrightx': app.c.calcUpperRightX(elDimensions),
+                            '_upperrighty': app.c.calcUpperRightY(elDimensions),
+                            '_width': elDimensions[0],
+                            '_verticalalign': 'top',                        
+                            '__text': el.text
+                          }
+          }
+          console.log(baseObj);
+          cordData.push(baseObj);
+        }
+        // If it is a text element that uses an external source, it DOES NOT require a wrapping 'text-block-group'
+        else if(el.type === 'i-text' && typeof(el.stringSrc) !== 'undefined'){
+          var textBlockName  = 'text-block' + i
+          // Create <text-block>
+          baseObj[textBlockName] = {
+                                    '_align': el.textAlign,
+                                    '_colour': '94,0,100,0', // rgbToCMYK(el.fill),
+                                    '_editable': 'True', // Need to add to initial form
+                                    '_fitmethod': 'auto',
+                                    '_font-family': 'FuturaBT-Heavy', // el.fontFamily,
+                                    '_font-size': app.c.convertUnit(el.fontSize, app.ptSize),
+                                    '_height': elDimensions[1],
+                                    '_id': 'Block ' + i, // Need to add to initial form
+                                    '_leading': '125%', // Need to add to initial form,
+                                    '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
+                                    '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
+                                    '_mandatory': 'False', // Need to add to initial form
+                                    '_maxlen': '100', // Need to add to initial form
+                                    '_orientate': 'north',
+                                    '_source': el.stringSrc, // Need to add to initial form
+                                    '_textmode': 'multiline', // Need to add to initial form
+                                    '_title': 'Block ' + i, // Need to add to initial form
+                                    '_upperrightx': app.c.calcUpperRightX(elDimensions),
+                                    '_upperrighty': app.c.calcUpperRightY(elDimensions),
+                                    '_width': elDimensions[0],
+                                    '_verticalalign': 'top',                        
+                                    '__text': el.text
+                                  }
+          cordData.push(baseObj);
+        }
+        // Otherwise it will be treated as an image block
+        else{
+          var imgBlockName = 'image_' + i;
+          baseObj[imgBlockName] = {
+                                    '_align': el.halign,
+                                    '_editable': 'False',
+                                    '_fillcolor': app.c.rgbToCMYK(el.fill),
+                                    '_fitmethod': 'auto',
+                                    '_height': elDimensions[1],
+                                    '_highresfilename': 'demo-800.jpg', //el.src
+                                    '_id': 'image_' + i,
+                                    '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
+                                    '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
+                                    '_lowresfilename': 'demo-800.jpg',  //el.src
+                                    '_mandatory': 'False',
+                                    '_orientate': 'north',
+                                    '_title': 'image ' + i,
+                                    '_upperrightx': app.c.calcUpperRightX(elDimensions),
+                                    '_upperrighty': app.c.calcUpperRightY(elDimensions),
+                                    '_verticalalign': el.valign,
+                                    '_width': elDimensions[0]
+                                  };
+          cordData.push(baseObj);
+        }
+      });

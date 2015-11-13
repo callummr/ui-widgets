@@ -15,6 +15,7 @@
   app.templateType  = 'default';
   app.imagedata;
   app.docDimesions  = [];
+  app.templateName;
 
   app.c = {
     initCreate: function(){
@@ -88,13 +89,19 @@
       // return [computedC,computedM,computedY,computedK];
       return computedC + ',' + computedM + ',' + computedY + ',' + computedK;
     },
+    toggleElements: function(){
+      var $this         = $(this),
+          toggleTarget  = $this.data('targetel'),
+          toggleGroup   = $this.data('toggle-group');
 
+      $('.' + toggleGroup).addClass('hidden');
+      $('#' + toggleTarget).removeClass('hidden');
+    },
     // Canvas Controls and Events
     resetTemplate: function(){
       app._canvas.clear();
       app.docDimesions = [];
-      $('#canvas-container').empty();
-      $('#i').empty();
+      $('.empty-on-reset').empty();
       $('.stepped-option-2').addClass('hidden');
       $('.active-option').fadeOut(100, function(){
         $('.stepped-option').removeClass('active-option');
@@ -106,13 +113,9 @@
       // (http://stackoverflow.com/questions/5034529/size-of-html5-canvas-via-css-versus-element-attributes)
       var canvasEl = document.createElement('canvas'),
           size;
-      // Store the set document varaitions sizes to an array
-      $('input[name=doc-size]').each(function() {
-        var $this = $(this);
-        if($this.prop('checked') === true){
-          app.docDimesions.push($this.val());
-        }
-      });
+      
+      app.c.setTemplateDetails();
+      
       canvasEl.setAttribute('id', 'c');
 
       // Check if the document size desired template should be a regular paper size or business card.
@@ -145,6 +148,29 @@
     },
     loadExistingTemp: function(){
 
+    },
+    setTemplateDetails: function(){
+      var $orientationDetail = $('#template-orientation');
+      // Set the template name
+      $('#template-name').text(app.templateName);
+
+      // Store the set document varaitions sizes to an array
+      $('input[name=doc-size]').each(function() {
+        var $this = $(this);
+        if($this.prop('checked') === true){
+          app.docDimesions.push($this.val());
+        }
+      });
+
+      // template-size-options
+      $('#template-size-options').text( app.docDimesions.join(','));
+
+      // 
+      if(app.orientation === 'p'){
+        $orientationDetail.text('Portrait');
+      }else{
+        $orientationDetail.text('Landscape');
+      }
     },
     drawGrid: function(gSize){
       var gridLines = [];
@@ -385,6 +411,17 @@
         });
       });
     },
+
+    // Validation
+    validateTemplateName: function(){
+      var $this = $(this);
+      if($this.val().length > 2){
+        app.$newTempBtn.removeAttr('disabled');
+        app.templateName = $.trim($this.val());
+      }else{
+        app.$newTempBtn.attr('disabled', 'disabled');
+      }
+    },
     validateDocSize: function(){
       var $this               = $(this),
           $businessCardOpt    = $('.doc-size-business'),
@@ -417,16 +454,18 @@
       // Remove the grid element group from data
       canvasData.objects.shift();
       
-      // console.log(JSON.stringify(canvasData));
+      console.log(JSON.stringify(canvasData));
       // canvasData.objects.push()
       return canvasData.objects
     },
     generateCords: function(canvasData){
       // All based of fixed values of of canvas_size:print_size(A4) a scale will need to be passed to the DOC property if larger/smaller
-      // The canvas doesnt allow percentage decimal values. The coordinates need to be 2.0174 times bigger than the canvas
+      // The canvas doesn't allow percentage decimal values so the canvas is slighlty less than 2 times smaller than it should be mm > px.
+      // The 'canvasScale' need to be 2.0174 times bigger than the canvas for default sized documents (all A sizes)
+      // For business cards the canvas is set at a 1:1 scale and therefore 'canvasScale' needs to be to 1
 
       var docSettings     = app.c.setDocumentSize(),
-          canvasScale     = 2.0174, // Create function to make this dyanmic based on canvas/document size ratio
+          canvasScale     = app.templateType === 'default' ? 2.0174 : 1,
           cordData        = [],
           baseObj         = {},
           destDocWidth    = docSettings[0],
@@ -464,7 +503,7 @@
 
       // Create collection of objects for the JSON, which will be converted to XML
       canvasData.forEach(function(el, i) {
-        // console.log(el);
+        console.log(el);
         // Check if the element has been scaled. If it has then get the scaled value
         var scalex        = el.scaleX === 1 ? 1 : el.scaleX,
             scaley        = el.scaleY === 1 ? 1 : el.scaleY,
@@ -621,18 +660,11 @@
             url: '/be/api/PDFMake.ashx',
             type: 'post',
             dataType: 'json',
-            data: {tn : "test",tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions},
+            data: {tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions},
             success: function (data) {
                 alert('call...sent');
             }
         });
-
-      /*
-      var templateName = $("input[name=templateName]").val();
-      if (templateName == "") {
-          alert('Please enter a template name');
-      }
-      */
     },
 
     // elWidth[0], elHeight[1], top[2], left[3], docWidth[4], docHeight[5]
@@ -669,6 +701,9 @@
       app.$newTempBtn       = $('#at-new-template');
       app.$fromTempBtn      = $('#at-from-template');
       app.$documentSizeBtns = $('input[name=doc-size]');
+      app.$textComponentOpt = $('.text-editor-option button');
+      app.$templateName     = $('#new-template-name');
+      app.$toggleElTriggers = $('.js-toggle-target-el');
 
       // Bind event listeners to dom elements
       app.$reserCreateTemp.on('click', app.c.resetTemplate)
@@ -679,7 +714,10 @@
       app.$newTempBtn.on('click', app.c.createNewTemp);
       app.$fromTempBtn.on('click', app.c.loadExistingTemp);
       app.$stepBtns.on('click', app.c.steppedOptionHandler);
-      app.$addTempArea.on('click', app.c.createTempBlock);      
+      app.$addTempArea.on('click', app.c.createTempBlock);   
+      app.$textComponentOpt.on('click', app.c.setSelectedOption);
+      app.$templateName.on('keyup blur', app.c.validateTemplateName);
+      app.$toggleElTriggers.on('click', app.c.toggleElements);
     },
 
     // Creation tool end points
