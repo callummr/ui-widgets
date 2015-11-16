@@ -16,7 +16,12 @@
   app.imagedata;
   app.docDimesions  = [];
   app.templateName;
-  app.dummyText = $.get('assets/data/dummy-text.txt', function(data){return data}, 'text');
+
+  if(document.location.hostname ===  "widget.macmillan.org.uk"){
+    app.dummyText = $.get('assets/data/dummy-text.txt', function(data){return data}, 'text');
+  }else{
+    app.dummyText = $.get('../assets/data/dummy-text.txt', function(data){return data}, 'text');
+  }  
 
   app.c = {
     initCreate: function(){
@@ -60,15 +65,15 @@
         return [88,55]      // Business Card 
       }
     },
-    rgbToCMYK: function(rgb){
+    rgbToCMYK: function(color){
       var computedC = 0,
           computedM = 0,
           computedY = 0,
           computedK = 0,
-          rgb       = rgb.replace(/rgb|\(|\)/gi, '').split(','),
-          r = parseInt(rgb[0]),
-          g = parseInt(rgb[1]),
-          b = parseInt(rgb[2]);
+          rgb       = color.replace(/rgb|\(|\)/gi, '').split(','),
+          r         = parseInt(rgb[0]),
+          g         = parseInt(rgb[1]),
+          b         = parseInt(rgb[2]);
 
       // BLACK
       if (r==0 && g==0 && b==0) {
@@ -82,12 +87,13 @@
 
       var minCMY = Math.min(computedC, Math.min(computedM,computedY));
 
-      computedC = (computedC - minCMY) / (1 - minCMY) ;
-      computedM = (computedM - minCMY) / (1 - minCMY) ;
-      computedY = (computedY - minCMY) / (1 - minCMY) ;
-      computedK = minCMY;
+      computedC = Math.round( (computedC - minCMY) / (1 - minCMY) * 100 );
+      computedM = Math.round( (computedM - minCMY) / (1 - minCMY) * 100 );
+      computedY = Math.round( (computedY - minCMY) / (1 - minCMY) * 100 );
+      computedK = Math.round( minCMY * 100 );
 
       // return [computedC,computedM,computedY,computedK];
+      // console.log( computedC + ',' + computedM + ',' + computedY + ',' + computedK );
       return computedC + ',' + computedM + ',' + computedY + ',' + computedK;
     },
     toggleElements: function(){
@@ -103,6 +109,7 @@
       app._canvas.clear();
       app.docDimesions = [];
       $('.empty-on-reset').empty();
+      $('.clear-on-reset').val('');
       $('.stepped-option-2').addClass('hidden');
       $('.active-option').fadeOut(100, function(){
         $('.stepped-option').removeClass('active-option');
@@ -337,8 +344,9 @@
     createTempBlock: function(){
       // Pass through the selected aspect ratio of the element
       // Add the RGB Value to the settings
-      var blockType     = $('input[name=template-block-type]:checked').val() === 'new-template-text-block' ? 't' : 'i',
-          blockSettings = app.c.setAspectRatio($('input[name=block-ratio]:checked').val());
+      var $componentTitle = $('#at-block-title'),
+          blockType       = $('input[name=template-block-type]:checked').val() === 'new-template-text-block' ? 't' : 'i',
+          blockSettings   = app.c.setAspectRatio($('input[name=block-ratio]:checked').val());
           blockSettings.push($('input[name=h-pos]:checked').val());
           blockSettings.push($('input[name=v-pos]:checked').val());
           console.log(blockType);
@@ -371,9 +379,15 @@
       }else{
         _block['blocktype'] = 'new-image-block';
       }
-      _block['halign'] = blockSettings[3];
-      _block['valign'] = blockSettings[4];
+
+      _block['blockTitle']  = $componentTitle.val() || 'Block';
+      _block['isManditory'] = $('#at-manditory').is(':checked') ? true : false;
+      _block['isEditable']  = $('#at-editable').is(':checked') ? true : false;
+      _block['halign']      = blockSettings[3];
+      _block['valign']      = blockSettings[4];
       app._canvas.add(_block);
+      // Empty the input field with the previous component name.
+      $componentTitle.val('');
     },
     bindCanavsEvents: function(){
       // This event handler stops elements being moved outside of the canvas element when moving an element on the canvas
@@ -465,13 +479,16 @@
     generateJSON: function(){
       // Pass through additional attributes toe generated JSON
       var canvasData = app._canvas.toDatalessJSON([
-        'stringSrc',
-        'halign',
-        'valign',
+        'blockTitle',
         'blocktype',
         'fontFamily',
         'fontSize',
-        'maxLength'
+        'halign',
+        'isEditable',
+        'isManditory',
+        'maxLength',
+        'stringSrc',
+        'valign'    
       ]);
       if ( localStorage.getItem('canvasDataJSON') === null ){
         localStorage.removeItem('canvasDataJSON');
@@ -489,8 +506,6 @@
       // The canvas doesn't allow percentage decimal values so the canvas is slighlty less than 2 times smaller than it should be mm > px.
       // The 'canvasScale' need to be 2.0174 times bigger than the canvas for default sized documents (all A sizes)
       // For business cards the canvas is set at a 1:1 scale and therefore 'canvasScale' needs to be to 1
-
-      console.log(app.dummyText);
 
       var docSettings     = app.c.setDocumentSize(),
           canvasScale     = app.templateType === 'default' ? 2.0174 : 1,
@@ -553,16 +568,16 @@
           // Create <text-block-group>
           baseObj[textBlockGroupName] = {
             '_align': el.halign,
-            '_editable': 'True',
+            '_editable': el.isEditable,
             '_fitmethod': 'auto',
             '_height': elDimensions[1],
             '_id': 'Group'+ i,
             '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
             '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
-            '_mandatory': 'False',
+            '_mandatory': el.isManditory,
             '_orientate': 'north',
             '_spacing': '0',
-            '_title': 'Group '+ i,
+            '_title': el.blockTitle,
             '_upperrightx': app.c.calcUpperRightX(elDimensions),
             '_upperrighty': app.c.calcUpperRightY(elDimensions),
             '_verticalalign': el.valign,  
@@ -570,24 +585,23 @@
             // Create <text-block>
             'text-block': {
                             '_align': el.halign,
-                            '_colour': '94,0,100,0', // rgbToCMYK(el.fill),
-                            '_editable': 'True', // Need to add to initial form
+                            '_colour': app.c.rgbToCMYK(el.fill),
+                            '_editable': el.isEditable,
                             '_fitmethod': 'auto',
                             '_font-family':el.fontFamily,
                             '_font-size': el.fontSize, // app.c.convertUnit(el.fontSize, app.ptSize),
-                            '_id': 'Block' + i, // Need to add to initial form
+                            '_id': el.blockTitle,
                             '_leading': '125%', // Need to add to initial form,
-                            '_mandatory': 'False', // Need to add to initial form
+                            '_mandatory': el.isManditory,
                             '_maxlen': el.maxLength,
                             '_orientate': 'north',
                             '_source': '',
-                            '_textmode': 'multiline', // Need to add to initial form
-                            '_title': 'Block ' + i, // Need to add to initial form
+                            '_textmode': 'multiline',
+                            '_title': el.blockTitle,
                             '_verticalalign': el.valign,                        
                             '__text': app.dummyText.responseText.substr(0, el.maxLength) //el.text
                           }
           }
-          console.log(baseObj);
           cordData.push(baseObj);
         }
         // If it is a text element that uses an external source, it DOES NOT require a wrapping 'text-block-group'
@@ -597,21 +611,21 @@
           baseObj[textBlockName] = {
                                     '_align': el.halign,
                                     '_colour': '94,0,100,0', // rgbToCMYK(el.fill),
-                                    '_editable': 'True', // Need to add to initial form
+                                    '_editable': el.isEditable,
                                     '_fitmethod': 'auto',
-                                    '_font-family': 'FuturaBT-Heavy', // el.fontFamily,
+                                    '_font-family': el.fontFamily,
                                     '_font-size': app.c.convertUnit(el.fontSize, app.ptSize),
                                     '_height': elDimensions[1],
-                                    '_id': 'Block ' + i, // Need to add to initial form
+                                    '_id': el.blockTitle,
                                     '_leading': '125%', // Need to add to initial form,
                                     '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
                                     '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
-                                    '_mandatory': 'False', // Need to add to initial form
+                                    '_mandatory': el.isManditory,
                                     '_maxlen': el.maxLength,
                                     '_orientate': 'north',
                                     '_source': el.stringSrc,
                                     '_textmode': 'multiline',
-                                    '_title': 'Block ' + i, // Need to add to initial form
+                                    '_title': el.blockTitle,
                                     '_upperrightx': app.c.calcUpperRightX(elDimensions),
                                     '_upperrighty': app.c.calcUpperRightY(elDimensions),
                                     '_width': elDimensions[0],
@@ -625,18 +639,18 @@
           var imgBlockName = 'image_' + i;
           baseObj[imgBlockName] = {
                                     '_align': el.halign,
-                                    '_editable': 'False',
-                                    '_fillcolor': app.c.rgbToCMYK(el.fill),
+                                    '_editable': el.isEditable,
+                                    // '_fillcolor': app.c.rgbToCMYK(el.fill),
                                     '_fitmethod': 'auto',
                                     '_height': elDimensions[1],
                                     '_highresfilename': 'demo-800.jpg', //el.src
-                                    '_id': 'image_' + i,
+                                    '_id': el.blockTitle,
                                     '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
                                     '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
                                     '_lowresfilename': 'demo-800.jpg',  //el.src
-                                    '_mandatory': 'False',
+                                    '_mandatory': el.isManditory,
                                     '_orientate': 'north',
-                                    '_title': 'image ' + i,
+                                    '_title': el.blockTitle,
                                     '_upperrightx': app.c.calcUpperRightX(elDimensions),
                                     '_upperrighty': app.c.calcUpperRightY(elDimensions),
                                     '_verticalalign': el.valign,

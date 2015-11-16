@@ -80,11 +80,12 @@
 					</div>
 				</div>
 
-				<div class="stepped-option" data-step="2">
-					<h2>Add component</h2>							
-					<div class="">
+				<div class="stepped-option" data-step="2">							
+					<div>
 						<!-- adt- id prefix is for add template elements -->
-						<h3>Template block type</h3>
+						<h2>Create component</h2>
+						<input type="text" id="at-block-title" class="form-control clear-on-reset" placeholder="Name of component...">
+						<hr>
 						<div id="adt-fill" class="text-editor-option">
 							<label for="template-text-block">
 								<span class="badge">Text Block</span>
@@ -106,22 +107,23 @@
 
 								<h3>Select Font Size</h3>
 								<div id="at-font-size" class="text-editor-option">
-									<button type="button" type="button" class="btn btn-default option-selected" data-size="24">Small</button>
-									<button type="button" class="btn btn-default" data-size="30">Medium</button>
+									<button type="button" type="button" class="btn btn-default option-selected" data-size="12">Small</button>
+									<button type="button" class="btn btn-default" data-size="24">Medium</button>
 									<button type="button" class="btn btn-default" data-size="36">Large</button>
 								</div>							
 
 								<h3>Select Colour</h3>
 								<div id="at-font-color" class="text-editor-option">
-									<button type="button" class="btn btn-default option-selected color-option color-red" data-rgb="255,0,0">Red</button>
-									<button type="button" class="btn btn-default color-option color-yellow" data-rgb="255,252,0">Yellow</button>
-									<button type="button" class="btn btn-default color-option color-pink" data-rgb="255,0,187">Pink</button>
-									<button type="button" class="btn btn-default color-option color-blue" data-rgb="0,0,255">Blue</button>
-									<button type="button" class="btn btn-default color-option color-purple" data-rgb="222,0,255">Purple</button>
+									<button type="button" class="btn btn-default color-option color-light-green option-selected" data-rgb="140,198,63">Light Green</button>
+									<button type="button" class="btn btn-default color-option color-mid-green" data-rgb="0,162,70">Mid Green</button>
+									<button type="button" class="btn btn-default color-option color-dark-green" data-rgb="0,92,70">Dark Green</button>
+									<button type="button" class="btn btn-default color-option color-purple" data-rgb="104,44,136">Purple</button>
+									<button type="button" class="btn btn-default color-option color-orange" data-rgb="241,131,21">Orange</button>
+									<button type="button" class="btn btn-default color-option color-red" data-rgb="227,35,51">Red</button>
 								</div>
 
 								<h3>Maxlength</h3>
-								<input type="number" value="100" id="at-maxlength">
+								<input type="number" value="100" id="at-maxlength" class="form-control">
 							</div>
 
 							<div class="hidden template-options" id="new-template-image-block">
@@ -175,14 +177,6 @@
 							</div>
 						</div>
 
-						<!-- <div id="adt-fill" class="text-editor-option">
-							<button type="button" class="btn btn-default option-selected color-option color-red" data-rgb="255,0,0">Red</button>
-							<button type="button" class="btn btn-default color-option color-yellow" data-rgb="255,252,0">Yellow</button>
-							<button type="button" class="btn btn-default color-option color-pink" data-rgb="255,0,187">Pink</button>
-							<button type="button" class="btn btn-default color-option color-blue" data-rgb="0,0,255">Blue</button>
-							<button type="button" class="btn btn-default color-option color-purple" data-rgb="222,0,255">Purple</button>
-						</div> -->
-
 						<hr>
 
 						<h3>Horizontal positioning</h3>
@@ -212,8 +206,29 @@
 			            	<input type="radio" id="v-bottom" name="v-pos" value="bottom">
 			          	</span>
 							
-						<hr>
-
+						<div class="row">
+							<div class="col-md-6">
+								<div class="onoffswitch">
+									<h3>Manditory?</h3>
+								    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="at-manditory" checked>
+								    <label class="onoffswitch-label" for="at-manditory">
+								        <span class="onoffswitch-inner"></span>
+								        <span class="onoffswitch-switch"></span>
+								    </label>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="onoffswitch">
+									<h3>Editable?</h3>
+								    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="at-editable" checked>
+								    <label class="onoffswitch-label" for="at-editable">
+								        <span class="onoffswitch-inner"></span>
+								        <span class="onoffswitch-switch"></span>
+								    </label>
+								</div>
+							</div>
+						</div>
+						<hr>		
 						<button type="button" class="btn btn-primary" id="add-template-area">Add template block</button>
 					</div>
 					<!--
