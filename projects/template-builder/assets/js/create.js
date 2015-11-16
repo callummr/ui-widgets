@@ -16,6 +16,7 @@
   app.imagedata;
   app.docDimesions  = [];
   app.templateName;
+  app.dummyText = $.get('assets/data/dummy-text.txt', function(data){return data}, 'text');
 
   app.c = {
     initCreate: function(){
@@ -336,26 +337,42 @@
     createTempBlock: function(){
       // Pass through the selected aspect ratio of the element
       // Add the RGB Value to the settings
-      var blockSettings = app.c.setAspectRatio( $('input[name=block-ratio]:checked').val() );
-          blockSettings.push('rgb(' + $('#adt-fill .option-selected').attr('data-rgb') + ')');
+      var blockType     = $('input[name=template-block-type]:checked').val() === 'new-template-text-block' ? 't' : 'i',
+          blockSettings = app.c.setAspectRatio($('input[name=block-ratio]:checked').val());
           blockSettings.push($('input[name=h-pos]:checked').val());
           blockSettings.push($('input[name=v-pos]:checked').val());
+          console.log(blockType);
+
+      if( blockType === 't'){
+        blockSettings.push('rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')');
+      }else{
+        blockSettings.push('rgb(0,0,0)');
+      }
+      console.log(blockSettings);
 
       // Create the fabric js element on the canvas
       // Use the settings from 'blockSettings' variable
       var _block = new fabric.Rect({
-                                    fill: blockSettings[3],
+                                    fill: blockSettings[5],
                                     hasBorders: false,
                                     hasRotatingPoint: false,
                                     height: blockSettings[1],
                                     left: 0,
                                     lockRotation: true,
-                                    lockUniScaling: blockSettings[2],
+                                    lockUniScaling: blockType === 't' ? false : blockSettings[2],
                                     top: 0,
                                     width: blockSettings[0]
                                   });
-      _block['halign'] = blockSettings[4];
-      _block['valign'] = blockSettings[5];
+      if(blockType === 't'){
+        _block['blocktype']   = 'new-text-block';
+        _block['fontFamily']  = $('#at-font-face .option-selected').data('fface');
+        _block['fontSize']    = $('#at-font-size .option-selected').data('size');
+        _block['maxLength']   = $('#at-maxlength').val();
+      }else{
+        _block['blocktype'] = 'new-image-block';
+      }
+      _block['halign'] = blockSettings[3];
+      _block['valign'] = blockSettings[4];
       app._canvas.add(_block);
     },
     bindCanavsEvents: function(){
@@ -446,7 +463,16 @@
     
     // Functions needed to prepare template for export
     generateJSON: function(){
-      var canvasData = app._canvas.toDatalessJSON(['stringSrc', 'halign', 'valign']);
+      // Pass through additional attributes toe generated JSON
+      var canvasData = app._canvas.toDatalessJSON([
+        'stringSrc',
+        'halign',
+        'valign',
+        'blocktype',
+        'fontFamily',
+        'fontSize',
+        'maxLength'
+      ]);
       if ( localStorage.getItem('canvasDataJSON') === null ){
         localStorage.removeItem('canvasDataJSON');
       }
@@ -454,7 +480,7 @@
       // Remove the grid element group from data
       canvasData.objects.shift();
       
-      console.log(JSON.stringify(canvasData));
+      // console.log(JSON.stringify(canvasData));
       // canvasData.objects.push()
       return canvasData.objects
     },
@@ -463,6 +489,8 @@
       // The canvas doesn't allow percentage decimal values so the canvas is slighlty less than 2 times smaller than it should be mm > px.
       // The 'canvasScale' need to be 2.0174 times bigger than the canvas for default sized documents (all A sizes)
       // For business cards the canvas is set at a 1:1 scale and therefore 'canvasScale' needs to be to 1
+
+      console.log(app.dummyText);
 
       var docSettings     = app.c.setDocumentSize(),
           canvasScale     = app.templateType === 'default' ? 2.0174 : 1,
@@ -520,15 +548,15 @@
 
         // Check if the canvas object is a text element, and if the text for it is coming from an external source (.txt file for example)
         // If it is a regular text element, then it needs to be wrapped in a 'text-group-block'
-        if(el.type === 'i-text' && typeof(el.stringSrc) === 'undefined'){  
+        if(el.blocktype === 'new-text-block' && typeof(el.stringSrc) === 'undefined'){  
           var textBlockGroupName  = 'text-block-group_' + i
           // Create <text-block-group>
           baseObj[textBlockGroupName] = {
-            '_align': el.textAlign,
+            '_align': el.halign,
             '_editable': 'True',
             '_fitmethod': 'auto',
             '_height': elDimensions[1],
-            '_id': 'Group '+ i,
+            '_id': 'Group'+ i,
             '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
             '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
             '_mandatory': 'False',
@@ -537,43 +565,37 @@
             '_title': 'Group '+ i,
             '_upperrightx': app.c.calcUpperRightX(elDimensions),
             '_upperrighty': app.c.calcUpperRightY(elDimensions),
-            '_verticalalign': 'top',  
+            '_verticalalign': el.valign,  
             '_width': elDimensions[0],
             // Create <text-block>
             'text-block': {
-                            '_align': el.textAlign,
+                            '_align': el.halign,
                             '_colour': '94,0,100,0', // rgbToCMYK(el.fill),
                             '_editable': 'True', // Need to add to initial form
                             '_fitmethod': 'auto',
-                            '_font-family': 'FuturaBT-Heavy', // el.fontFamily,
-                            '_font-size': app.c.convertUnit(el.fontSize, app.ptSize),
-                            '_height': elDimensions[1],
-                            '_id': 'Block ' + i, // Need to add to initial form
+                            '_font-family':el.fontFamily,
+                            '_font-size': el.fontSize, // app.c.convertUnit(el.fontSize, app.ptSize),
+                            '_id': 'Block' + i, // Need to add to initial form
                             '_leading': '125%', // Need to add to initial form,
-                            '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
-                            '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
                             '_mandatory': 'False', // Need to add to initial form
-                            '_maxlen': '100', // Need to add to initial form
+                            '_maxlen': el.maxLength,
                             '_orientate': 'north',
-                            '_source': 'C:\\Projects\\bemac_discovery\\BeMacDiscovery\\Assets\\terms.txt', // Need to add to initial form
+                            '_source': '',
                             '_textmode': 'multiline', // Need to add to initial form
                             '_title': 'Block ' + i, // Need to add to initial form
-                            '_upperrightx': app.c.calcUpperRightX(elDimensions),
-                            '_upperrighty': app.c.calcUpperRightY(elDimensions),
-                            '_width': elDimensions[0],
-                            '_verticalalign': 'top',                        
-                            '__text': el.text
+                            '_verticalalign': el.valign,                        
+                            '__text': app.dummyText.responseText.substr(0, el.maxLength) //el.text
                           }
           }
           console.log(baseObj);
           cordData.push(baseObj);
         }
         // If it is a text element that uses an external source, it DOES NOT require a wrapping 'text-block-group'
-        else if(el.type === 'i-text' && typeof(el.stringSrc) !== 'undefined'){
+        else if(el.type === 'new-text-block' && typeof(el.stringSrc) !== 'undefined'){
           var textBlockName  = 'text-block' + i
           // Create <text-block>
           baseObj[textBlockName] = {
-                                    '_align': el.textAlign,
+                                    '_align': el.halign,
                                     '_colour': '94,0,100,0', // rgbToCMYK(el.fill),
                                     '_editable': 'True', // Need to add to initial form
                                     '_fitmethod': 'auto',
@@ -585,16 +607,16 @@
                                     '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
                                     '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
                                     '_mandatory': 'False', // Need to add to initial form
-                                    '_maxlen': '100', // Need to add to initial form
+                                    '_maxlen': el.maxLength,
                                     '_orientate': 'north',
-                                    '_source': el.stringSrc, // Need to add to initial form
-                                    '_textmode': 'multiline', // Need to add to initial form
+                                    '_source': el.stringSrc,
+                                    '_textmode': 'multiline',
                                     '_title': 'Block ' + i, // Need to add to initial form
                                     '_upperrightx': app.c.calcUpperRightX(elDimensions),
                                     '_upperrighty': app.c.calcUpperRightY(elDimensions),
                                     '_width': elDimensions[0],
-                                    '_verticalalign': 'top',                        
-                                    '__text': el.text
+                                    '_verticalalign': el.valign,                        
+                                    '__text': app.dummyText.responseText.substr(0, el.maxLength) //el.text
                                   }
           cordData.push(baseObj);
         }
@@ -653,6 +675,7 @@
         return val
       }
     },
+    // Function that sends data to the backend to create a new template
     createTemplate: function(xml) {
       // Function receives the generated XML from what has been created on the canvas
       console.log(xml)

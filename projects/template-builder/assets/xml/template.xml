@@ -29,15 +29,15 @@
    </page>
 </doc>
 
-<doc assetspath="E:\be.macmillan.org.uk store\App_Data\Uploads\2594" scalex="1" scaley="1">
-   <page width="297" height="420">
-      <image lowresfilename="cancer-factfile-icon.jpg" highresfilename="cancer-factfile-icon.jpg" align="right" verticalalign="top" id="partnerlogo" mandatory="False" editable="True" title="Partner logo" lowerleftx="15" lowerlefty="347" upperrightx="282" upperrighty="405" width="267" height="58" fitmethod="auto" orientate="north" />
-      <pdf lowresfilename="" highresfilename="" align="left" verticalalign="top" id="logo" mandatory="False" editable="False" title="Logo" lowerleftx="244.167" lowerlefty="165" upperrightx="282" upperrighty="339" width="37.833" height="174" fitmethod="auto" orientate="north" />
-      <text-block font-family="Macmillan Headline" font-size="135" source="" textmode="multiline" maxlen="100" colour="50,0,100,0" align="left" verticalalign="top" leading="100%" id="heading" mandatory="False" editable="True" title="Heading" lowerleftx="15" lowerlefty="165" upperrightx="236.167" upperrighty="339" width="221.167" height="174" fitmethod="auto" orientate="north">This is sample text</text-block>
-      <text-block-group align="left" verticalalign="bottom" spacing="0" id="Group1" mandatory="False" editable="True" title="Group 1" lowerleftx="15" lowerlefty="43" upperrightx="236.167" upperrighty="157" width="221.167" height="114" fitmethod="auto" orientate="north">
-         <text-block font-family="FuturaBT-Heavy" font-size="24" source="" textmode="multiline" maxlen="200" colour="50,0,100,0" align="left" verticalalign="top" leading="125%" id="Details" mandatory="False" editable="True" title="Details" fitmethod="auto" orientate="north">This is just a sample text to show you how your  resource will look. Please replace it with your own  copy, keeping it as brief as possible.    We are:  Persons Name, Another Person, Persons Name    You can find us at:  Location Name  Tel 01234 567890  Fax 01234 567 891</text-block>
+<?xml version="1.0" encoding="UTF-8"?>
+<doc scalex="1" scaley="1" assetspath="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\268">
+   <page width="210" height="297">
+      <pdf lowresfilename="" highresfilename="" align="left" verticalalign="top" id="bglayer" mandatory="True" editable="False" title="background" lowerleftx="0" lowerlefty="0" upperrightx="210" upperrighty="297" width="210" height="297" fitmethod="auto" orientate="north" />
+      <text-block-group align="left" editable="True" fitmethod="auto" height="53" id="Group0" lowerleftx="-77" lowerlefty="-1" mandatory="False" orientate="north" spacing="0" title="Group 0" upperrightx="211" upperrighty="52" verticalalign="top" width="288">
+         <text-block align="left" colour="94,0,100,0" editable="True" fitmethod="auto" font-family="FuturaBT-Heavy" font-size="24" id="Block 0" leading="125%" mandatory="False" maxlen="100" orientate="north" source="" textmode="multiline" title="Block 0" verticalalign="top" />
       </text-block-group>
-      <text-block font-family="FuturaBT-Heavy" font-size="24" source="E:\Websites\beMacmillan\Assets\CancerLine.txt" textmode="singleline" maxlen="" colour="50,0,100,0" align="left" verticalalign="bottom" leading="100%" id="cancerline" mandatory="False" editable="False" title="CancerLine" lowerleftx="15" lowerlefty="15" upperrightx="236.167" upperrighty="35" width="221.167" height="20" fitmethod="auto" orientate="north" />
-      <text-block font-family="FuturaBT-Medium" font-size="9" source="E:\Websites\beMacmillan\Assets\Terms.txt" textmode="singleline" maxlen="" colour="94,0,100,0" align="left" verticalalign="bottom" leading="100%" id="Terms" mandatory="False" editable="False" title="Terms and Conditions" lowerleftx="244.167" lowerlefty="15" upperrightx="282" upperrighty="157" width="37.833" height="142" fitmethod="auto" orientate="west" />
+      <text-block-group align="left" editable="True" fitmethod="auto" height="53" id="Group1" lowerleftx="0" lowerlefty="0" mandatory="False" orientate="north" spacing="0" title="Group 1" upperrightx="210" upperrighty="297" verticalalign="top" width="210">
+         <text-block align="left" colour="94,0,100,0" editable="True" fitmethod="auto" font-family="FuturaBT-Heavy" font-size="24" id="Block 1" leading="125%" mandatory="False" maxlen="100" orientate="north" source="" textmode="multiline" title="Block 1" verticalalign="top" />
+      </text-block-group>
    </page>
 </doc>

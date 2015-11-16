@@ -98,9 +98,10 @@
 							<div class="template-options" id="new-template-text-block">
 								<h3>Font Face</h3>
 								<div id="at-font-face" class="text-editor-option">
-									<button type="button" class="btn btn-default option-selected" data-type="reg">Regular</button>
-									<button type="button" class="btn btn-default" data-type="med">Medium</button>
-									<button type="button" class="btn btn-default" data-type="bol">Bold</button>
+									<!-- Need to add more weights -->
+									<button type="button" class="btn btn-default option-selected" data-fface="FuturaBT-Heavy">Regular</button>
+									<!-- <button type="button" class="btn btn-default" data-fface="FuturaBT-Heavy">Medium</button> -->
+									<button type="button" class="btn btn-default" data-fface="Macmillan Headline">Headline</button>
 								</div>
 
 								<h3>Select Font Size</h3>
@@ -110,13 +111,6 @@
 									<button type="button" class="btn btn-default" data-size="36">Large</button>
 								</div>							
 
-								<h3>Alignment</h3>
-								<div id="at-alignment" class="text-editor-option">
-									<button type="button" class="btn btn-default option-selected" data-align="left">Left</button>
-									<button type="button" class="btn btn-default" data-align="center">Center</button>
-									<button type="button" class="btn btn-default" data-align="right">Right</button>
-								</div>
-
 								<h3>Select Colour</h3>
 								<div id="at-font-color" class="text-editor-option">
 									<button type="button" class="btn btn-default option-selected color-option color-red" data-rgb="255,0,0">Red</button>
@@ -125,6 +119,9 @@
 									<button type="button" class="btn btn-default color-option color-blue" data-rgb="0,0,255">Blue</button>
 									<button type="button" class="btn btn-default color-option color-purple" data-rgb="222,0,255">Purple</button>
 								</div>
+
+								<h3>Maxlength</h3>
+								<input type="number" value="100" id="at-maxlength">
 							</div>
 
 							<div class="hidden template-options" id="new-template-image-block">
@@ -190,7 +187,7 @@
 
 						<h3>Horizontal positioning</h3>
 						<span class="input-group-addon">
-			          		<label class="badge" for="h-left">left</label>
+			          		<label class="badge" for="h-left">Left</label>
 			            	<input type="radio" id="h-left" name="h-pos" value="left" checked>
 			          	</span>
 			          	<span class="input-group-addon">

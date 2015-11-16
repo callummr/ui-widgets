@@ -13,3 +13,13 @@
     <image lowresfilename='demo.jpg' highresfilename='demo.jpg' align='left' verticalalign='top' id='image' mandatory='False' editable='False' title='image 0' lowerleftx='0' lowerlefty='0' upperrightx='105' upperrighty='54' fitmethod='auto' orientate='north' width='105' height='52'/>
   </page>
 </doc>
+
+<doc scalex="1" scaley="1" assetspath="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\268">
+   <page width="210" height="297">
+      <pdf lowresfilename="" highresfilename="" align="left" verticalalign="top" id="bglayer" mandatory="True" editable="False" title="background" lowerleftx="0" lowerlefty="0" upperrightx="210" upperrighty="297" width="210" height="297" fitmethod="auto" orientate="north" />
+      <text-block-group align="left" editable="True" fitmethod="auto" height="53" id="Group0" lowerleftx="-69" lowerlefty="244" mandatory="False" orientate="north" spacing="0" title="Group 0" upperrightx="212" upperrighty="297" verticalalign="top" width="281">
+         <text-block align="left" colour="94,0,100,0" editable="True" fitmethod="auto" font-family="FuturaBT-Heavy" font-size="24" id="Block0" leading="125%" mandatory="False" maxlen="100" orientate="north" source="" textmode="multiline" title="Block 0" verticalalign="top">Lorem ipsum dolor sit amet, ea natum persius eum, quidam mediocrem ocurreret ex mei. In etiam tempor</text-block>
+      </text-block-group>
+      <image align="left" editable="False" fillcolor="0,0,0,1" fitmethod="auto" height="53" highresfilename="demo-800.jpg" id="image" lowerleftx="0" lowerlefty="0" lowresfilename="demo-800.jpg" mandatory="False" orientate="north" title="image 1" upperrightx="211" upperrighty="52" verticalalign="top" width="289" />
+   </page>
+</doc>
