@@ -115,6 +115,7 @@
     resetTemplate: function(){
       app._canvas.clear();
       app.docDimesions = [];
+      // Reset the create template tool back to its default
       app.c.resetCreateTempBlock();
       $('.empty-on-reset').empty();
       $('.clear-on-reset').val('');
@@ -127,6 +128,9 @@
       });
     },
     resetCreateTempBlock: function(){
+      // Hide the edit buttons
+      app.c.toggleTempState(false);
+
       // Resets all checkboxes and radio buttons to the default setting.
       $('input[type="radio"].reset-to-default, input[type="checkbox"].reset-to-default').prop('checked', true);
       // Resets all text and number fields to the default setting.
@@ -455,8 +459,6 @@
 
       // Reset the component creation tool.
       app.c.resetCreateTempBlock();
-      // Hide the edit buttons
-      app.c.toggleTempState(false);
       // De-select the element previously selected on the canvas
       app._canvas.deactivateAll().renderAll();
     },
@@ -526,16 +528,12 @@
       var _activeObject = app._canvas.getActiveObject();
       app._canvas.remove(_activeObject);
 
-      // Hide the edit buttons
-      app.c.toggleTempState(false);
       // Reset the component creation tool.
       app.c.resetCreateTempBlock();
     },
     stopTempBlock: function(){
       // De-select the element previously selected on the canvas
       app._canvas.deactivateAll().renderAll();
-      // Hide the edit buttons
-      app.c.toggleTempState(false);
       // Reset the component creation tool.
       app.c.resetCreateTempBlock();
     },
