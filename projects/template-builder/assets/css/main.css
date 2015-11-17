@@ -52,6 +52,36 @@ textarea{
 .hidden-el{
 	display: none;
 }
+
+/* Alignment Roles */
+.align-icon{
+	background-image: url('../img/alignment-sprite.png');
+	background-repeat: no-repeat;
+	width: 30px;
+	height: 30px;
+}
+.align-left{
+	background-position: -80px 0;
+}
+.align-center{
+	background-position: 0 0;
+}
+.align-right{
+	background-position: -40px 0;
+}
+.align-top{
+	background-position: 0 -40px;
+}
+.align-middle{
+	background-position: -40px -40px;
+}
+.align-bottom{
+	background-position: -80px -40px;
+}
+input:checked + .align-icon{
+	border: solid 1px black;
+}
+
 .color-light-green{
 	background: rgb(140,198,63);
 }

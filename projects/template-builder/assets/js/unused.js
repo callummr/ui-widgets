@@ -87,7 +87,7 @@
 
     // app.$addTextArea      = $('#add-text-area');
     // app.$addTextArea.on('click', app.c.createTextArea);
-        createTextArea: function(){ 
+    createTextArea: function(){ 
       var _textComponent;
 
       // if(textString.length && textString !== null){
@@ -132,6 +132,13 @@
       // }
     },
 
+    setDefaultVal: function(val, expression, defaultVal){
+      if(val === expression){
+        return defaultVal
+      }else{
+        return val
+      }
+    },
 
 
 

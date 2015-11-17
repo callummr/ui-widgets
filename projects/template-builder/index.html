@@ -19,7 +19,7 @@
 					<div class="stepped-option-2 hidden" data-step-target="1">
 						<h3>Name template</h3>
 						<!-- Remove value attr -->
-						<input type="text" id="new-template-name" class="form-control canvas-name-field" value="Example Template Name" placeholder="At least 3 characters...">
+						<input type="text" id="new-template-name" class="form-control clear-on-reset canvas-name-field" value="Example Template Name" placeholder="At least 3 characters...">
 						
 						<hr>
 
@@ -34,7 +34,7 @@
 			          	</span>
 			          	<span class="input-group-addon">
 			          		<label class="badge" for="a4">A4</label>
-			            	<input type="checkbox" id="a4" name="doc-size" value="A4" checked>
+			            	<input type="checkbox" id="a4" class="default-setting" name="doc-size" value="A4" checked>
 			          	</span>
 			          	<span class="input-group-addon">
 			          		<label class="badge" for="a5">A5</label>
@@ -58,7 +58,7 @@
 
 			          	<span class="input-group-addon">
 							<label class="badge" for="p">Portrait</label>
-			            	<input type="radio" id="p" name="doc-orientation" value="p" checked>
+			            	<input type="radio" id="p" class="default-setting" name="doc-orientation" value="p" checked>
 			          	</span>
 			          	<span class="input-group-addon">
 							<label class="badge" for="l">Landscape</label>
@@ -84,134 +84,144 @@
 					<div>
 						<!-- adt- id prefix is for add template elements -->
 						<h2>Create component</h2>
-						<input type="text" id="at-block-title" class="form-control clear-on-reset" placeholder="Name of component...">
+						<input type="text" id="at-block-title" class="at-control reset-to-default form-control" placeholder="Name of component...">
 						<hr>
 						<div id="adt-fill" class="text-editor-option">
-							<label for="template-text-block">
+							<label for="template-text-block" class="at-control">
 								<span class="badge">Text Block</span>
-								<input type="radio" id="template-text-block" class="js-toggle-target-el" name="template-block-type" value="new-template-text-block" data-targetel="new-template-text-block" data-toggle-group="template-options" checked>
+								<input type="radio" id="template-text-block" class="at-control reset-to-default js-toggle-target-el" name="template-block-type" value="new-template-text-block" data-targetel="new-template-text-block" data-toggle-group="template-options" checked>
 							</label>
-							<label for="template-image-block">
+							<label for="template-image-block" class="at-control">
 								<span class="badge">Image Block</span>
-								<input type="radio" id="template-image-block" class="js-toggle-target-el" name="template-block-type" value="new-template-image-block" data-targetel="new-template-image-block" data-toggle-group="template-options">
+								<input type="radio" id="template-image-block" class="at-control js-toggle-target-el" name="template-block-type" value="new-template-image-block" data-targetel="new-template-image-block" data-toggle-group="template-options">
 							</label>
+							
+							<div>
+								<div class="template-options reset-to-default" id="new-template-text-block">
+									<h3>Font Face</h3>
+									<div id="at-font-face" class="text-editor-option">
+										<!-- Need to add more weights -->
+										<button type="button" class="at-control reset-to-default btn btn-default option-selected" data-fface="FuturaBT-Heavy">Regular</button>
+										<!-- <button type="button" class="btn btn-default" data-fface="FuturaBT-Heavy">Medium</button> -->
+										<button type="button" class="at-control btn btn-default" data-fface="Macmillan Headline">Headline</button>
+									</div>
 
-							<div class="template-options" id="new-template-text-block">
-								<h3>Font Face</h3>
-								<div id="at-font-face" class="text-editor-option">
-									<!-- Need to add more weights -->
-									<button type="button" class="btn btn-default option-selected" data-fface="FuturaBT-Heavy">Regular</button>
-									<!-- <button type="button" class="btn btn-default" data-fface="FuturaBT-Heavy">Medium</button> -->
-									<button type="button" class="btn btn-default" data-fface="Macmillan Headline">Headline</button>
+									<h3>Select Font Size</h3>
+									<div id="at-font-size" class="text-editor-option">
+										<button type="button" class="at-control reset-to-default btn btn-default option-selected" data-size="12">Small</button>
+										<button type="button" class="at-control btn btn-default" data-size="24">Medium</button>
+										<button type="button" class="at-control btn btn-default" data-size="36">Large</button>
+									</div>							
+
+									<h3>Select Colour</h3>
+									<div id="at-font-color" class="text-editor-option">
+										<button type="button" class="at-control reset-to-default btn btn-default color-option color-light-green option-selected" data-rgb="140,198,63">Light Green</button>
+										<button type="button" class="at-control btn btn-default color-option color-mid-green" data-rgb="0,162,70">Mid Green</button>
+										<button type="button" class="at-control btn btn-default color-option color-dark-green" data-rgb="0,92,70">Dark Green</button>
+										<button type="button" class="at-control btn btn-default color-option color-purple" data-rgb="104,44,136">Purple</button>
+										<button type="button" class="at-control btn btn-default color-option color-orange" data-rgb="241,131,21">Orange</button>
+										<button type="button" class="at-control btn btn-default color-option color-red" data-rgb="227,35,51">Red</button>
+									</div>
+
+									<h3>Maxlength</h3>
+									<input type="number" value="100" id="at-maxlength" class="reset-to-default at-control form-control">
 								</div>
 
-								<h3>Select Font Size</h3>
-								<div id="at-font-size" class="text-editor-option">
-									<button type="button" type="button" class="btn btn-default option-selected" data-size="12">Small</button>
-									<button type="button" class="btn btn-default" data-size="24">Medium</button>
-									<button type="button" class="btn btn-default" data-size="36">Large</button>
-								</div>							
-
-								<h3>Select Colour</h3>
-								<div id="at-font-color" class="text-editor-option">
-									<button type="button" class="btn btn-default color-option color-light-green option-selected" data-rgb="140,198,63">Light Green</button>
-									<button type="button" class="btn btn-default color-option color-mid-green" data-rgb="0,162,70">Mid Green</button>
-									<button type="button" class="btn btn-default color-option color-dark-green" data-rgb="0,92,70">Dark Green</button>
-									<button type="button" class="btn btn-default color-option color-purple" data-rgb="104,44,136">Purple</button>
-									<button type="button" class="btn btn-default color-option color-orange" data-rgb="241,131,21">Orange</button>
-									<button type="button" class="btn btn-default color-option color-red" data-rgb="227,35,51">Red</button>
+								<div class="hidden template-options" id="new-template-image-block">
+									<div class="disabled-in-edit-state">
+										<h3>Select Ratio</h3>
+										<span class="input-group-addon">
+											<label class="badge at-control" for="r1-1">1:1</label>
+							            	<input type="radio" id="r1-1" class="reset-to-default" name="block-ratio" value="1:1" checked>
+							          	</span>
+										<span class="input-group-addon">
+											<label class="badge at-control" for="r1-2">1:2</label>
+							            	<input type="radio" id="r1-2" name="block-ratio" value="1:2">
+							          	</span>
+							          	<span class="input-group-addon">
+							          		<label class="badge at-control" for="r2-1">2:1</label>
+							            	<input type="radio" id="r2-1" name="block-ratio" value="2:1">
+							          	</span>
+							          	<span class="input-group-addon">
+							          		<label class="badge at-control" for="r3-1">3:1</label>
+							            	<input type="radio" id="r3-1" name="block-ratio" value="3:1">
+							          	</span>
+							          	<br>
+							          	<span class="input-group-addon">
+							          		<label class="badge at-control" for="r1-3">1:3</label>
+							            	<input type="radio" id="r1-3" name="block-ratio" value="1:3">
+							          	</span>
+							          	<span class="input-group-addon">
+							          		<label class="badge at-control" for="r3-2">3:2</label>
+							            	<input type="radio" id="r3-2" name="block-ratio" value="3:2">
+							          	</span>
+							          	<span class="input-group-addon">
+							          		<label class="badge at-control" for="r2-3">2:3</label>
+							            	<input type="radio" id="r2-3" name="block-ratio" value="2:3">
+							          	</span>
+							          	<span class="input-group-addon">
+							          		<label class="badge at-control" for="r3-4">3:4</label>
+							            	<input type="radio" id="r3-4" name="block-ratio" value="3:4">
+							          	</span>
+							          	<br>
+							          	<span class="input-group-addon">
+							          		<label class="badge at-control" for="r4-3">4:3</label>
+							            	<input type="radio" id="r4-3" name="block-ratio" value="4:3">
+							          	</span>
+							          	<span class="input-group-addon">
+							          		<label class="badge at-control" for="r16-9">16:9</label>
+							            	<input type="radio" id="r16-9" name="block-ratio" value="16:9">
+							          	</span>
+							          	<span class="input-group-addon">
+							          		<label class="badge at-control" for="no-ratio">No Ratio</label>
+							            	<input type="radio" id="no-ratio" name="block-ratio" value="0">
+							          	</span>
+							        </div>
 								</div>
-
-								<h3>Maxlength</h3>
-								<input type="number" value="100" id="at-maxlength" class="form-control">
-							</div>
-
-							<div class="hidden template-options" id="new-template-image-block">
-								<h3>Select Ratio</h3>
-								<span class="input-group-addon">
-									<label class="badge" for="r1-1">1:1</label>
-					            	<input type="radio" id="r1-1" name="block-ratio" value="1:1" checked>
-					          	</span>
-								<span class="input-group-addon">
-									<label class="badge" for="r1-2">1:2</label>
-					            	<input type="radio" id="r1-2" name="block-ratio" value="1:2">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<label class="badge" for="r2-1">2:1</label>
-					            	<input type="radio" id="r2-1" name="block-ratio" value="2:1">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<label class="badge" for="r3-1">3:1</label>
-					            	<input type="radio" id="r3-1" name="block-ratio" value="3:1">
-					          	</span>
-					          	<br>
-					          	<span class="input-group-addon">
-					          		<label class="badge" for="r1-3">1:3</label>
-					            	<input type="radio" id="r1-3" name="block-ratio" value="1:3">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<label class="badge" for="r3-2">3:2</label>
-					            	<input type="radio" id="r3-2" name="block-ratio" value="3:2">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<label class="badge" for="r2-3">2:3</label>
-					            	<input type="radio" id="r2-3" name="block-ratio" value="2:3">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<label class="badge" for="r3-4">3:4</label>
-					            	<input type="radio" id="r3-4" name="block-ratio" value="3:4">
-					          	</span>
-					          	<br>
-					          	<span class="input-group-addon">
-					          		<label class="badge" for="r4-3">4:3</label>
-					            	<input type="radio" id="r4-3" name="block-ratio" value="4:3">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<label class="badge" for="r16-9">16:9</label>
-					            	<input type="radio" id="r16-9" name="block-ratio" value="16:9">
-					          	</span>
-					          	<span class="input-group-addon">
-					          		<label class="badge" for="no-ratio">No Ratio</label>
-					            	<input type="radio" id="no-ratio" name="block-ratio" value="0">
-					          	</span>
-							</div>
+							</div>							
 						</div>
 
 						<hr>
 
-						<h3>Horizontal positioning</h3>
-						<span class="input-group-addon">
-			          		<label class="badge" for="h-left">Left</label>
-			            	<input type="radio" id="h-left" name="h-pos" value="left" checked>
-			          	</span>
-			          	<span class="input-group-addon">
-			          		<label class="badge" for="h-center">Center</label>
-			            	<input type="radio" id="h-center" name="h-pos" value="center">
-			          	</span>
-			          	<span class="input-group-addon">
-			          		<label class="badge" for="h-right">Right</label>
-			            	<input type="radio" id="h-right" name="h-pos" value="right">
-			          	</span>
-			          	<h3>Vertical positioning</h3>
-						<span class="input-group-addon">
-			          		<label class="badge" for="v-top">Top</label>
-			            	<input type="radio" id="v-top" name="v-pos" value="top" checked>
-			          	</span>
-			          	<span class="input-group-addon">
-			          		<label class="badge" for="v-middle">Middle</label>
-			            	<input type="radio" id="v-middle" name="v-pos" value="center">
-			          	</span>
-			          	<span class="input-group-addon">
-			          		<label class="badge" for="v-bottom">Bottom</label>
-			            	<input type="radio" id="v-bottom" name="v-pos" value="bottom">
-			          	</span>
+						<h3>Horizontal &amp; Vertical positioning</h3>
+						<div class="row">
+							<div class="col-md-6">
+								<span>
+									<input type="radio" id="h-left" class="reset-to-default hidden" name="h-pos" value="left" checked>
+					          		<label class="at-control align-icon align-left" for="h-left"></label>
+					          	</span>
+					          	<span>
+					          		<input type="radio" id="h-center" class="hidden" name="h-pos" value="center">
+					          		<label class="at-control align-icon align-center" for="h-center"></label>
+					          	</span>
+					          	<span>
+					          		<input type="radio" id="h-right" class="hidden" name="h-pos" value="right">
+					          		<label class="at-control align-icon align-right" for="h-right"></label>
+					          	</span>
+					        </div>
+							
+							<div class="col-md-6">
+								<span>
+									<input type="radio" id="v-top" class="reset-to-default hidden" name="v-pos" value="top" checked>
+					          		<label class="at-control align-icon align-top" for="v-top"></label>
+					          	</span>
+					          	<span>
+					          		<input type="radio" id="v-middle" class="hidden" name="v-pos" value="center">
+					          		<label class="at-control align-icon align-middle" for="v-middle"></label>
+					          	</span>
+					          	<span>
+					          		<input type="radio" id="v-bottom" class="hidden" name="v-pos" value="bottom">
+					          		<label class="at-control align-icon align-bottom" for="v-bottom"></label>				            	
+					          	</span>
+					        </div>
+						</div>
 							
 						<div class="row">
 							<div class="col-md-6">
 								<div class="onoffswitch">
 									<h3>Manditory?</h3>
-								    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="at-manditory" checked>
-								    <label class="onoffswitch-label" for="at-manditory">
+								    <input type="checkbox" name="onoffswitch" class="reset-to-default onoffswitch-checkbox" id="at-manditory" checked>
+								    <label class="at-control onoffswitch-label" for="at-manditory">
 								        <span class="onoffswitch-inner"></span>
 								        <span class="onoffswitch-switch"></span>
 								    </label>
@@ -220,16 +230,24 @@
 							<div class="col-md-6">
 								<div class="onoffswitch">
 									<h3>Editable?</h3>
-								    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="at-editable" checked>
-								    <label class="onoffswitch-label" for="at-editable">
+								    <input type="checkbox" name="onoffswitch" class="reset-to-default onoffswitch-checkbox" id="at-editable" checked>
+								    <label class="at-control onoffswitch-label" for="at-editable">
 								        <span class="onoffswitch-inner"></span>
 								        <span class="onoffswitch-switch"></span>
 								    </label>
 								</div>
 							</div>
 						</div>
-						<hr>		
-						<button type="button" class="btn btn-primary" id="add-template-area">Add template block</button>
+						<hr>
+						<div class="disabled-in-edit-state">
+							<button type="button" class="btn btn-primary" id="add-template-area">Add template block</button>
+						</div>
+						<div class="enabled-in-edit-state hidden">
+							<button class="at-control btn btn-primary" id="at-update-component">Update</button>
+							<button class="at-control btn btn-info" id="at-stop-update-component">Stop</button>							
+							<button class="at-control btn btn-danger" id="at-remove-component">Delete</button>
+						</div>
+						
 					</div>
 					<!--
 					<ul class="list-group" id="">
@@ -266,42 +284,14 @@
 			          	</span>
 
 			          	<input type="text" class="form-control" id="at-src" value="assets/terms.txt" checked>
+							
 
-						<h3>Font Face</h3>
-						<div id="at-font-face" class="text-editor-option">
-							<button type="button" class="btn btn-default option-selected" data-type="reg">Regular</button>
-							<button type="button" class="btn btn-default" data-type="med">Medium</button>
-							<button type="button" class="btn btn-default" data-type="bol">Bold</button>
-						</div>
-
-						<h3>Select Font Size</h3>
-						<div id="at-font-size" class="text-editor-option">
-							<button type="button" type="button" class="btn btn-default option-selected" data-size="24">Small</button>
-							<button type="button" class="btn btn-default" data-size="30">Medium</button>
-							<button type="button" class="btn btn-default" data-size="36">Large</button>
-						</div>							
-
-						 <h3>Bullet lists</h3>
+						<h3>Bullet lists</h3>
 						<div class="text-editor-option">
 							<button type="button" class="btn btn-default" data-bullet="ol">Order List</button>
 							<button type="button" class="btn btn-default" data-bullet="ul">Un-ordered List</button> 
 						</div>
 
-						<h3>Alignment</h3>
-						<div id="at-alignment" class="text-editor-option">
-							<button type="button" class="btn btn-default option-selected" data-align="left">Left</button>
-							<button type="button" class="btn btn-default" data-align="center">Center</button>
-							<button type="button" class="btn btn-default" data-align="right">Right</button>
-						</div>
-
-						<h3>Select Colour</h3>
-						<div id="at-font-color" class="text-editor-option">
-							<button type="button" class="btn btn-default option-selected color-option color-red" data-rgb="255,0,0">Red</button>
-							<button type="button" class="btn btn-default color-option color-yellow" data-rgb="255,252,0">Yellow</button>
-							<button type="button" class="btn btn-default color-option color-pink" data-rgb="255,0,187">Pink</button>
-							<button type="button" class="btn btn-default color-option color-blue" data-rgb="0,0,255">Blue</button>
-							<button type="button" class="btn btn-default color-option color-purple" data-rgb="222,0,255">Purple</button>
-						</div>							
 
 						<h3>Layer comp</h3>
 						<button type="button" class="btn btn-default">Increase layer</button>

@@ -8,14 +8,15 @@
 
   app._canvas;
   app._grid;
-  app.gridSquare    = 24;
-  app.ptSize        = 0.75;
-  app.mmSize        = 0.2645833333333;
+  app.gridSquare      = 24;
+  app.ptSize          = 0.75;
+  app.mmSize          = 0.2645833333333;
   app.orientation;
-  app.templateType  = 'default';
+  app.templateType    = 'default';
   app.imagedata;
-  app.docDimesions  = [];
+  app.docDimesions    = [];
   app.templateName;
+  app.$tempBlockName  = $('#at-block-title');
 
   if(document.location.hostname ===  "widget.macmillan.org.uk"){
     app.dummyText = $.get('assets/data/dummy-text.txt', function(data){return data}, 'text');
@@ -46,7 +47,9 @@
     // }
 
 
-    // Util functions
+    /**
+      Util functions
+    **/
     createFileName: function(extension){
       var filename = $('.canvas-name-field').val() || 'template-download';
       return filename + extension
@@ -104,17 +107,44 @@
       $('.' + toggleGroup).addClass('hidden');
       $('#' + toggleTarget).removeClass('hidden');
     },
-    // Canvas Controls and Events
+
+
+    /**
+      Canvas Controls and Events
+    **/
     resetTemplate: function(){
       app._canvas.clear();
       app.docDimesions = [];
+      app.c.resetCreateTempBlock();
       $('.empty-on-reset').empty();
       $('.clear-on-reset').val('');
       $('.stepped-option-2').addClass('hidden');
+      $('input[name=doc-size], input[name=doc-orientation]').not('default-setting').prop('checked', false);
+      $('.default-setting').prop('checked',  true);
       $('.active-option').fadeOut(100, function(){
         $('.stepped-option').removeClass('active-option');
         $('.stepped-option[data-step=0]').addClass('active-option').fadeIn(100);
       });
+    },
+    resetCreateTempBlock: function(){
+      // Resets all checkboxes and radio buttons to the default setting.
+      $('input[type="radio"].reset-to-default, input[type="checkbox"].reset-to-default').prop('checked', true);
+      // Resets all text and number fields to the default setting.
+      $('input[type="text"].reset-to-default, input[type="number"].reset-to-default').each(function(){
+        var $this = $(this);
+        if( $this.attr('value') > 0){
+          var textVal = $this.attr('value');
+          $this.val(textVal);
+        }else{
+         $this.val(''); 
+       }    
+      });
+      // Resets all buttons back to the default settings
+      $('button.reset-to-default').siblings().removeClass('option-selected').end()
+                                  .addClass('option-selected');
+      // Resets the tempale block options back to default
+      $('.template-options').not('reset-to-default').addClass('hidden');
+      $('div.reset-to-default').removeClass('hidden');
     },
     createNewTemp: function(){
       // The canvas needs to be created this way: For more details:
@@ -155,7 +185,7 @@
       // /app.c.drawDemoItems();
     },
     loadExistingTemp: function(){
-
+      // To do...
     },
     setTemplateDetails: function(){
       var $orientationDetail = $('#template-orientation');
@@ -224,9 +254,19 @@
       app._canvas.deactivateAll().renderAll();
     },
     deactiveCanvasControls: function(e){
-      if(!$(e.target).hasClass('upper-canvas')){
-        app._canvas.deactivateAll().renderAll();
-      }
+      // Check if something outside of the canvas has been clicked and is not a template control
+      // If it has, deactive the fabric controls and get out of edit mode.
+      var $targetEl = $(e.target);
+      // console.log(!$targetEl.hasClass('upper-canvas'));
+      // console.log(!$targetEl.hasClass('at-control'))
+      // if(!$targetEl.hasClass('upper-canvas') && !$targetEl.hasClass('at-control')){
+      //   app._canvas.deactivateAll().renderAll();
+      // }else{
+        if(!$('.disabled-in-edit-state').hasClass('hidden')){
+          // Hide the edit options
+          app.c.toggleTempState(false);          
+        }
+      //}
     },
     toggleCanvasGrid: function(toggle){
       var $this = $(this);
@@ -344,19 +384,17 @@
     createTempBlock: function(){
       // Pass through the selected aspect ratio of the element
       // Add the RGB Value to the settings
-      var $componentTitle = $('#at-block-title'),
-          blockType       = $('input[name=template-block-type]:checked').val() === 'new-template-text-block' ? 't' : 'i',
-          blockSettings   = app.c.setAspectRatio($('input[name=block-ratio]:checked').val());
-          blockSettings.push($('input[name=h-pos]:checked').val());
-          blockSettings.push($('input[name=v-pos]:checked').val());
-          console.log(blockType);
+      var blockType       = $('input[name=template-block-type]:checked').val() === 'new-template-text-block' ? 't' : 'i',
+          blockSettings   = app.c.setAspectRatio($('input[name=block-ratio]:checked').val()); // This returns and array
+
+      blockSettings.push($('input[name=h-pos]:checked').val());
+      blockSettings.push($('input[name=v-pos]:checked').val());
 
       if( blockType === 't'){
         blockSettings.push('rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')');
       }else{
         blockSettings.push('rgb(0,0,0)');
       }
-      console.log(blockSettings);
 
       // Create the fabric js element on the canvas
       // Use the settings from 'blockSettings' variable
@@ -371,23 +409,144 @@
                                     top: 0,
                                     width: blockSettings[0]
                                   });
+      // Add additional properties to the 
       if(blockType === 't'){
         _block['blocktype']   = 'new-text-block';
         _block['fontFamily']  = $('#at-font-face .option-selected').data('fface');
         _block['fontSize']    = $('#at-font-size .option-selected').data('size');
         _block['maxLength']   = $('#at-maxlength').val();
       }else{
-        _block['blocktype'] = 'new-image-block';
+        _block['blocktype']   = 'new-image-block';
       }
 
-      _block['blockTitle']  = $componentTitle.val() || 'Block';
-      _block['isManditory'] = $('#at-manditory').is(':checked') ? true : false;
+      _block['blockTitle']  = app.$tempBlockName.val() || 'Block';
+      _block['halign']      = $('input[name=h-pos]:checked').val();
       _block['isEditable']  = $('#at-editable').is(':checked') ? true : false;
-      _block['halign']      = blockSettings[3];
+      _block['isManditory'] = $('#at-manditory').is(':checked') ? true : false;     
       _block['valign']      = blockSettings[4];
+
+      // Add the new component to the canavs
       app._canvas.add(_block);
       // Empty the input field with the previous component name.
-      $componentTitle.val('');
+      app.c.resetCreateTempBlock();
+    },
+    editTempBlock: function(){
+      var _block = app._canvas.getActiveObject(),
+          blockType = $('input[name=template-block-type]:checked').val() === 'new-template-text-block' ? 't' : 'i';
+          
+      if(blockType === 't'){
+        _block.blocktype    = 'new-text-block';
+        _block.fill         = 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')';
+        _block.fontFamily   = $('#at-font-face .option-selected').data('fface');
+        _block.fontSize     = $('#at-font-size .option-selected').data('size');
+        _block.maxLength    = $('#at-maxlength').val();
+      }else{
+        $('#new-template-image-block').siblings().addClass('hidden').end()
+                                     .removeClass('hidden');
+        _block.blocktype    = 'new-image-block';
+        _block.fill         = 'rgb(0,0,0)';
+      }
+      _block.blockTitle     = app.$tempBlockName.val();
+      _block.halign         = $('input[name=h-pos]:checked').val();
+      _block.isEditable     = $('#at-editable').is(':checked') ? true : false;
+      _block.isManditory    = $('#at-manditory').is(':checked') ? true : false;
+      _block.lockUniScaling = blockType === 't' && !$('#no-ratio').is(':checked') ? false : true;    
+      _block.valign         = $('input[name=v-pos]:checked').val();
+
+      // Reset the component creation tool.
+      app.c.resetCreateTempBlock();
+      // Hide the edit buttons
+      app.c.toggleTempState(false);
+      // De-select the element previously selected on the canvas
+      app._canvas.deactivateAll().renderAll();
+    },
+    setTempBlockSettings: function(_selectedEl){
+      console.log(_selectedEl);
+      // Set the block type
+      var blockTypeName = 'template' + _selectedEl.blocktype.replace('new', ''),
+          rgb           = _selectedEl.fill.replace('rgb(', '').replace(')', '');
+
+      console.log(blockTypeName);
+
+      // Set the title
+      app.$tempBlockName.val(_selectedEl.blockTitle);
+
+      // Set H Align      
+      $('input[value='+ _selectedEl.halign +']').prop('checked', true);
+
+      // Set V Align
+      $('input[value='+ _selectedEl.valign +']').prop('checked', true);
+
+      // Set Editable
+      if(_selectedEl.isEditable === true){
+        $('#at-editable').prop('checked', true);
+      }else{
+        $('#at-editable').prop('checked', false);
+      }
+
+      // Set Manditory
+      if(_selectedEl.isManditory === true){
+        $('#at-manditory').prop('checked', true);
+      }else{
+        $('#at-manditory').prop('checked', false);
+      }
+
+      // Set MaxLengh
+      $('#at-maxlength').val(_selectedEl.maxLength);
+
+      // Set Block Type
+      console.log( $('input[id='+ blockTypeName +']') );
+      $('input[id='+ blockTypeName +']').prop('checked', true);
+
+      // Set Block specific values
+      if( blockTypeName == 'template-text-block'){
+        var rgbAttr   = 'data-rgb="' + rgb + '"',
+            ffaceAtt  = 'data-fface="' + _selectedEl.fontFamily + '"';
+
+        // Color
+        $('button[' + rgbAttr +']').siblings().removeClass('option-selected').end()
+                                              .addClass('option-selected');
+        // Font size
+        $('button[data-size='+ _selectedEl.fontSize +']').siblings().removeClass('option-selected').end()
+                                                         .addClass('option-selected');
+        // Font Family
+        $('button['+ ffaceAtt +']').siblings().removeClass('option-selected').end()
+                                              .addClass('option-selected');
+        // Show the TEXT editing options                                 
+        $('#new-template-text-block').removeClass('hidden');
+        $('#new-template-image-block').addClass('hidden');
+      }else{
+        // Show the IMAGE editing options
+        $('#new-template-image-block').removeClass('hidden');
+        $('#new-template-text-block').addClass('hidden');
+      }
+    },
+    delTempBlock: function(){
+      // Get the select fabric object and remove it.
+      var _activeObject = app._canvas.getActiveObject();
+      app._canvas.remove(_activeObject);
+
+      // Hide the edit buttons
+      app.c.toggleTempState(false);
+      // Reset the component creation tool.
+      app.c.resetCreateTempBlock();
+    },
+    stopTempBlock: function(){
+      // De-select the element previously selected on the canvas
+      app._canvas.deactivateAll().renderAll();
+      // Hide the edit buttons
+      app.c.toggleTempState(false);
+      // Reset the component creation tool.
+      app.c.resetCreateTempBlock();
+    },
+    toggleTempState: function(isEditing){
+      if(isEditing === true){
+        $('.disabled-in-edit-state').addClass('hidden');
+        $('.enabled-in-edit-state').removeClass('hidden');
+      }else{
+        $('.disabled-in-edit-state').removeClass('hidden');
+        $('.enabled-in-edit-state').addClass('hidden');
+      }
     },
     bindCanavsEvents: function(){
       // This event handler stops elements being moved outside of the canvas element when moving an element on the canvas
@@ -400,26 +559,18 @@
       });
       // This event handler deletes the selected object from the canvas when DEL or BACKSPACE is pressed
       app._canvas.on('object:selected', function(e) {
-        var _activeElement = app._canvas.getActiveObject();
-        // console.log(app._canvas.getObjects());
-        // console.log(_activeElement);
-        // console.log(_activeElement.item);
-        $('html').keydown(function(e){
-            if(e.keyCode == 46 || e.keyCode === 8) {
-              e.preventDefault();
-              _activeElement.remove();
-              // app._canvas.fxRemove(_activeElement, onComplete({
-              //     app._canvas.renderAll();
-              // });
-            }
-        });
-        // e.remove();
+        // Show the edit options
+        app.c.toggleTempState(true);
+        // Set the block settings to what the currently selected blocks settings are
+        app.c.setTempBlockSettings(app._canvas.getActiveObject());
       });
-
-      // $('body').on('click', app.c.deactiveCanvasControls);
+      $('.template-container').on('click', app.c.deactiveCanvasControls);
     },
 
-    // UI Specific Functions
+
+    /**
+      UI Specific Functions
+    **/
     setSelectedOption: function(){
       var $this = $(this);
       $this.siblings().removeClass('option-selected').end()
@@ -443,7 +594,10 @@
       });
     },
 
-    // Validation
+
+    /** 
+      Validation
+    **/
     validateTemplateName: function(){
       var $this = $(this);
       if($this.val().length > 2){
@@ -475,7 +629,10 @@
       }
     },
     
-    // Functions needed to prepare template for export
+
+    /**
+      Functions needed to prepare template for export
+    **/
     generateJSON: function(){
       // Pass through additional attributes toe generated JSON
       var canvasData = app._canvas.toDatalessJSON([
@@ -507,6 +664,13 @@
       // The 'canvasScale' need to be 2.0174 times bigger than the canvas for default sized documents (all A sizes)
       // For business cards the canvas is set at a 1:1 scale and therefore 'canvasScale' needs to be to 1
 
+      var assetPath;
+      if(document.location.hostname ===  "widget.macmillan.org.uk"){
+        assetPath = 'C:\\Projects\\bemac_discovery\\BeMacDiscovery\\Assets\\268';
+      }else{
+        assetPath = '@';
+      }
+
       var docSettings     = app.c.setDocumentSize(),
           canvasScale     = app.templateType === 'default' ? 2.0174 : 1,
           cordData        = [],
@@ -517,7 +681,7 @@
                                 doc : {     
                                   _scalex: 1,
                                   _scaley: 1,
-                                  _assetspath: 'C:\\Projects\\bemac_discovery\\BeMacDiscovery\\Assets\\268',
+                                  _assetspath: assetPath,
                                   // Path to asset root, may need to come from hidden field    
                                   page : {
                                     _width: docSettings[0],
@@ -682,13 +846,6 @@
         app.c.createTemplate(xmlOutput);
       }      
     },
-    setDefaultVal: function(val, expression, defaultVal){
-      if(val === expression){
-        return defaultVal
-      }else{
-        return val
-      }
-    },
     // Function that sends data to the backend to create a new template
     createTemplate: function(xml) {
       // Function receives the generated XML from what has been created on the canvas
@@ -703,8 +860,6 @@
             }
         });
     },
-
-    // elWidth[0], elHeight[1], top[2], left[3], docWidth[4], docHeight[5]
     calcLowerLeftX: function(elDimensions){
       // left
       //console.log(elDimensions[3]);
@@ -727,7 +882,10 @@
       return elDimensions[5] - elDimensions[2]
     },  
 
-    // Click elements
+
+    /** 
+      Click elements
+    **/
     bindClickEvents: function(){
       app.$saveThumb        = $('#save-thumb');
       app.$downloadThumb    = $('#dl-thumb');
@@ -742,8 +900,13 @@
       app.$templateName     = $('#new-template-name');
       app.$toggleElTriggers = $('.js-toggle-target-el');
 
-      // Bind event listeners to dom elements
-      app.$reserCreateTemp.on('click', app.c.resetTemplate)
+      // Edit Canvas Component Triggers
+      app.$delComponentBtn  = $('#at-remove-component');
+      app.$editComponentBtn = $('#at-update-component');
+      app.$stopComponentBtn = $('#at-stop-update-component');
+
+      // Bind to dom elements to functions
+      app.$reserCreateTemp.on('click', app.c.resetTemplate);
       app.$saveThumb.on('click', app.c.convertCanvasToImgElement);
       app.$downloadThumb.on('click', app.c.covertCanvasToImgDownload);
       app.$toggleGrid.on('click', app.c.toggleCanvasGrid);
@@ -755,9 +918,15 @@
       app.$textComponentOpt.on('click', app.c.setSelectedOption);
       app.$templateName.on('keyup blur', app.c.validateTemplateName);
       app.$toggleElTriggers.on('click', app.c.toggleElements);
+      app.$delComponentBtn.on('click', app.c.delTempBlock);
+      app.$editComponentBtn.on('click', app.c.editTempBlock);
+      app.$stopComponentBtn.on('click', app.c.stopTempBlock);
     },
 
-    // Creation tool end points
+
+    /**
+      Creation tool end points
+    **/
     convertCanvasToImgElement: function() {
       // Remove selected states and grid before saving img
       app.c.cleanCanvas();
