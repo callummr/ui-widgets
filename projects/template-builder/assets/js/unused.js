@@ -140,6 +140,66 @@
       }
     },
 
+    drawDemoItems: function(){
+      // Draw the grid
+      
+      // var _el1 = new fabric.IText( 'textString', {
+      //       left: 60,
+      //       top: 99,
+      //       // lockRotation: true,
+      //       // hasRotatingPoint: false,
+      //       hasBorders: true,
+      //       isEditing : true,
+      //       editable: true,
+      //       editingBorderColor: 'rga(0,255,0)',
+      //       hasControls: false,
+      //       fill: 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')',
+      //       // fontFamily: '',
+      //       fontSize: $('#at-font-size .option-selected').attr('data-size'),
+      //       lineHeight: 1.4,
+      //       // fontStyle: '',
+      //       // fontWeight: '',
+      //       textAlign: $('#at-alignment .option-selected').attr('data-align'),
+      //       // lockUniScaling: true,
+      //       lockScalingX: true,
+      //       lockScalingY: true,            
+      //       // textDecoration: '',
+      //       // exitEditing: ''// Bind to the textarea
+      //     });
+      // console.log(_el1);
+      // _el1['stringSrc'] = 'C:\\Projects\\bemac_discovery\\BeMacDiscovery\\Assets\\terms.txt'; // need to add this property dynamically based on if this element has an option checked
+      // console.log(_el1);
+      // app._canvas.add(_el1);
+
+      // var _el2 = new fabric.IText( 'text String 2', {
+      //       left: 250,
+      //       top: 250,
+      //       lockRotation: true,
+      //       hasRotatingPoint: false,
+      //       hasBorders: true,
+      //       isEditing : true,
+      //       editable: true,
+      //       editingBorderColor: 'rga(255,255,0)',
+      //       hasControls: true,
+      //       fill: 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')',
+      //       // fontFamily: '',
+      //       fontSize: $('#at-font-size .option-selected').attr('data-size'),
+      //       lineHeight: 1.4,
+      //       lockUniScaling: true,
+      //       // fontStyle: '',
+      //       // fontWeight: '',
+      //       textAlign: $('#at-alignment .option-selected').attr('data-align')
+      //       // textDecoration: '',
+      //       // exitEditing: ''// Bind to the textarea
+      //     });
+      // app._canvas.add(_el2);
+
+      // fabric.Image.fromURL('assets/img/demo.jpg', function(oImg) {
+      //   oImg.lockUniScaling = true;
+      //   app._canvas.add(oImg);
+      // });
+    },
+
 
 
 

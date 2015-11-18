@@ -186,7 +186,6 @@
       app._canvas = new fabric.Canvas('c', { selection: false, backgroundColor: '#FFF' });
       app.c.bindCanavsEvents();
       app.c.drawGrid(396); // Pass in the width dynamically so the whole grid is covered
-      // /app.c.drawDemoItems();
     },
     loadExistingTemp: function(){
       // To do...
@@ -326,84 +325,23 @@
             break;
       }
     },
-    drawDemoItems: function(){
-      // Draw the grid
-      app.c.drawGrid(600);
-      // var _el1 = new fabric.IText( 'textString', {
-      //       left: 60,
-      //       top: 99,
-      //       // lockRotation: true,
-      //       // hasRotatingPoint: false,
-      //       hasBorders: true,
-      //       isEditing : true,
-      //       editable: true,
-      //       editingBorderColor: 'rga(0,255,0)',
-      //       hasControls: false,
-      //       fill: 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')',
-      //       // fontFamily: '',
-      //       fontSize: $('#at-font-size .option-selected').attr('data-size'),
-      //       lineHeight: 1.4,
-      //       // fontStyle: '',
-      //       // fontWeight: '',
-      //       textAlign: $('#at-alignment .option-selected').attr('data-align'),
-      //       // lockUniScaling: true,
-      //       lockScalingX: true,
-      //       lockScalingY: true,            
-      //       // textDecoration: '',
-      //       // exitEditing: ''// Bind to the textarea
-      //     });
-      // console.log(_el1);
-      // _el1['stringSrc'] = 'C:\\Projects\\bemac_discovery\\BeMacDiscovery\\Assets\\terms.txt'; // need to add this property dynamically based on if this element has an option checked
-      // console.log(_el1);
-      // app._canvas.add(_el1);
-
-      // var _el2 = new fabric.IText( 'text String 2', {
-      //       left: 250,
-      //       top: 250,
-      //       lockRotation: true,
-      //       hasRotatingPoint: false,
-      //       hasBorders: true,
-      //       isEditing : true,
-      //       editable: true,
-      //       editingBorderColor: 'rga(255,255,0)',
-      //       hasControls: true,
-      //       fill: 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')',
-      //       // fontFamily: '',
-      //       fontSize: $('#at-font-size .option-selected').attr('data-size'),
-      //       lineHeight: 1.4,
-      //       lockUniScaling: true,
-      //       // fontStyle: '',
-      //       // fontWeight: '',
-      //       textAlign: $('#at-alignment .option-selected').attr('data-align')
-      //       // textDecoration: '',
-      //       // exitEditing: ''// Bind to the textarea
-      //     });
-      // app._canvas.add(_el2);
-
-      // fabric.Image.fromURL('assets/img/demo.jpg', function(oImg) {
-      //   oImg.lockUniScaling = true;
-      //   app._canvas.add(oImg);
-      // });
-    },
     createTempBlock: function(){
       // Pass through the selected aspect ratio of the element
       // Add the RGB Value to the settings
       var blockType       = $('input[name=template-block-type]:checked').val() === 'new-template-text-block' ? 't' : 'i',
           blockSettings   = app.c.setAspectRatio($('input[name=block-ratio]:checked').val()); // This returns and array
-
+      // Add the Horizontal and Veritcal position values into the block settings array
       blockSettings.push($('input[name=h-pos]:checked').val());
       blockSettings.push($('input[name=v-pos]:checked').val());
-
+      // If the block type is text, we need to set the fill colour dynamically otherwise, set the fill to black
       if( blockType === 't'){
         blockSettings.push('rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')');
       }else{
         blockSettings.push('rgb(0,0,0)');
       }
-
       // Create the fabric js element on the canvas
       // Use the settings from 'blockSettings' variable
       var _block = new fabric.Rect({
-                                    fill: blockSettings[5],
                                     hasBorders: false,
                                     hasRotatingPoint: false,
                                     height: blockSettings[1],
@@ -413,24 +351,26 @@
                                     top: 0,
                                     width: blockSettings[0]
                                   });
-      // Add additional properties to the 
+      // Add additional non-block specific properties based on blocktype
+      _block['blockTitle']  = app.$tempBlockName.val() || 'Block';
+      _block['halign']      = $('input[name=h-pos]:checked').val();
+      _block['isEditable']  = $('#at-editable').is(':checked') ? true : false;
+      _block['isManditory'] = $('#at-manditory').is(':checked') ? true : false;     
+      _block['valign']      = blockSettings[4];
+      // Add additional properties based on blocktype
       if(blockType === 't'){
         _block['blocktype']   = 'new-text-block';
+        _block['fontColor']   = blockSettings[5];
         _block['fontFamily']  = $('#at-font-face .option-selected').data('fface');
         _block['fontSize']    = $('#at-font-size .option-selected').data('size');
         _block['maxLength']   = $('#at-maxlength').val();
       }else{
         _block['blocktype']   = 'new-image-block';
       }
-
-      _block['blockTitle']  = app.$tempBlockName.val() || 'Block';
-      _block['halign']      = $('input[name=h-pos]:checked').val();
-      _block['isEditable']  = $('#at-editable').is(':checked') ? true : false;
-      _block['isManditory'] = $('#at-manditory').is(':checked') ? true : false;     
-      _block['valign']      = blockSettings[4];
-
-      // Add the new component to the canavs
+      // Add the new component to the canvas. This needs to be done, before we can update the background img of the object
       app._canvas.add(_block);
+      // Set the relevant background image for block, based on blocktype
+      app.c.setTempBlockBackgroundImg(_block, blockType);
       // Empty the input field with the previous component name.
       app.c.resetCreateTempBlock();
     },
@@ -440,15 +380,14 @@
           
       if(blockType === 't'){
         _block.blocktype    = 'new-text-block';
-        _block.fill         = 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')';
+        _block.fontColor    = 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')';
         _block.fontFamily   = $('#at-font-face .option-selected').data('fface');
         _block.fontSize     = $('#at-font-size .option-selected').data('size');
         _block.maxLength    = $('#at-maxlength').val();
       }else{
         $('#new-template-image-block').siblings().addClass('hidden').end()
-                                     .removeClass('hidden');
+                                      .removeClass('hidden');
         _block.blocktype    = 'new-image-block';
-        _block.fill         = 'rgb(0,0,0)';
       }
       _block.blockTitle     = app.$tempBlockName.val();
       _block.halign         = $('input[name=h-pos]:checked').val();
@@ -456,19 +395,17 @@
       _block.isManditory    = $('#at-manditory').is(':checked') ? true : false;
       _block.lockUniScaling = blockType === 't' && !$('#no-ratio').is(':checked') ? false : true;    
       _block.valign         = $('input[name=v-pos]:checked').val();
-
+      // Set the relevant background image for block, based on blocktype
+      app.c.setTempBlockBackgroundImg(_block, blockType);
       // Reset the component creation tool.
       app.c.resetCreateTempBlock();
       // De-select the element previously selected on the canvas
       app._canvas.deactivateAll().renderAll();
     },
     setTempBlockSettings: function(_selectedEl){
-      console.log(_selectedEl);
-      // Set the block type
-      var blockTypeName = 'template' + _selectedEl.blocktype.replace('new', ''),
-          rgb           = _selectedEl.fill.replace('rgb(', '').replace(')', '');
-
-      console.log(blockTypeName);
+      // console.log(_selectedEl);
+      // Set the block type and format the RGB value
+      var blockTypeName = 'template' + _selectedEl.blocktype.replace('new', '');
 
       // Set the title
       app.$tempBlockName.val(_selectedEl.blockTitle);
@@ -497,12 +434,12 @@
       $('#at-maxlength').val(_selectedEl.maxLength);
 
       // Set Block Type
-      console.log( $('input[id='+ blockTypeName +']') );
       $('input[id='+ blockTypeName +']').prop('checked', true);
 
       // Set Block specific values
-      if( blockTypeName == 'template-text-block'){
-        var rgbAttr   = 'data-rgb="' + rgb + '"',
+      if(blockTypeName == 'template-text-block'){
+        var rgb       = _selectedEl.fontColor.replace('rgb(', '').replace(')', ''),
+            rgbAttr   = 'data-rgb="' + rgb + '"',
             ffaceAtt  = 'data-fface="' + _selectedEl.fontFamily + '"';
 
         // Color
@@ -522,6 +459,24 @@
         $('#new-template-image-block').removeClass('hidden');
         $('#new-template-text-block').addClass('hidden');
       }
+    },
+    setTempBlockBackgroundImg: function(_block, blocktype){
+      var imgSrc,
+          repeatSetting;
+      if(blocktype === 't'){
+        imgSrc        = 'assets/img/text-placeholder.png';
+        repeatSetting = 'repeat';
+      }else{
+        imgSrc = 'assets/img/img-placeholder.png';
+        repeatSetting = 'no-repeat';
+      }
+      fabric.util.loadImage(imgSrc, function (img) {
+          _block.setPatternFill({
+              source: img,
+              repeat: repeatSetting
+          });
+        app._canvas.renderAll();
+      });
     },
     delTempBlock: function(){
       // Get the select fabric object and remove it.
@@ -564,7 +519,6 @@
       });
       $('.template-container').on('click', app.c.deactiveCanvasControls);
     },
-
 
     /**
       UI Specific Functions
@@ -636,6 +590,7 @@
       var canvasData = app._canvas.toDatalessJSON([
         'blockTitle',
         'blocktype',
+        'fontColor',
         'fontFamily',
         'fontSize',
         'halign',
@@ -731,7 +686,7 @@
           baseObj[textBlockGroupName] = {
             '_align': el.halign,
             '_editable': el.isEditable,
-            '_fitmethod': 'auto',
+            '_fitmethod': 'nofit',
             '_height': elDimensions[1],
             '_id': 'Group'+ i,
             '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
@@ -747,9 +702,9 @@
             // Create <text-block>
             'text-block': {
                             '_align': el.halign,
-                            '_colour': app.c.rgbToCMYK(el.fill),
+                            '_colour': app.c.rgbToCMYK(el.fontColor),
                             '_editable': el.isEditable,
-                            '_fitmethod': 'auto',
+                            '_fitmethod': 'nofit',
                             '_font-family':el.fontFamily,
                             '_font-size': el.fontSize, // app.c.convertUnit(el.fontSize, app.ptSize),
                             '_id': el.blockTitle,
@@ -772,7 +727,7 @@
           // Create <text-block>
           baseObj[textBlockName] = {
                                     '_align': el.halign,
-                                    '_colour': '94,0,100,0', // rgbToCMYK(el.fill),
+                                    '_colour': app.c.rgbToCMYK(el.fontColor),
                                     '_editable': el.isEditable,
                                     '_fitmethod': 'auto',
                                     '_font-family': el.fontFamily,
