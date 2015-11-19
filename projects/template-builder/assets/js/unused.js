@@ -200,6 +200,38 @@
       // });
     },
 
+    rgbToCMYK: function(color){
+      var computedC = 0,
+          computedM = 0,
+          computedY = 0,
+          computedK = 0,
+          rgb       = color.replace(/rgb|\(|\)/gi, '').split(','),
+          r         = parseInt(rgb[0]),
+          g         = parseInt(rgb[1]),
+          b         = parseInt(rgb[2]);
+
+      // BLACK
+      if (r==0 && g==0 && b==0) {
+        computedK = 1;
+        return [0,0,0,1];
+      }
+
+      computedC = 1 - (r/255);
+      computedM = 1 - (g/255);
+      computedY = 1 - (b/255);
+
+      var minCMY = Math.min(computedC, Math.min(computedM,computedY));
+
+      computedC = Math.round( (computedC - minCMY) / (1 - minCMY) * 100 );
+      computedM = Math.round( (computedM - minCMY) / (1 - minCMY) * 100 );
+      computedY = Math.round( (computedY - minCMY) / (1 - minCMY) * 100 );
+      computedK = Math.round( minCMY * 100 );
+
+      // return [computedC,computedM,computedY,computedK];
+      // console.log( computedC + ',' + computedM + ',' + computedY + ',' + computedK );
+      return computedC + ',' + computedM + ',' + computedY + ',' + computedK;
+    },
+
 
 
 

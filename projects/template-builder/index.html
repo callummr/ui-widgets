@@ -68,15 +68,47 @@
 			          	<hr>
 
 			          	<button type="button" id="at-new-template" class="btn btn-lg btn-primary step-option-btn" data-step-action="forward" disabled title="Please add a template name">Create Template</button>
+			          	<button type="button" class="btn btn-lg btn-danger reset-create-template" data-step-action="back">Back</button>
 					</div>
 
 					<div class="stepped-option-2 hidden" data-step-target="2">
 						<ul class="list-group">
-		          			<li class="list-group-item">Template 1 <input type="radio" name="doc-orientation" value="data/data.1-block.json"></li>
-		          			<li class="list-group-item">Template 2 <input type="radio" name="doc-orientation" value="data/data.2-block.json"></li>
+		          			<li class="list-group-item">
+		          				<label for="template1">Single Text Group - Red</label>
+		          				<input type="radio" id="template1" name="template-url" value="assets/xml/data.1.xml" checked>
+		          			</li>
+		          			<li class="list-group-item">
+		          				<label for="template1-2">Single Text Group - Green</label>
+		          				<input type="radio" id="template1-2" name="template-url" value="assets/xml/data.1.2.xml">
+		          			</li>
+		          			<li class="list-group-item">
+		          				<label for="template2">1 IMG, 1 text group </label>
+		          				<input type="radio" id="template2" name="template-url" value="assets/xml/data.2.xml">
+		          			</li>
+		          			<li class="list-group-item">
+		          				<label for="template3">1 IMG, 2 text groups </label>
+		          				<input type="radio" id="template3" name="template-url" value="assets/xml/data.3.xml">
+		          			</li>
+		          			<li class="list-group-item">
+		          				<label for="template4">2 IMG, 2 text groups </label>
+		          				<input type="radio" id="template4" name="template-url" value="assets/xml/data.4.xml">
+		          			</li>
+		          			<li class="list-group-item">
+		          				<label for="template5">Single Image </label>
+		          				<input type="radio" id="template5" name="template-url" value="assets/xml/data.single.image.xml">
+		          			</li>
+		          			<li class="list-group-item">
+		          				<label for="template6">2 IMG </label>
+		          				<input type="radio" id="template6" name="template-url" value="assets/xml/data.two-image.xml">
+		          			</li>
+		          			<li class="list-group-item">
+		          				<label for="template7">4 IMG - ALL Corners </label>
+		          				<input type="radio" id="template7" name="template-url" value="assets/xml/data.4.1.xml">
+		          			</li>
 		          		</ul>
 
-		          		<button type="button" id="at-from-template" class="btn btn-lg btn-primary step-option-btn" data-step-action="forward">Add</button>
+		          		<button type="button" id="at-from-template" class="btn btn-lg btn-primary step-option-btn" data-step-action="forward">Load Template</button>
+		          		<button type="button" class="btn btn-lg btn-danger reset-create-template" data-step-action="back">Back</button>
 					</div>
 				</div>
 
@@ -321,7 +353,7 @@
 
 			<div class="col-md-7 col-md-offset-1 stepped-option new-template-container" data-step="2">
 
-				<button type="button" class="btn btn-danger" id="reset-create-template" data-step-action="back">Reset</button>
+				<button type="button" class="btn btn-danger reset-create-template" data-step-action="back">Reset</button>
 				<button type="button" class="btn btn-default " id="toggle-grid" style="margin-right: 20px">Toggle grid</button>
 				<button type="button" class="btn btn-info" id="save-thumb">Create template</button>
 				<a class="btn btn-warning" id="dl-thumb" download="template-thumbnail.png">Download thumbnail</a>
@@ -343,7 +375,7 @@
 	<script src="assets/js/libs/jquery-1.11.3.js"></script>
 	<script src="assets/js/libs/fabrics.js"></script>
 	<script src="assets/js/libs/reimg.js"></script>
-	<script src="assets/js/libs/jspdf.js"></script>
+	<!-- <script src="assets/js/libs/jspdf.js"></script> -->
 	<script src="assets/js/libs/xml2json.js"></script>
 	<script src="assets/js/create.js"></script>
 </body>
