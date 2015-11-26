@@ -1,0 +1,12 @@
+<doc>
+   <page width="148" height="104.5">
+      <pdf id="heading" title="Heading" lowerleftx="7.5" lowerlefty="36" upperrightx="79.5" upperrighty="97" editable="false" />
+      <text-block-group id="Group1" title="Group 1" lowerleftx="84.5" lowerlefty="36" upperrightx="140.5" upperrighty="97" editable="true" align="right" verticalalign="top" spacing="10">
+         <text-block font-family="FuturaBT-Heavy" font-size="16" source="" textmode="singleline" maxlen="30" colour="100,0,75,45" align="left" verticalalign="top" leading="100%" id="Title" mandatory="False" editable="True" title="Title" fitmethod="auto" orientate="north">Name of Event</text-block>
+         <text-block font-family="FuturaBT-Heavy" font-size="15" source="" textmode="multiline" maxlen="200" colour="100,0,75,45" align="left" verticalalign="top" leading="125%" id="Medium" mandatory="False" editable="True" title="Medium Text" fitmethod="auto" orientate="north">20 Month 2013 11am to 4pm Name of venue/location Street address, town, county</text-block>
+         <text-block font-family="FuturaBT-Heavy" font-size="10" source="" textmode="multiline" maxlen="150" colour="100,0,75,45" align="left" verticalalign="top" leading="125%" id="Small" mandatory="False" editable="True" title="Small Text" fitmethod="auto" orientate="north">Please bring this ticket with you.</text-block>
+      </text-block-group>
+      <image lowresfilename="" highresfilename="" align="right" verticalalign="bottom" id="logo" mandatory="False" editable="True" title="Logo" lowerleftx="7.5" lowerlefty="13.5" upperrightx="140.5" upperrighty="31" width="133" height="17.5" fitmethod="auto" orientate="north" />
+      <text-block id="terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="7" editable="false" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="7.5" lowerlefty="7.5" upperrightx="140.5" upperrighty="10.5" />
+   </page>
+</doc>

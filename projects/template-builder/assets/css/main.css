@@ -206,3 +206,47 @@ input[name="template-block-type"]:checked + .template-block-type-options{
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px; 
 }
+
+/* Template Selector Styles */
+.template-selection:checked + label{
+	background: #5bc0de;
+	font-weight: bold;
+}
+.thumbnail{
+	min-height: 180px;
+	text-align: center;
+}
+.thumbnail .template-name{
+	font-size: 1.25em;
+	margin: 10px 5px;
+}
+.thumbnail a > img,
+.thumbnail > img{
+	height: auto;
+}
+#dynamic-templates{
+	clear: both;
+	display: block;
+	margin-top: 20px;
+}
+.at-from-source-label{
+	display: block;
+}
+input[name=from-template]:checked + label{
+	background: #5bc0de;
+}
+input[name=from-template]:checked + .at-from-source-value{
+	display: block;
+}
+.load-template-state .update-template{
+	display: inline-block;
+}
+
+/* Text block group options */
+#at-text-block-group-list{
+	display: none;
+	margin-top: 20px;
+}
+.list-group-item>.badge{
+	float: none;
+}

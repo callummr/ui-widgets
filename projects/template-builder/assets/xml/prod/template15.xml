@@ -1,0 +1,22 @@
+<doc>
+   <page width="210" height="297">
+      <pdf id="heading" title="Heading" lowerleftx="10" lowerlefty="197" upperrightx="200" upperrighty="287" editable="false" />
+      <pdf id="maclogo" title="Macmillan logo" lowerleftx="171" lowerlefty="10" upperrightx="200" upperrighty="187" editable="false" />
+      <text-block-group id="Group1" title="Group 1" lowerleftx="10" lowerlefty="20" upperrightx="166" upperrighty="187" editable="true" align="left" verticalalign="top" spacing="10">
+         <text-block id="menu" title="menu" font-family="FuturaBT-Book" font-size="16" editable="false" maxlen="100">Menu</text-block>
+         <text-block id="course1name" title="Course 1" font-family="FuturaBT-Book" font-size="16" editable="true" margin-bottom="0">First Course</text-block>
+         <text-block id="course1desc" title="Description" font-family="FuturaBT-Heavy" font-size="16" editable="true" textmode="multiline" leading="120%" />
+         <text-block id="course2name" title="Course 2" font-family="FuturaBT-Book" font-size="16" editable="true" margin-bottom="0">Main Course</text-block>
+         <text-block id="course2desc" title="Description" font-family="FuturaBT-Heavy" font-size="16" editable="true" textmode="multiline" leading="120%" />
+         <text-block id="course3name" title="Course 3" font-family="FuturaBT-Book" font-size="16" editable="true" margin-bottom="0">Pudding</text-block>
+         <text-block id="course3desc" title="Description" font-family="FuturaBT-Heavy" font-size="16" editable="true" textmode="multiline" leading="120%" />
+         <text-block id="course4name" title="Course 4" font-family="FuturaBT-Book" font-size="16" editable="true" margin-bottom="0" />
+         <text-block id="course4desc" title="Description" font-family="FuturaBT-Heavy" font-size="16" editable="true" textmode="multiline" leading="120%" />
+         <text-block id="course5name" title="Course 5" font-family="FuturaBT-Book" font-size="16" editable="true" margin-bottom="0">Wines</text-block>
+         <text-block id="course5desc" title="Description" font-family="FuturaBT-Heavy" font-size="16" editable="true" textmode="multiline" leading="120%" />
+         <text-block id="course6name" title="Course 6" font-family="FuturaBT-Book" font-size="16" editable="true" margin-bottom="0" />
+         <text-block id="course6desc" title="Description" font-family="FuturaBT-Heavy" font-size="16" editable="true" textmode="multiline" leading="120%" />
+      </text-block-group>
+      <text-block id="Terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="9" editable="false" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="10" lowerlefty="10" upperrightx="166" upperrighty="15" />
+   </page>
+</doc>

@@ -1,0 +1,11 @@
+<doc>
+   <page width="148" height="104">
+      <pdf id="heading" editable="False" title="Heading" lowerleftx="7.5" lowerlefty="13.5" upperrightx="83.5" upperrighty="96.5" width="76" height="83" />
+      <text-block-group align="right" spacing="5" id="Group1" editable="True" title="Group 1" lowerleftx="88.5" lowerlefty="13.5" upperrightx="140.5" upperrighty="96.5" width="52" height="83">
+         <text-block font-family="FuturaBT-Heavy" font-size="16" source="" textmode="singleline" maxlen="50" colour="100,0,75,45" align="right" verticalalign="top" leading="100%" id="Salutation" mandatory="False" editable="True" title="Salutation">Event Title</text-block>
+         <text-block font-family="FuturaBT-Heavy" font-size="16" source="" textmode="multiline" maxlen="200" colour="100,0,75,45" align="right" verticalalign="top" leading="125%" id="Details" mandatory="False" editable="True" title="Details">20 Month 2013, 11am to 4pm Name of venue/location Street address, town, county</text-block>
+         <text-block font-family="FuturaBT-Heavy" font-size="14" source="" textmode="multiline" maxlen="100" colour="100,0,75,45" align="right" verticalalign="top" leading="125%" id="Rsvp" mandatory="False" editable="True" title="RSVP">Please bring this ticket with you.</text-block>
+      </text-block-group>
+      <text-block font-family="FuturaBT-Medium" font-size="8" source="E:\Websites\beMacmillan\Assets\Terms.txt" textmode="singleline" maxlen="" colour="100,0,75,45" align="left" verticalalign="bottom" leading="100%" id="Terms" mandatory="False" editable="False" title="Terms and Conditions" lowerleftx="7.5" lowerlefty="7.5" upperrightx="140.5" upperrighty="10.5" width="133" height="3" />
+   </page>
+</doc>

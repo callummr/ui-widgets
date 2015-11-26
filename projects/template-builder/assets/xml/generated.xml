@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<doc scalex="1" scaley="1" assetspath="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\268">
+<doc scalex="1" scaley="1" assetspath="">
    <page width="210" height="297">
       <pdf lowresfilename="" highresfilename="" align="left" verticalalign="top" id="bglayer" mandatory="True" editable="False" title="background" lowerleftx="0" lowerlefty="0" upperrightx="210" upperrighty="297" width="210" height="297" fitmethod="auto" orientate="north" />
-      <text-block align="left" colour="94,0,100,0" editable="true" fitmethod="auto" font-family="FuturaBT-Heavy" font-size="24" id="Block" leading="125%" mandatory="true" maxlen="100" orientate="north" source="Lorem ipsum dolor sit amet, ea natum persius eum, quidam mediocrem ocurreret ex mei. In etiam tempor" textmode="multiline" title="Block" verticalalign="top"/>
+      <text-block align="left" colour="29,0,68,22" editable="true" fitmethod="auto" font-family="FuturaBT-Heavy" font-size="9" height="53" id=" 10" leading="125%" lowerleftx="0" lowerlefty="244" mandatory="true" maxlen="100" orientate="north" source="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\terms.txt" textmode="multiline" title=" 1" upperrightx="53" upperrighty="297" width="53" verticalalign="top" />
    </page>
 </doc>

@@ -1,0 +1,12 @@
+<doc>
+   <page width="297" height="420">
+      <pdf id="heading" title="Heading" lowerleftx="18" lowerlefty="196" upperrightx="281" upperrighty="404" editable="false" />
+      <text-block-group id="Group1" title="Group 1" spacing="10" lowerleftx="16" lowerlefty="22" upperrightx="232" upperrighty="190" editable="true" align="left" verticalalign="top">
+         <text-block id="title" title="Event Title" font-family="FuturaBT-Heavy" font-size="56" textmode="multiline" editable="true" leading="125%" align="left" verticalalign="bottom" lowerleftx="16" lowerlefty="80" upperrightx="113" upperrighty="87" maxlen="200">Fashion Show</text-block>
+         <text-block id="para1" title="Paragraph 1" font-family="FuturaBT-Heavy" font-size="36" leading="125%" editable="true" textmode="multiline" maxlen="200">From the Beatties of Worcester    20 Month 2007  11am to 4pm  Name of venue/location</text-block>
+         <text-block id="para2" title="Paragraph 2" font-family="FuturaBT-Heavy" font-size="28" leading="125%" editable="true" textmode="multiline" maxlen="200">Street address, town, county  call contact Name on 01234 567890  or email c.name@macmillan.org.uk</text-block>
+      </text-block-group>
+      <text-block id="terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="12" editable="false" leading="125%" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="16" lowerlefty="16" upperrightx="226" upperrighty="22" />
+      <image id="Logo" title="Logo" type="1" lowerleftx="232" lowerlefty="16" upperrightx="281" upperrighty="190" editable="true" verticalalign="bottom" />
+   </page>
+</doc>

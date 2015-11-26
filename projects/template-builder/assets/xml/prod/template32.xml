@@ -1,0 +1,12 @@
+<doc>
+   <page width="297" height="420">
+      <image id="Logo" title="Logo" type="1" lowerleftx="15" lowerlefty="358" upperrightx="282" upperrighty="403" editable="true" align="right" />
+      <pdf id="heading" title="Heading" lowerleftx="15" lowerlefty="153" upperrightx="282" upperrighty="358" editable="false" />
+      <text-block-group id="Group1" title="Group 1" spacing="10" lowerleftx="15" lowerlefty="25" upperrightx="282" upperrighty="148" editable="true" align="left" verticalalign="top">
+         <text-block id="title" title="Event Title" font-family="FuturaBT-Heavy" font-size="56" textmode="multiline" editable="true" leading="125%" align="left" verticalalign="bottom" maxlen="25">Event Title</text-block>
+         <text-block id="para1" title="Paragraph 1" font-family="FuturaBT-Heavy" font-size="36" leading="125%" editable="true" textmode="multiline" maxlen="400">This flyer is designed for events which need a longer description. The maximum is 400 characters in this section.</text-block>
+         <text-block id="para2" title="Paragraph 2" font-family="FuturaBT-Heavy" font-size="28" leading="125%" editable="true" textmode="multiline" maxlen="325">No more than 5 lines of text and up to 325 characters in this section. The rest of this text is holding text, so that you can get an idea of what your resource will look like. Time, date and location of event Contact tel 01234 567 890 or email anyone@myorg.org.uk</text-block>
+      </text-block-group>
+      <text-block id="terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="12" editable="false" leading="125%" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="15" lowerlefty="15" upperrightx="282" upperrighty="25" />
+   </page>
+</doc>

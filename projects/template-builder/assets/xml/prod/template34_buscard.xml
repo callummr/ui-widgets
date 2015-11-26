@@ -1,0 +1,8 @@
+<doc>
+   <page width="85" height="55">
+      <image id="partnerlogodigital" title="Partner Logo" lowerleftx="64.5" lowerlefty="17" upperrightx="80" upperrighty="50" editable="true" align="right" verticalalign="top" />
+      <text-block id="Position" title="Position" font-family="FuturaBT-Heavy" font-size="12" editable="true" maxlen="60" textmode="multiline" lowerleftx="5" lowerlefty="36" upperrightx="63" upperrighty="50" align="left" verticalalign="top">Position within the company</text-block>
+      <text-block id="People" title="People" font-family="FuturaBT-Heavy" font-size="10" editable="true" maxlen="140" textmode="multiline" lowerleftx="5" lowerlefty="17" upperrightx="63" upperrighty="34.5" align="left" verticalalign="top">Peoples names: first name, second name, third name, fourth name, fifth name, sixth name, seventh name, eighth name, ninth name.</text-block>
+      <text-block id="Details" title="Contact Details" font-family="FuturaBT-Heavy" font-size="10" editable="true" maxlen="100" textmode="multiline" lowerleftx="5" lowerlefty="5" upperrightx="80" upperrighty="15" align="left" verticalalign="bottom">tel 01234 456 789  email personname@macmillan.org.uk  www.macmillan.org.uk</text-block>
+   </page>
+</doc>

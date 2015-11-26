@@ -1,0 +1,11 @@
+<doc>
+   <page width="210" height="148">
+      <pdf id="back" title="Background Silhouette" lowerleftx="0" lowerlefty="0" upperrightx="110" upperrighty="148" editable="false" fitmethod="auto" />
+      <text-block-group id="Group1" title="Group 1" lowerleftx="112.5" lowerlefty="22.5" upperrightx="200" upperrighty="138" editable="true" align="right" verticalalign="top" spacing="10">
+         <text-block id="Title" title="Title" font-family="FuturaBT-Heavy" font-size="32" editable="true" maxlen="30" />
+         <text-block id="Medium" title="Medium Text" font-family="FuturaBT-Heavy" font-size="20" editable="true" textmode="multiline" maxlen="200">20 Month 2006  11am to 4pm  Name of venue/location  Street address, town, county</text-block>
+         <text-block id="Small" title="Small Text" font-family="FuturaBT-Heavy" font-size="16" editable="true" textmode="multiline" maxlen="150">call Contact Name on 01234 567890  or email cname@macmillan.org.uk</text-block>
+      </text-block-group>
+      <text-block id="Terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="9" editable="false" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="right" verticalalign="bottom" lowerleftx="112.5" lowerlefty="10" upperrightx="200" upperrighty="20" />
+   </page>
+</doc>

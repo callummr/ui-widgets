@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc>
+   <page width="148" height="105">
+      <image id="partnerlogodigital" title="Partner Logo" lowerleftx="5" lowerlefty="85" upperrightx="143" upperrighty="100" editable="true" align="right" verticalalign="top" />
+      <pdf id="header" title="Header" lowerleftx="5" lowerlefty="57.5" upperrightx="120.5" upperrighty="80" editable="false" align="right" verticalalign="top" />
+      <pdf id="logo" title="Macmillan Logo" lowerleftx="123" lowerlefty="5" upperrightx="143" upperrighty="55" editable="false" align="right" verticalalign="top" />
+      <text-block-group id="Group1" title="My Details" lowerleftx="5" lowerlefty="25" upperrightx="120.5" upperrighty="55" editable="true" align="left" verticalalign="top" spacing="5">
+         <text-block id="Para1" title="Paragraph 1" font-family="FuturaBT-Heavy" font-size="10" editable="true" textmode="multiline" maxlen="200" leading="100%">My name is John Smith My role involves:</text-block>
+         <text-block id="Para2" title="Paragraph 2" font-family="FuturaBT-Heavy" font-size="8" editable="true" textmode="multiline" maxlen="200" leading="100%">- Providing  – Ensure effective communication – Assessing</text-block>
+      </text-block-group>
+      <text-block id="nextmeeting" title="Next meeting" font-family="FuturaBT-Heavy" font-size="10" editable="false" align="left" verticalalign="bottom" lowerleftx="5" lowerlefty="23.5" upperrightx="120.5" upperrighty="27.5">Our next meeting will be:</text-block>
+      <text-block id="date" title="Date" font-family="FuturaBT-Heavy" font-size="9" editable="false" align="left" verticalalign="bottom" lowerleftx="5" lowerlefty="18" upperrightx="55" upperrighty="22.5">Date</text-block>
+      <text-block id="time" title="Time" font-family="FuturaBT-Heavy" font-size="9" editable="false" align="left" verticalalign="bottom" lowerleftx="60" lowerlefty="18" upperrightx="120.5" upperrighty="22.5">Time</text-block>
+      <text-block id="location" title="Location" font-family="FuturaBT-Heavy" font-size="9" editable="false" align="left" verticalalign="bottom" lowerleftx="5" lowerlefty="11" upperrightx="120.5" upperrighty="17">Location</text-block>
+      <line id="line1" title="Line 1" colour="100,0,75,32" width="1" lowerleftx="5" lowerlefty="10.5" upperrightx="120.5" upperrighty="10.5" />
+      <line id="line2" title="Line 2" colour="100,0,75,32" width="1" lowerleftx="5" lowerlefty="17.5" upperrightx="120.5" upperrighty="17.5" />
+      <text-block id="Terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="6" editable="false" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="5" lowerlefty="5" upperrightx="120.5" upperrighty="7.5" />
+   </page>
+</doc>

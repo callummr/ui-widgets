@@ -1,0 +1,9 @@
+<doc>
+   <page width="148" height="105">
+      <pdf id="heading" title="Heading" lowerleftx="7.5" lowerlefty="61" upperrightx="141" upperrighty="97.5" editable="false" />
+      <image id="logo" title="Logo" lowerleftx="123.5" lowerlefty="7.5" upperrightx="141" upperrighty="56" editable="true" />
+      <text-block id="details" maxlen="250" title="Details" font-family="FuturaBT-Heavy" font-size="14" editable="true" textmode="multiline" align="left" verticalalign="bottom" lowerleftx="7.5" lowerlefty="23.5" upperrightx="118.5" upperrighty="56">Name of Event  20 Month 2013, 11am to 4pm  Name of venue/location  Street address, town, county</text-block>
+      <text-block id="reminder" title="Ticket Reminder" font-family="FuturaBT-Heavy" font-size="12" editable="false" leading="116.667%" align="left" verticalalign="bottom" lowerleftx="7.5" lowerlefty="13.5" upperrightx="118.5" upperrighty="18.5">Please bring this ticket with you.</text-block>
+      <text-block id="terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="7" editable="false" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="7.5" lowerlefty="7.5" upperrightx="118.5" upperrighty="10.5" />
+   </page>
+</doc>

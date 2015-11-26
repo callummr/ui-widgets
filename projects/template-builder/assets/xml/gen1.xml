@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc scalex="1" scaley="1" assetspath="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\">
+   <page width="210" height="297">
+      <pdf lowresfilename="" highresfilename="" align="left" verticalalign="top" id="bglayer" mandatory="True" editable="False" title="background" lowerleftx="0" lowerlefty="0" upperrightx="210" upperrighty="297" width="210" height="297" fitmethod="auto" orientate="north" />
+      <text-block align="right" colour="0,46,91,5" editable="true" fitmethod="clip" font-family="FuturaBT-Heavy" font-size="9" height="53" id="Block1" leading="125%" lowerleftx="25" lowerlefty="5" mandatory="true" maxlen="100" orientate="north" source="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\terms.txt" textmode="multiline" title="Block" upperrightx="200" upperrighty="58" width="175" verticalalign="top" />
+      <text-block-group editable="True" height="297" id="Group1" lowerleftx="0" lowerlefty="0" mandatory="False" orientate="north" spacing="0" upperrightx="210" upperrighty="297" width="210">
+         <text-block align="left" colour="29,0,68,22" editable="true" fitmethod="clip" font-family="FuturaBT-Heavy" font-size="12" height="53" id=" 12" leading="125%" lowerleftx="16" lowerlefty="228" mandatory="true" maxlen="100" source="" textmode="multiline" title=" 1" upperrightx="69" upperrighty="281" width="53">Lorem ipsum dolor sit amet, ea natum persius eum, quidam mediocrem ocurreret ex mei. In etiam tempor</text-block>
+      </text-block-group>
+   </page>
+</doc>
