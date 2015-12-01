@@ -153,14 +153,14 @@
 						          	</span>
 					          		<input type="radio" id="at-source-yes" name="from-template" class="hidden">
 									<div class="hidden-el at-from-source-value">
-										<input type="text" class="form-control reset-to-default" id="at-src" value="terms.txt">
+										<input type="text" class="form-control reset-to-default" id="at-src" placeholder="terms.txt" value="terms.txt">
 									</div>				          	
 
 									<h3>Font Face</h3>
 									<div id="at-font-face" class="text-editor-option">
 										<!-- Need to add more weights -->
-										<button type="button" class="at-control reset-to-default btn btn-default option-selected" data-fface="FuturaBT-Heavy">Regular</button>
-										<!-- <button type="button" class="btn btn-default" data-fface="FuturaBT-Heavy">Medium</button> -->
+										<button type="button" class="at-control reset-to-default btn btn-default option-selected" data-fface="FuturaBT-Book">Regular</button>
+										<button type="button" class="btn btn-default" data-fface="FuturaBT-Medium">Medium</button>
 										<button type="button" class="at-control btn btn-default" data-fface="FuturaBT-Heavy">Headline</button>
 									</div>
 
@@ -194,18 +194,18 @@
 									</div>
 								</div>
 
-								<div class="hidden template-options" id="new-template-text-block-group">
-									<!-- Spacing -->
-									<h3>Text block Spacing</h3>
-									<input type="number" value="10" id="at-spacing-g" class="reset-to-default at-control form-control">
-									<ul id="at-text-block-group-list" class="empty-on-reset list-group new-block-controls"></ul>
+								<div class="hidden template-options" id="new-template-text-block-group">	
+									<div data-state="disable-text-block-controls">							
+										<h3>Text block Spacing</h3>
+										<input type="number" value="10" id="at-spacing-g" class="reset-to-default at-control form-control">
+										<ul id="at-text-block-group-list" class="empty-on-reset list-group new-block-controls"></ul>
 
-									<hr>
-									<!-- Add textblock -->
-									<button type="button" class="btn btn-info new-block-controls" id="at-add-block-to-group">Add text block to group</button>
-									<hr class="new-block-controls">
-
-									<div class="hidden new-group-controls" id="at-text-block-group-el-options" data-tbgid="">
+										<hr>
+										<button type="button" class="btn btn-info new-block-controls" id="at-add-block-to-group">Add text block to group</button>
+									</div>
+			
+									<div class="hidden new-group-controls" id="at-text-block-group-el-options" data-tbgid="" data-state="enable-text-block-controls">
+										<hr class="hidden divider" data-state="disable-in-tgb-edit-state">
 										<div class="alert alert-info">
 											<p>These settings only effect the individual text block, not the group.</p>
 										</div>
@@ -213,9 +213,8 @@
 										<input type="text" id="at-text-block-title" class="at-control reset-to-default form-control" placeholder="Name of text block...">
 										<h3>Font Face</h3>
 										<div id="at-font-face-g" class="text-editor-option">
-											<!-- Need to add more weights -->
-											<button type="button" class="at-control reset-to-default btn btn-default option-selected" data-fface="FuturaBT-Heavy">Regular</button>
-											<!-- <button type="button" class="btn btn-default" data-fface="FuturaBT-Heavy">Medium</button> -->
+											<button type="button" class="btn btn-default" data-fface="FuturaBT-Book">Regular</button>
+											<button type="button" class="btn btn-default" data-fface="FuturaBT-Medium">Medium</button>
 											<button type="button" class="at-control btn btn-default" data-fface="FuturaBT-Heavy">Headline</button>
 										</div>
 
@@ -272,6 +271,11 @@
 											</div>
 										</div>
 									</div>
+									<div class="hidden" data-state="enable-text-block-controls">
+										<hr>
+										<button class="btn btn-info" data-action="update-tb-from-tbg">Update</button>
+										<button class="btn btn-danger" data-action="stop-tb-from-tbg">Stop</button>
+									</div>
 								</div>
 
 								<div class="hidden template-options" id="new-template-image-block">
@@ -327,10 +331,8 @@
 								</div>
 							</div>							
 						</div>
-						
-						<hr>
-						
-						<div class="new-block-controls">							
+												
+						<div class="new-block-controls" data-state="disable-text-block-controls">							
 							<h3>Horizontal &amp; Vertical positioning</h3>
 							<div class="row">
 								<div class="col-md-6">
@@ -365,7 +367,7 @@
 							</div>
 						</div>
 							
-						<div class="row new-block-controls">
+						<div class="row new-block-controls" data-state="disable-text-block-controls">
 							<div class="col-md-6">
 								<div class="onoffswitch">
 									<h3>Manditory?</h3>
@@ -388,19 +390,20 @@
 							</div>
 						</div>
 
-						<hr>
+						<hr data-state="disable-in-tgb-edit-state">
 
-						<div class="disabled-in-edit-state">
-							<button type="button" class="btn btn-primary new-block-controls" id="add-template-block">Add Template Block</button>
+						<div class="disabled-in-edit-state" data-state="disable-text-block-controls">
+							<button type="button" class="btn btn-primary new-block-controls" id="add-template-block" data-state="disable-in-tgb-edit-state">Add Template Block</button>
 							<button type="button" class="btn btn-primary new-group-controls hidden" id="at-save-block-to-group">Add Text Block to group</button>
 							<button type="button" class="btn btn-danger new-group-controls hidden" id="at-close-block-to-group">Close</button>
+							<hr>
 						</div>
-						<div class="enabled-in-edit-state hidden">
+						<div class="enabled-in-edit-state hidden" data-state="disable-text-block-controls">
 							<button type="button" class="at-control btn btn-primary" id="at-update-component">Update</button>
 							<button type="button" class="at-control btn btn-info" id="at-stop-update-component">Stop</button>							
 							<button type="button" class="at-control btn btn-danger" id="at-remove-component">Delete</button>
-						</div>
-						
+							<hr>
+						</div>						
 					</div>
 				</div>
 

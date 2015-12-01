@@ -1,1 +1,11 @@
-<doc scalex='1' scaley='1' assetspath='C:\Projects\bemac_discovery\BeMacDiscovery\Assets\268'><page width='210' height='297'><pdf lowresfilename='' highresfilename='' align='left' verticalalign='top' id='bglayer' mandatory='True' editable='False' title='background' lowerleftx='0' lowerlefty='0' upperrightx='210' upperrighty='297' width='210' height='297' fitmethod='auto' orientate='north'/><image align='center' editable='true' fitmethod='auto' height='115' highresfilename='demo-800.jpg' id='Image 1' lowerleftx='0' lowerlefty='182' lowresfilename='demo-800.jpg' mandatory='false' orientate='north' title='Image 1' upperrightx='115' upperrighty='297' verticalalign='center' width='115'/><image align='right' editable='false' fitmethod='auto' height='107' highresfilename='demo-800.jpg' id='Image 2' lowerleftx='103' lowerlefty='-1' lowresfilename='demo-800.jpg' mandatory='true' orientate='north' title='Image 2' upperrightx='210' upperrighty='106' verticalalign='bottom' width='107'/></page></doc>
+<doc>
+   <page width="420" height="297">
+      <pdf id="back" title="Background Silhouette" lowerleftx="0" lowerlefty="0" upperrightx="420" upperrighty="297" editable="false" />
+      <text-block-group id="Group1" title="Group 1" lowerleftx="240.72" lowerlefty="15" upperrightx="405" upperrighty="118.8" editable="true" align="right" verticalalign="bottom" spacing="10">
+         <text-block id="Title" title="Title" font-family="FuturaBT-Heavy" font-size="36" editable="true" maxlen="30" />
+         <text-block id="Medium" title="Medium Text" font-family="FuturaBT-Heavy" font-size="24" editable="true" maxlen="200" textmode="multiline" leading="125%">20 Month 2006  11am to 4pm  Name of venue/location  Street address, town, county</text-block>
+         <text-block id="Small" title="Small Text" font-family="FuturaBT-Heavy" font-size="20" editable="true" maxlen="150" textmode="multiline" leading="125%">call Contact Name on 01234 567890  or email cname@macmillan.org.uk</text-block>
+      </text-block-group>
+      <text-block id="Terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="9" editable="false" source="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\Terms.txt" align="right" verticalalign="top" lowerleftx="292.15" lowerlefty="272" upperrightx="405" upperrighty="282" />
+   </page>
+</doc>

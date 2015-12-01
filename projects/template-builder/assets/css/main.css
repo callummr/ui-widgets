@@ -247,6 +247,17 @@ input[name=from-template]:checked + .at-from-source-value{
 	display: none;
 	margin-top: 20px;
 }
+#at-text-block-group-list li{
+	min-height: 45px;
+}
+#at-text-block-group-list .btn{
+	padding: 6px;
+	line-height: 1;
+	font-size: 10px;
+	font-weight: bold;
+	margin-left: 10px;
+}
+
 .list-group-item>.badge{
 	float: none;
 }

@@ -6,16 +6,6 @@
          <text-block id="Medium" title="Medium Text" font-family="FuturaBT-Heavy" font-size="24" editable="true" maxlen="200" textmode="multiline" leading="125%">20 Month 2006  11am to 4pm  Name of venue/location  Street address, town, county</text-block>
          <text-block id="Small" title="Small Text" font-family="FuturaBT-Heavy" font-size="20" editable="true" maxlen="150" textmode="multiline" leading="125%">call Contact Name on 01234 567890  or email cname@macmillan.org.uk</text-block>
       </text-block-group>
-      <text-block id="Terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="9" editable="false" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="15" lowerlefty="15" upperrightx="118.8" upperrighty="25" />
-   </page>
-</doc>
-
-<doc scalex="1" scaley="1" assetspath="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\">
-   <page width="210" height="297">
-      <pdf lowresfilename="" highresfilename="" align="left" verticalalign="top" id="bglayer" title="background" lowerleftx="0" lowerlefty="0" upperrightx="210" upperrighty="297" orientate="north" />
-      <text-block-group align="left" editable="True" id="Group0" lowerleftx="10" lowerlefty="7" mandatory="False" orientate="north" spacing="10" upperrightx="201" upperrighty="113" verticalalign="top">
-         <text-block colour="29,0,68,22" editable="true" font-family="FuturaBT-Heavy" font-size="12" id="TextBlockG_0" leading="125%" mandatory="true" maxlen="10" textmode="multiline" title="Text Block 0" source="">1234567890 1</text-block>
-         <text-block colour="29,0,68,22" editable="true" font-family="FuturaBT-Heavy" font-size="12" id="TextBlockG_1" leading="125%" mandatory="true" maxlen="100" textmode="multiline" title="Text Block 1" source="">Lorem ipsum dolor sit amet, ea natum persius eum, quidam mediocrem ocurreret ex mei. In etiam temporibus usu. Eam ad solet nominavi. At qui integre deserunt, nam delenit officiis te, ipsum sonet expetendis at vel. Veritus minimum has at, congue nullam id vel.Sit te brute discere debitis, hinc wisi error an eos. His cu amet postea utamur, ad illud malis accusata mei, enim tota quaestio an nec. Veri sonet habemus et duo. Harum eirmod omittam vel et, electram mediocrem vis at. Sed iudico omnium no, te eam fugit adipisci honestatis. Per ad ancillae petentium reprehendunt.An purto munere apeirian vix. Affert doctus consetetur in vis, vel quando albucius ne. Corpora suavitate te nec. Veri vidisse copiosae at nec. Ad fabulas veritus his. Pri novum accusata principes ex, cum id iisque feugiat delicatissimi, per reque legendos honestatis ei.Ei appetere salutatus complectitur vel. Eu admodum electram theophrastus eam, lucilius recteque vel et. Et sit novum alterum epicurei, vim integre adolescens ad, et pri reque idque minimum. Sed at integre voluptatibus. Prompta omittantur qui eu, id error percipitur comprehensam per.Tantas recusabo vituperatoribus cu eam, appetere signiferumque sed ut, sea aperiri indoctum ne. Quo in labores ancillae perfecto. Dicunt tractatos et quo. Dicunt vituperata cum ei, ei vis falli dicit, vel scripta facilisis in.</text-block>
-      </text-block-group>
+      <text-block id="Terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="9" editable="false" source="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\terms.txt" align="left" verticalalign="bottom" lowerleftx="15" lowerlefty="15" upperrightx="118.8" upperrighty="25" />
    </page>
 </doc>
