@@ -1,6 +1,37 @@
+/* Create Product Styles */
+.show-border-when-selected:checked + label{
+	border: solid 1px #000;
+}
+.list-margin-top{
+	margin-top: 20px;
+}
+.pull-top-right{
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	z-index: 1;
+}
+.block-item-heading{
+	font-size: 1.5em;
+}
+.edit-tb-defaults-container{
+	position: relative;
+}
+.text-block-defaults-container{
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: solid 1px #CCC;
+	border-bottom: solid 1px #CCC;
+}
+
+
 /*Resets*/
-.template-container{
+.template-container,
+.product-container{
 	margin-bottom: 40px;
+}
+.clear-all{
+	clear: both;
 }
 @media (max-width: 991px ){
 	.new-template-container{
@@ -9,6 +40,7 @@
 }
 .list-group-item{
 	list-style: none;
+	position: relative;
 }
 textarea{
 	resize:vertical;

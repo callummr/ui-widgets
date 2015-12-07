@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Create Product</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+	<div class="row product-container">
+		<div class="container" data-template="build-product">
+			<h1>Create Product</h1>
+			<hr>
+			<div class="stepped-option active-option" data-step="0">
+	      		<div class="hidden clearfix" id="dynamic-product-templates"></div>
+			</div>
+
+			<div class="stepped-option" data-step="1">
+				<div class="col-md-5">
+					<ul id="product-blocks-list" class="list-group"></ul>
+					<!-- Template -->
+					<table class="table hidden">
+						<tr>
+							<th>Default</th>
+							<th>Option</th>
+							<th>Use?</th>
+						</tr>
+						<tr>
+							<td>
+								<input type="radio" name="block-[x]-[type]-default" value="" checked>
+							</td>
+							<td>
+								Name of option
+							</td>
+							<td>
+								<input type="checkbox" name="block-[x]-type" value="" checked>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div class="col-md-5 hidden">
+					<button type="button" class="btn btn-info pull-right">Back</button>
+
+					<ul class="asset-library-list">
+						<input type="search" class="form-control" placeholder="Search...">
+						<li class="asset-library-item">
+							<span>Asset Name</span>
+							<img src="" alt="">
+							<input type="checkbox" name="asset-library-img" value="path/to/img.jpg">
+						</li>
+					</ul>
+				</div>
+
+				<div class="col-md-7 stepped-option" data-step="1">
+					<button type="button" class="btn btn-default" data-action="toggle-grid" style="margin-right: 20px">Toggle Grid</button>
+					<button type="button" class="btn btn-info create-template">Create Template</button>				
+					<a class="btn btn-warning" data-action="download-thumbnail" download="template-thumbnail.png">Download Thumbnail</a>				
+					<hr>
+					<label for="non-variant"><input type="checkbox" id="non-variant" checked>Non varient</label>
+					<hr>
+					<!-- Size of canvas is relative to A4: 210mm x 297mm (px > mm = 0.376065) -->
+					<!-- Canvas is half than pixel to mm -->
+					<div class="alert alert-info">
+						<span class="badge">Template name: </span> <span id="template-name"></span><br>
+						<span class="badge">Available sizes: </span> <span id="template-size-options"></span><br> 
+						<span class="badge">Orientation: </span> <span id="template-orientation"></span> 
+					</div>
+
+					<div id="canvas-container"></div>
+					<!-- <canvas id="c" width="396.85" height="561.25"></canvas> -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="assets/js/libs/jquery-1.11.3.js"></script>
+	<script src="assets/js/libs/fabrics.js"></script>
+	<script src="assets/js/libs/reimg.js"></script>
+	<!-- <script src="assets/js/libs/jspdf.js"></script> -->
+	<script src="assets/js/libs/xml2json.js"></script>
+	<script src="assets/js/utils.js"></script>
+	<!-- <script src="assets/js/create-template.js"></script> -->
+	<script src="assets/js/create-product.js"></script>
+</body>
+</html>

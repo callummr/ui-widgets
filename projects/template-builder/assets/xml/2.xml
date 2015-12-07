@@ -6,7 +6,8 @@
          <text-block font-family="FuturaBT-Heavy" font-size="15" source="" textmode="multiline" maxlen="200" colour="100,0,75,45" align="left" verticalalign="top" leading="125%" id="Medium" mandatory="False" editable="True" title="Medium Text" fitmethod="auto" orientate="north">20 Month 2013 11am to 4pm Name of venue/location Street address, town, county</text-block>
          <text-block font-family="FuturaBT-Heavy" font-size="10" source="" textmode="multiline" maxlen="150" colour="100,0,75,45" align="left" verticalalign="top" leading="125%" id="Small" mandatory="False" editable="True" title="Small Text" fitmethod="auto" orientate="north">Please bring this ticket with you.</text-block>
       </text-block-group>
-      <image lowresfilename="demo-800.jpg" highresfilename="demo-800.jpg" align="right" verticalalign="bottom" id="logo" mandatory="False" editable="True" title="Logo" lowerleftx="7.5" lowerlefty="13.5" upperrightx="140.5" upperrighty="31" width="133" height="17.5" fitmethod="auto" orientate="north" />
-      <text-block id="terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="7" editable="false" source="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="7.5" lowerlefty="7.5" upperrightx="140.5" upperrighty="10.5" />
+     
+      <text-block id="terms1" title="Test Block" font-family="FuturaBT-Medium" font-size="12" editable="false" align="left" verticalalign="bottom" lowerleftx="7.5" lowerlefty="7.5" upperrightx="140.5" upperrighty="10.5">This is a text</text-block>
+
    </page>
 </doc>

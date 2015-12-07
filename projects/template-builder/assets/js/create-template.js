@@ -1,49 +1,19 @@
+var app = app || {};
 (function(){
   'use strict';
 
   // $ = dom elements
   // _ = fabric elements
 
-  var app = app || {};
-
-  // Canvas Elements/Settings
-  app._canvas;
-  app._grid;
-  app.gridSquare      = 24;
-  // Units/Measurements
-  app.ptSize          = 0.75; // 1px > 1pt
-  app.mmSize          = 0.2645833333333; // 1px > 1mm
-  app.pxSize          = 3.779527559055; // 1mm > 1px
-  // Template Creation Settings/Values
-  app.orientation;
-  app.templateType    = 'default';
-  app.imagedata;
-  app.docDimesions    = [];
-  app.templateName;
-  app.$tempBlockName  = $('#at-block-title');
-  app.templateDatURL  = '';
-  app.templateId      = null;
-  app.tempGroupCnt    = 0;
-  app.tempGBlockCnt   = 0;
-  // Enviornment Check
-  app.isLocalEnv      = document.location.hostname ===  "widget.macmillan.org.uk";
   // State controllers
   app.gEditActive     = false; // Global active mode
   app.tbgEditActive   = false; // Text Block Group Edit Active
 
-  // Sets the default templates and some example text for textblocks
-  if(app.isLocalEnv){
-    app.dummyText = $.get('assets/data/dummy-text.txt', function(data){return data}, 'text');
-    app.templateDatURL = 'assets/data/data.templates.txt';
-  }else{
-    app.dummyText = $.get('../assets/data/dummy-text.txt', function(data){return data}, 'text');
-    app.templateDatURL = '/be/api/PDF/Template.ashx';
-  }
   
-  app.c = {
-    initCreate: function(){
-      app.c.bindClickEvents();
-      app.c.loadTempList();
+  app.ct = {
+    initCreateTemp: function(){
+      app.ct.bindCreateTemplateClickEvents();
+      app.ct.loadTempList();
     },
 
     /**
@@ -53,24 +23,10 @@
       var filename = $('.canvas-name-field').val() || 'template-download';
       return filename + extension
     },
-    convertUnit: function(unit, targetUnit){
-      return parseInt( parseFloat(unit * targetUnit).toFixed(5) );    
-      // return unit * targetUnit;    
-    },
-    coverUnitFromMM: function(unit, targetUnit){
-      var changeVal = Math.ceil(unit * targetUnit);
-      if(changeVal < 0){
-        // console.log(0);
-        return 0
-      }else{
-        // console.log(changeVal);
-        return changeVal
-      }  
-    },
     setDocumentSize: function(){
       // X, Y, % of A4.
-      console.log(app.orientation);
-      console.log(app.docDimesions);
+      // console.log(app.orientation);
+      // console.log(app.docDimesions);
       if(app.templateType !== 'default'){
         return [88,55, 1]      // Business Card 
       }else{
@@ -101,59 +57,6 @@
         } 
       }     
     },
-    rgbToCMYK: function(color){
-      var computedC = 0,
-          computedM = 0,
-          computedY = 0,
-          computedK = 0,
-          rgb       = color.replace(/rgb|\(|\)/gi, '').split(','),
-          r         = parseInt(rgb[0]),
-          g         = parseInt(rgb[1]),
-          b         = parseInt(rgb[2]);
-
-      // BLACK
-      if (r==0 && g==0 && b==0) {
-        computedK = 1;
-        return [0,0,0,1];
-      }
-
-      computedC = 1 - (r/255);
-      computedM = 1 - (g/255);
-      computedY = 1 - (b/255);
-
-      var minCMY = Math.min(computedC, Math.min(computedM,computedY));
-
-      computedC = Math.round( (computedC - minCMY) / (1 - minCMY) * 100 );
-      computedM = Math.round( (computedM - minCMY) / (1 - minCMY) * 100 );
-      computedY = Math.round( (computedY - minCMY) / (1 - minCMY) * 100 );
-      computedK = Math.round( minCMY * 100 );
-
-      // return [computedC,computedM,computedY,computedK];
-      // console.log( computedC + ',' + computedM + ',' + computedY + ',' + computedK );
-      return computedC + ',' + computedM + ',' + computedY + ',' + computedK;
-    },
-    cmykToRGB: function(color){
-      //console.log(color);
-      // if(typeof(color) !== 'undefined'){
-      //   var colorArr = color.split(','),
-      //       c        = colorArr[0] / 100,
-      //       m        = colorArr[1] / 100,
-      //       y        = colorArr[2] / 100,
-      //       k        = colorArr[3] / 100,
-      //       r,
-      //       g,
-      //       b;
-
-      //   r = Math.round(1 - Math.min(1, c * (1 - k) + k)) * 255;
-      //   g = Math.round(1 - Math.min(1, m * (1 - k) + k)) * 255;
-      //   b = Math.round(1 - Math.min(1, y * (1 - k) + k)) * 255;
-      //   //console.log('rgb(' + r + ',' + g + ',' + b + ')');
-      //   return 'rgb(' + r + ',' + g + ',' + b + ')'
-      // }else{
-      //   return 'rgb(0,0,0)'
-      // }
-      return 'rgb(0,0,0)'
-    },
     toggleElements: function(){
       var $this         = $(this),
           toggleTarget  = $this.data('targetel'),
@@ -172,7 +75,7 @@
     },
 
     /**
-      Working with existing templateas
+      Working with existing templates
     **/
     loadTempList: function(){
       $('#static-templates').remove();
@@ -183,7 +86,7 @@
       })
       .done(function(data){
         // Filter the response and then create JSON        
-        var templatesData = JSON.parse(app.c.filterResponse(data)),
+        var templatesData = JSON.parse(app.utils.filterResponse(data)),
             tempString = '';
         // console.log(templatesData);
         // console.log(JSON.parse(data));
@@ -225,7 +128,7 @@
           templateData = data;
           tempJSON = x2js.xml2json(templateData);
         }else{
-          templateData = JSON.parse(app.c.filterResponse(data));2
+          templateData = JSON.parse(app.utils.filterResponse(data));
           tempJSON = x2js.xml_str2json(templateData[0].XML);
           app.docDimesions = templateData[0].Dimensions.replace(' ', '').split(',');
         }
@@ -235,84 +138,32 @@
         $('#template-name').text($selectedInput.next().find('.template-name').text());       
         $('#template-tools-navigation').addClass('col-md-4');
 
-        app.c.loadTempFromJSON(tempJSON);        
+        app.ct.loadTempFromJSON(tempJSON);        
+      }).fail(function(){
+        alert('Load template request failed');
       });
-
     },    
     loadTempFromJSON: function(canvasData){
       // console.log(canvasData);
       // console.log(canvasData.doc);
       var canvasEl    = document.createElement('canvas'),
           docWidth    = parseInt(canvasData.doc.page._width),
-          docHeight   = parseInt(canvasData.doc.page._height),
-          canvasScale = 0; 
+          docHeight   = parseInt(canvasData.doc.page._height);
 
       // Set the ID of the Canvas      
-      canvasEl.setAttribute('id', 'c');      
+      canvasEl.setAttribute('id', 'c');
 
-      // Set the orientation
-      if(docWidth < docHeight){
-        app.orientation   = 'p'; // Portrait
-        $('#template-orientation').text('Portrait');
-      }else{
-        app.orientation   = 'l'; // Landscape
-        $('#template-orientation').text('Landscape');
-      }
-
-      // Set the width of the canvas based on asset type. All assets use an A4 as a base, except business cards
-      if(docWidth === 85 && docHeight === 55){        
-        app.templateType  = 'business';
-        canvasEl.width    = 332;
-        canvasEl.height   = 207;
-      } else{
-        if(docWidth < docHeight){
-          canvasEl.width  = 396;
-          canvasEl.height = 561;
-        } else{
-          canvasEl.width  = 561;
-          canvasEl.height = 396;
-        }
-      }
-
-      // Set the level of scaling so the when converting the cooridinates to pixels that are accurate      
-      if((docWidth === 420 && docHeight === 594) || (docHeight=== 420 && docWidth === 594)){
-        // A2 = 420x594 or 594x420
-        canvasScale = 2;
-        app.isLocalEnv == true ? app.docDimesions = ['A2'] : [];
-      }
-      else if((docWidth === 297 && docHeight === 420) || (docHeight=== 297 && docWidth === 420)){
-        // A3 = 297x420 or 420x297
-        canvasScale = 1.4142;
-        app.isLocalEnv == true ? app.docDimesions = ['A3'] : [];
-      } else if((docWidth === 210 && docHeight === 297) || (docHeight=== 210 && docWidth === 297)){
-        // A4 = 210x297 or 297x210
-        canvasScale = 1;
-        app.isLocalEnv == true ? app.docDimesions = ['A4'] : [];
-      } else if((docWidth === 148 && docHeight === 210) || ((docHeight === 148 || docHeight === 148.5) && docWidth === 210)){
-        // A5 = 148x210 or 210x148
-        canvasScale = 0.7071;
-        app.isLocalEnv == true ? app.docDimesions = ['A5'] : [];    
-      } else if((docWidth === 105 && docHeight === 148) || (docHeight >= 104 && docHeight <= 105 && docWidth === 148)){
-        // A6 = 105x148 or 148x105
-        canvasScale = 0.5;
-        app.isLocalEnv == true ? app.docDimesions = ['A6'] : [];
-      } else if((docWidth === 74 && docHeight === 105) || (docHeight === 74 && docWidth === 105)){
-        // A7 = 74x105 or 105x74
-        canvasScale = 0.3536;
-        app.isLocalEnv == true ? app.docDimesions = ['A7'] : [];
-      } else if(docWidth === 85 && docHeight === 55){
-        // Business Card = 85x55
-        canvasScale = 1;
-        app.isLocalEnv == true ? app.docDimesions = ['Business Card'] : [];
-      } 
-      console.log(docWidth, docHeight, canvasScale)
+      var canvasSettings = app.utils.setCanvasSettings(docWidth, docHeight);
+      canvasEl.width  = canvasSettings.width;
+      canvasEl.height = canvasSettings.height;
 
       document.getElementById('canvas-container').appendChild(canvasEl);
       app._canvas = new fabric.Canvas('c', { selection: false, backgroundColor: '#FFF' });
-      app.c.drawGrid(396); // Pass in the width dynamically so the whole grid is covered
+      app.utils.drawGrid(396); // Pass in the width dynamically so the whole grid is covered
       // Add all of the elements to the page.
-      app.c.createTempBlockFromXML(canvasData.doc.page, canvasScale);
-      app.c.bindCanavsEvents(); 
+      app.ct.createTempBlockFromXML(canvasData.doc.page, canvasSettings.canvasScale);
+      app.ct.bindCreateTemplateCanvasEvents();
+      app.utils.bindGlobalCanvasEvents();
     },
     createTempBlockFromXML: function(templateJSON, scale){
       // console.log(templateJSON);
@@ -321,13 +172,13 @@
             // Only a single text block group
             templateJSON['text-block-group']['block'] = 'tbg';
             templateJSON['text-block-group']['scale'] = scale;
-            app.c.createTempBlockData(true, templateJSON['text-block-group']);
+            app.ct.createTempBlockData(true, templateJSON['text-block-group']);
           }else{
             // Multiple text block groups
             templateJSON['text-block-group'].forEach(function(textBlockGroup){
               textBlockGroup['block'] = 'tbg';
               textBlockGroup['scale'] = scale;
-              app.c.createTempBlockData(true, textBlockGroup);
+              app.ct.createTempBlockData(true, textBlockGroup);
             });
           }
       }
@@ -337,13 +188,13 @@
           // Only a single text block
           templateJSON['text-block']['block'] = 'tb';
           templateJSON['text-block']['scale'] = scale;
-          app.c.createTempBlockData(true, templateJSON['text-block']);
+          app.ct.createTempBlockData(true, templateJSON['text-block']);
         }else{
           // Multiple text blocks
           templateJSON['text-block'].forEach(function(textBlock){
             textBlock['block'] = 'tb';
             textBlock['scale'] = scale;
-            app.c.createTempBlockData(true, textBlock);
+            app.ct.createTempBlockData(true, textBlock);
           });
         }
       }
@@ -353,13 +204,13 @@
           // Only a single image block
           templateJSON['image']['block'] = 'ib';
           templateJSON['image']['scale'] = scale;
-          app.c.createTempBlockData(true, templateJSON['image']);
+          app.ct.createTempBlockData(true, templateJSON['image']);
         }else{
           // Multiple image blocks
           templateJSON['image'].forEach(function(imgBlock){
             imgBlock['block'] = 'ib';
             imgBlock['scale'] = scale;
-            app.c.createTempBlockData(true, imgBlock);
+            app.ct.createTempBlockData(true, imgBlock);
           });
         }
       }
@@ -377,10 +228,10 @@
       app.docDimesions  = [];
       app.gEditActive   = false;
       app.tbgEditActive = false;
-      app.tempGroupCnt      = 0;
-      app.tempGBlockCnt     = 0
+      app.tempGroupCnt  = 0;
+      app.tempGBlockCnt = 0
       // Reset the create template tool back to its default
-      app.c.resetCreateTempBlock();
+      app.ct.resetCreateTempBlock();
       $('.empty-on-reset').empty();
       $('.clear-on-reset').val('');
       $('.stepped-option-2').addClass('hidden');
@@ -394,11 +245,12 @@
       });
     },
     resetCreateTempBlock: function(){
+      console.log('Called');
       // Hide the edit buttons
-      app.c.toggleTempState(false);
+      app.ct.toggleTempState(false);
 
       // Reset the text block group editing settings
-      app.c.handleTbgState(false);
+      app.ct.handleTbgState(false);
       // Empty the the text block group list
       $('#at-text-block-group-list').empty();
       // Resets all checkboxes and radio buttons to the default setting.
@@ -444,7 +296,7 @@
       var canvasEl = document.createElement('canvas'),
           size;
       
-      app.c.setTemplateDetails();
+      app.ct.setTemplateDetails();
       canvasEl.setAttribute('id', 'c');
 
       // Check if the document size desired template should be a regular paper size or business card.
@@ -471,8 +323,8 @@
 
       document.getElementById('canvas-container').appendChild(canvasEl);
       app._canvas       = new fabric.Canvas('c', { selection: false, backgroundColor: '#FFF' });
-      app.c.bindCanavsEvents();
-      app.c.drawGrid(396); // Pass in the width dynamically so the whole grid is covered
+      app.ct.bindCreateTemplateCanvasEvents();
+      app.utils.drawGrid(396); // Pass in the width dynamically so the whole grid is covered
     },  
     setTemplateDetails: function(){
       var $orientationDetail = $('#template-orientation');
@@ -496,21 +348,6 @@
       }else{
         $orientationDetail.text('Landscape');
       }
-    },
-    drawGrid: function(gSize){
-      var gridLines = [];
-      for (var i = 0; i < 50; i++) {
-        gridLines.push(new fabric.Line([ i * app.gridSquare, 0, i * app.gridSquare, gSize], { stroke: '#ccc'}));
-        gridLines.push(new fabric.Line([ 0, i * app.gridSquare, gSize, i * app.gridSquare], { stroke: '#ccc'}));
-      }
-      //console.log(gridLines);
-      app._grid = new fabric.Group(gridLines, {
-                  left: 0,
-                  top: 0,
-                  selectable: false
-                });
-      app._canvas.add(app._grid);
-      app._canvas.renderAll();
     },
     constrainGridMovement: function(e){
       // Snap to grid
@@ -537,32 +374,12 @@
           obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
       }
     },
-    cleanCanvas: function(){
-      app._grid['visible'] = false;
-      app._canvas.deactivateAll().renderAll();
-    },
     deactiveCanvasControls: function(){
       // If the edit state is active, hide the edit options
         if(!$('.disabled-in-edit-state').hasClass('hidden')){
           // Hide the edit options
-          app.c.toggleTempState(false);          
+          app.ct.toggleTempState(false);          
         }
-    },
-    toggleCanvasGrid: function(toggle){
-      var $this = $(this);
-      if( $this.hasClass('grid-disabled') ){
-        $this.removeClass('grid-disabled');
-        app._grid['visible'] = true;
-      }else{
-        $this.addClass('grid-disabled');
-        app._grid['visible'] = false;
-      }
-
-      // Show the grid, after saving the image and generating PDF
-      if(toggle === true){
-        app._grid['visible'] = true;
-      }
-      app._canvas.renderAll();
     },
     setAspectRatio: function(aspectRatio){
       switch(aspectRatio) {
@@ -624,8 +441,9 @@
           blockSettings = {},
           blockSize;
       // Check if an element is being created using the creation tool or loading an existing template.
+      // Replace with app.utils.createBlockDataFromXML(data) & app.utils.createBlockDataFromJSON(data);
       if(fromXML === true){
-        console.log(data);
+        // console.log(data);
         if(data.block === 'ib'){
           blockType = 'ib';
           blockSettings.blocktype     = 'new-image-block';
@@ -641,10 +459,10 @@
           blockSettings.halign        = typeof(data._align) !== 'undefined' ? data._align : 'left';
           blockSettings.isEditable    = typeof(data._editable) !== 'undefined' ? data._editable : 'false';
           blockSettings.isManditory   = typeof(data._mandatory) !== 'undefined' ? data._mandatory : 'false';
-          blockSettings.lineheight    = typeof(data._leading) !== 'undefined' ? data._leading.replace('%', '') : '100';
+          blockSettings.lineheight    = typeof(data._leading) !== 'undefined' ? String(data._leading).replace('%', '') : '100';
           blockSettings.valign        = typeof(data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
           // Text Block Specific
-          blockSettings.fontColor   = app.c.cmykToRGB(data._colour);
+          blockSettings.fontColor   = app.utils.cmykToRGB(data._colour);
           blockSettings.fontFamily  = typeof(data['_font-family']) !== 'undefined' ? data['_font-family'] : 'FuturaBT-Heavy';
           blockSettings.fontSize    = typeof(data['_font-size']) !== 'undefined' ? data['_font-size'] : '12';
           blockSettings.maxLength   = typeof(data._maxlen) !== 'undefined' ? data._maxlen : '';
@@ -683,33 +501,33 @@
         // 2. Convert the MM to its Pixel equivelant                || Math.ceil(10.60670343657191 * 3.779527559055) = 41
         // 3. Convert the that unit to the relevant size based of the scale of the canvas || Math.ceil(41 / 2.0174)  = 21
         
-        // console.log(Math.ceil(app.c.convertUnit(data._width, app.pxSize)));
-        // console.log(Math.ceil( Math.ceil(app.c.convertUnit(data._width, app.pxSize)) / canvasScale));
-        blockDimensions.upperX = Math.ceil(Math.ceil(app.c.coverUnitFromMM(data._upperrightx, app.pxSize)) / canvasScale);
-        blockDimensions.upperY = Math.ceil(Math.ceil(app.c.coverUnitFromMM(data._upperrighty, app.pxSize)) / canvasScale);
-        blockDimensions.lowerX = Math.ceil(Math.ceil(app.c.coverUnitFromMM(data._lowerleftx, app.pxSize)) / canvasScale);
-        blockDimensions.lowerY = Math.ceil(Math.ceil(app.c.coverUnitFromMM(data._lowerlefty, app.pxSize)) / canvasScale);
+        // console.log(Math.ceil(app.utils.convertUnit(data._width, app.pxSize)));
+        // console.log(Math.ceil( Math.ceil(app.utils.convertUnit(data._width, app.pxSize)) / canvasScale));
+        blockDimensions.upperX = Math.ceil(Math.ceil(app.utils.coverUnitFromMM(data._upperrightx, app.pxSize)) / canvasScale);
+        blockDimensions.upperY = Math.ceil(Math.ceil(app.utils.coverUnitFromMM(data._upperrighty, app.pxSize)) / canvasScale);
+        blockDimensions.lowerX = Math.ceil(Math.ceil(app.utils.coverUnitFromMM(data._lowerleftx, app.pxSize)) / canvasScale);
+        blockDimensions.lowerY = Math.ceil(Math.ceil(app.utils.coverUnitFromMM(data._lowerlefty, app.pxSize)) / canvasScale);
         // console.log(blockDimensions);
 
         // (el.width * scalex) * canvasScale, app.mmSize
-        blockSettings.height  = app.c.calcHeight(blockDimensions);
+        blockSettings.height  = app.utils.calcHeight(blockDimensions);
         blockSettings.left    = blockDimensions.lowerX;
         blockSettings.top     = app._canvas.height - blockDimensions.upperY;
-        blockSettings.width   = app.c.calcWidth(blockDimensions);
-        console.log(blockSettings);
+        blockSettings.width   = app.utils.calcWidth(blockDimensions);
+        // console.log(blockSettings);
 
         if(data.block === 'tbg'){
           var listItems = '';
           data['text-block'].forEach(function(block){
-            console.log(block);
+            // console.log(block);
             var blockSettings = {};
             // console.log(block);
             blockSettings.isEditable  = typeof(block._editable) !== 'undefined' ? block._editable : 'false';
             blockSettings.isManditory = typeof(block._mandatory)!== 'undefined' ? block._mandatory : 'false';
             blockSettings.fface       = typeof(block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
-            blockSettings.fontColor   = app.c.cmykToRGB(block._colour);
+            blockSettings.fontColor   = app.utils.cmykToRGB(block._colour);
             blockSettings.fontSize    = typeof(block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
-            blockSettings.lineheight  = typeof(block._leading)  !== 'undefined' ? block._leading.replace('%', '') : '100';
+            blockSettings.lineheight  = typeof(block._leading)  !== 'undefined' ? String(block._leading).replace('%', '') : '100';
             blockSettings.id          = typeof(block._id) !== 'undefined' ? block._id : 'false';
             blockSettings.label       = typeof(block._title) !== 'undefined' ? block._title : 'false';
             blockSettings.maxLength   = typeof(block._maxlen) !== 'undefined' ? block._maxlen : '';
@@ -719,17 +537,17 @@
              if(typeof(block.__text) !== 'undefined'){
               blockSettings.textVal = block.__text;
             }
-            listItems += app.c.textBlockHtmlSnippet(blockSettings);
+            listItems += app.ct.textBlockHtmlSnippet(blockSettings);
           });
           $('#at-text-block-group-list').append(listItems);
-          app.c.createTempBlockGroup(blockSettings);
+          app.ct.createTempBlockGroup(blockSettings);
         }else{
-          app.c.createTempBlockRegular(blockSettings)
+          app.ct.createTempBlockRegular(blockSettings)
         }
         // console.log(blockSettings);
       }else{
-        blockType = app.c.setBlockType($('input[name=template-block-type]:checked').val());
-        blockSize = app.c.setAspectRatio($('input[name=block-ratio]:checked').val()); // This returns and array
+        blockType = app.ct.setBlockType($('input[name=template-block-type]:checked').val());
+        blockSize = app.ct.setAspectRatio($('input[name=block-ratio]:checked').val()); // This returns and array
 
         // console.log(blockType);
 
@@ -747,7 +565,7 @@
           // If this is a image block;
           blockSettings.blocktype   = 'new-image-block';
           blockSettings.fontColor   = 'rgb(0,0,0)';
-          app.c.createTempBlockRegular(blockSettings);
+          app.ct.createTempBlockRegular(blockSettings);
         } else if(blockType === 'tb'){
           // If this is a text block;
           blockSettings.blocktype   = 'new-text-block';
@@ -769,62 +587,22 @@
           }else{
             blockSettings.textVal   = app.dummyText.responseText.substr(0, blockSettings.maxLength);
           }
-          app.c.createTempBlockRegular(blockSettings);
+          app.ct.createTempBlockRegular(blockSettings);
         } else if(blockType === 'tbg'){
           // If is a text block group
+
           blockSettings.blocktype   = 'new-text-block-group';
+          blockSettings.height      = 200;
           blockSettings.spacing     = parseInt($('#at-spacing-g').val());
+          blockSettings.width       = 200;
           //console.log(blockSettings);
-          app.c.createTempBlockGroup(blockSettings);
+          app.ct.createTempBlockGroup(blockSettings);
         } else{
           // This is a line block
           blockSettings.blocktype   = 'new-line-block';
-          app.c.createTempBlockLine(blockSettings);
+          app.ct.createTempBlockLine(blockSettings);
         }
       }
-    },
-    createTempBlockRegular: function(blockSettings){
-      // Create the fabric js element on the canvas
-      // Use the settings from 'blockSettings' objetect
-      console.log(blockSettings);
-      var _block = new fabric.Rect({
-                                    hasBorders: false,
-                                    hasRotatingPoint: false,
-                                    height: blockSettings.height,
-                                    left: blockSettings.left,
-                                    lockRotation: true,
-                                    top: blockSettings.top,
-                                    width: blockSettings.width
-                                  });
-      //console.log(_block);
-      // console.log(blockSettings);
-      // Add additional non-block specific properties based on blocktype
-      _block['blocktype']     = blockSettings.blocktype;
-      _block['blockTitle']    = blockSettings.blockTitle;
-      _block['halign']        = blockSettings.halign;
-      _block['isEditable']    = blockSettings.isEditable; 
-      _block['isManditory']   = blockSettings.isManditory;  
-      _block['valign']        = blockSettings.valign;
-
-      // Add additional properties based on blocktype
-      if(blockSettings.blocktype === 'new-text-block'){          
-        _block['fontColor']   = blockSettings.fontColor;
-        _block['fontFamily']  = blockSettings.fontFamily;
-        _block['fontSize']    = parseInt(blockSettings.fontSize);
-        _block['lineheight']  = blockSettings.lineheight.replace('%', '');
-        _block['maxLength']   = parseInt(blockSettings.maxLength);
-        _block['stringSrc']   = blockSettings.stringSrc;
-        _block['textVal']     = blockSettings.textVal;
-      } 
-
-      // console.log('Before adding: ', _block);
-      // console.log(blockType);
-      // Add the new component to the canvas. This needs to be done, before we can update the background img of the object
-      app._canvas.add(_block);
-      // Set the relevant background image for block, based on blocktype
-      app.c.setTempBlockBackgroundImg(_block, app.c.setBlockType($('input[name=template-block-type]:checked').val()));
-      // Empty the input field with the previous component name.
-      app.c.resetCreateTempBlock();
     },
     createTempBlockGroup: function(blockSettings, _block){
       // Create the fabric js element on the canvas      
@@ -838,7 +616,7 @@
       // Check if this is creating a group from an exisitng group. (Performing an update)
       if(typeof(_block) !== 'undefined'){
         // Create indiviual text block for the text block group   
-        var _tblocks = app.c.createTempBlockGroupItem($textBlockList.find('li'), $('#at-spacing-g'));
+        var _tblocks = app.ct.createTempBlockGroupItem($textBlockList.find('li'), $('#at-spacing-g'));
           // Add each block to the exiting group
           console.log(_block);
           _tblocks.forEach(function(block){
@@ -850,8 +628,9 @@
         app._canvas.add(_block); 
       }else if($textBlockList.find('li').length > 0){
         // Use the settings from 'blockSettings' object if this is a new group
-        var _tblocks = app.c.createTempBlockGroupItem($textBlockList.find('li'), blockSettings.spacing);
+        var _tblocks = app.ct.createTempBlockGroupItem($textBlockList.find('li'), blockSettings.spacing);
         // Add the group elements to the group container
+
         var _tblockg = new fabric.Group(_tblocks, {
                                                   backgroundColor: 'rgb(0,0,0)',
                                                   fill: 'rgb(0,0,0)',
@@ -865,6 +644,7 @@
                                                   top: typeof(blockSettings.top) !== 'undefined' ? blockSettings.top : 200,
                                                   left: typeof(blockSettings.left) !== 'undefined' ? blockSettings.left : 0,
                                                 });
+        console.log(_tblockg);
         // Set the id and blocktype of the Text Block Group
         // console.log(blockSettings);
         _tblockg['blockId']     = _blockId;
@@ -887,7 +667,52 @@
       app._canvas.renderAll();  
 
       // Empty the input field with the previous component name.
-      app.c.resetCreateTempBlock();
+      app.ct.resetCreateTempBlock();
+    },
+    createTempBlockRegular: function(blockSettings){
+      // Create the fabric js element on the canvas
+      // Use the settings from 'blockSettings' objetect
+      console.log(blockSettings);
+      var _block = new fabric.Rect({
+                                    hasBorders: false,
+                                    hasRotatingPoint: false,
+                                    height: blockSettings.height,
+                                    left: blockSettings.left,
+                                    lockRotation: true,
+                                    top: blockSettings.top,
+                                    width: blockSettings.width
+                                  });
+      //console.log(_block);
+      
+      // Add additional non-block specific properties based on blocktype
+      _block['blocktype']     = blockSettings.blocktype;
+      _block['blockTitle']    = blockSettings.blockTitle;
+      _block['halign']        = blockSettings.halign;
+      _block['isEditable']    = blockSettings.isEditable; 
+      _block['isManditory']   = blockSettings.isManditory;  
+      _block['parentid']      = blockSettings.parentid;
+      _block['valign']        = blockSettings.valign;
+      // console.log(blockSettings);
+      // Add additional properties based on blocktype
+      if(blockSettings.blocktype === 'new-text-block'){          
+        _block['fontColor']   = blockSettings.fontColor;
+        _block['fontFamily']  = blockSettings.fontFamily;
+        _block['fontSize']    = parseInt(blockSettings.fontSize);
+        _block['lineheight']  = String(blockSettings.lineheight).replace('%', '');
+        _block['maxLength']   = parseInt(blockSettings.maxLength);
+        _block['stringSrc']   = blockSettings.stringSrc;
+        _block['textVal']     = blockSettings.textVal;
+      } 
+
+      // console.log('Before adding: ', _block);
+      // console.log(blockType);
+      // Add the new component to the canvas. This needs to be done, before we can update the background img of the object
+      app._canvas.add(_block);
+      
+      // Set the relevant background image for block, based on blocktype
+      app.ct.setTempBlockBackgroundImg(_block, app.ct.setBlockType($('input[name=template-block-type]:checked').val()));
+      // Empty the input field with the previous component name.
+      app.ct.resetCreateTempBlock();
     },
     createTempBlockGroupItem: function($els, spacing){
       var _blocksCollection = [];
@@ -959,13 +784,13 @@
       // Add the new component to the canvas. This needs to be done, before we can update the background img of the object
       app._canvas.add(_block);
       // Set the relevant background image for block, based on blocktype
-      app.c.setTempBlockBackgroundImg(_block, blockType);
+      app.ct.setTempBlockBackgroundImg(_block, blockType);
       // Empty the input field with the previous component name.
-      app.c.resetCreateTempBlock();
+      app.ct.resetCreateTempBlock();
     },
     editTempBlock: function(){
       var _block    = app._canvas.getActiveObject(),
-          blockType = app.c.setBlockType($('input[name=template-block-type]:checked').val());
+          blockType = app.ct.setBlockType($('input[name=template-block-type]:checked').val());
       // console.log(blockType);
       // console.log(_block);
       if(blockType === 'tb'){
@@ -994,7 +819,7 @@
           console.log('Should be empty', _block);
 
           if( $('#at-text-block-group-list').find('li').length > 0){
-            app.c.createTempBlockGroup( $('#at-text-block-group-list').find('li'), _block);
+            app.ct.createTempBlockGroup( $('#at-text-block-group-list').find('li'), _block);
           }else{
             alert('The text block does not contain any text blocks, so it will be removed.');
             app._canvas.remove(_block);
@@ -1009,10 +834,10 @@
 
       // Set the relevant background image for block, based on blocktype
       if(blockType !== 'tbg'){
-        app.c.setTempBlockBackgroundImg(_block, blockType);
+        app.ct.setTempBlockBackgroundImg(_block, blockType);
       }      
       // Reset the component creation tool.
-      app.c.resetCreateTempBlock();
+      app.ct.resetCreateTempBlock();
       // De-select the element previously selected on the canvas
       app._canvas.deactivateAll().renderAll();
       // Upadate Global Edit State
@@ -1046,7 +871,7 @@
       $('#at-editable-g').prop('checked', $blockEl.data('editable'));
     },
     updateBlockFromGroup: function(){
-      app.c.handleTbgState(false);
+      app.ct.handleTbgState(false);
       var blockInEditIndex = $('#at-text-block-group-el-options').data('tbgid'),
           $blockItem       = $('#at-text-block-group-list li[data-id=' + blockInEditIndex + ']');
 
@@ -1061,12 +886,12 @@
       $blockItem.data('lineheight',  $('#at-lineheight-g .option-selected').data('lineheight'));
       $blockItem.data('manditory', $('#at-manditory-g').is(':checked'));
       $blockItem.data('editable', $('#at-editable-g').is(':checked'));
-      app.c.stopBlockFromGroup();
+      app.ct.stopBlockFromGroup();
       // Update the Edit active state
       app.tbgEditActive = false;
     },
     stopBlockFromGroup: function(){
-      app.c.handleTbgState(false);
+      app.ct.handleTbgState(false);
       // Hide or show the relevant controls
       if(app.gEditActive === true){
         $('[data-state=disable-in-tgb-edit-state]').addClass('hidden');
@@ -1181,7 +1006,7 @@
           blockDetails.maxLength   = _textBlock.maxLength;
           blockDetails.textVal     = _textBlock.textVal;
           // console.log(blockDetails);
-          blockHTML = app.c.textBlockHtmlSnippet(blockDetails);
+          blockHTML = app.ct.textBlockHtmlSnippet(blockDetails);
           $textBlockList.append(blockHTML);
         });
         // Add stuff for line elements        
@@ -1225,7 +1050,7 @@
       // Remove the item from the canvas
       app._canvas.remove(_activeObject).renderAll();
       // Reset the component creation tool.
-      app.c.resetCreateTempBlock();
+      app.ct.resetCreateTempBlock();
       // Upadate Global Edit State
       app.gEditActive = false;
     },
@@ -1233,12 +1058,12 @@
       // De-select the element previously selected on the canvas
       app._canvas.deactivateAll().renderAll();
       // Reset the component creation tool.
-      app.c.resetCreateTempBlock();
+      app.ct.resetCreateTempBlock();
       // Upadate Global Edit State
       app.gEditActive = false;
     },
     toggleTempState: function(isEditing){
-      // console.log(isEditing);
+      console.log(isEditing);
       if(isEditing === true){
         $('.disabled-in-edit-state').addClass('hidden');
         $('.enabled-in-edit-state').removeClass('hidden');
@@ -1247,23 +1072,15 @@
         $('.enabled-in-edit-state').addClass('hidden');
       }
     },
-    bindCanavsEvents: function(){
-      // This event handler stops elements being moved outside of the canvas element when moving an element on the canvas
-      app._canvas.on('object:moving', function(e) {
-        app.c.constrainGridMovement(e);
-      });
-      // This event handler stops elements being moved outside of the canvas element when and element is being modified (resized)
-      app._canvas.on('object:modified', function(e) {
-        app.c.constrainGridMovement(e);
-      });
+    bindCreateTemplateCanvasEvents: function(){
       // This event handles whether to enter edit mode or not
       app._canvas.on('object:selected', function(e) {
         // Set the global edit state
         app.gEditActive = true;
         // Set the block settings to what the currently selected blocks settings are
-        app.c.setTempBlockSettings(app._canvas.getActiveObject());
+        app.ct.setTempBlockSettings(app._canvas.getActiveObject());
         // Show the edit options
-        app.c.toggleTempState(true);
+        app.ct.toggleTempState(true);
       });
       app._canvas.on('mouse:down', function(e) {
         // console.log(e);
@@ -1273,12 +1090,12 @@
         // Checks if the canvas itself has been clicked. If it has been clicked, then get out of edit mode
         if(typeof(e.target) !== 'undefined' && typeof(e.target._objects) !== 'undefined' && e.target.blocktype !== 'new-text-block-group'){
           // Reset Create template options
-          app.c.resetCreateTempBlock();
+          app.ct.resetCreateTempBlock();
           // Hide the edit options
-          app.c.toggleTempState(false);
+          app.ct.toggleTempState(false);
         }        
       });
-      $('.template-container').on('click', app.c.deactiveCanvasControls);
+      $('.template-container').on('click', app.ct.deactiveCanvasControls);
     },
 
 
@@ -1290,35 +1107,17 @@
       $this.siblings().removeClass('option-selected').end()
            .addClass('option-selected');
     },
-    steppedOptionHandler: function(){
-      var $this               = $(this),
-          $activeContainer    = $('.active-option'),
-          activeStep          = $activeContainer.data('step'),
-          btnPrimaryAction    = $this.data('step-action'),
-          btnSecondaryAction  = $this.data('step-secondaction');
-
-      app.c.showTemplates($this);
-
-      $activeContainer.fadeOut(100, function(){
-        $activeContainer.removeClass('active-option');
-        btnPrimaryAction === 'forward'? activeStep++ : activeStep--;
-        var $newActiveEl = $('[data-step=' + activeStep + ']');
-        $newActiveEl.find($('[data-step-target=' + btnSecondaryAction +']')).removeClass('hidden');
-        $newActiveEl.fadeIn(100, function(){
-          $newActiveEl.addClass('active-option');
-        });
-      });
-    },
-    showTemplates: function(el){
+    showTemplates: function($el){
+      console.log($el);
       var $templateControlsContainer = $('#template-tools-navigation'),
           $templateCanvasContainer   = $('.new-template-container');
-      if(el.attr('id') === 'at-show-templates'){
+      if($el.attr('id') === 'at-show-templates'){
         $templateControlsContainer.removeClass('col-md-4'); 
       }else{
         $templateControlsContainer.addClass('col-md-4')
       }
 
-      if(el.hasClass('at-from-template')){
+      if($el.hasClass('at-from-template')){        
         $templateCanvasContainer.addClass('load-template-state');
       } else{
         $templateCanvasContainer.removeClass('load-template-state');
@@ -1331,8 +1130,8 @@
       if($(this).attr('id') === 'at-save-block-to-group'){
         $blockControls.removeClass('hidden');
         $groupControls.addClass('hidden');
-        app.c.addBlockToGroup(app.tempGBlockCnt);
-        app.c.resetGroupTextBlock();
+        app.ct.addBlockToGroup(app.tempGBlockCnt);
+        app.ct.resetGroupTextBlock();
         app.tempGBlockCnt++;
       }else{
         $('#at-text-block-group-el-options').attr('data-tbgid', app.tempGBlockCnt);
@@ -1362,7 +1161,7 @@
       blockDetails.lineheight  = $('#at-lineheight-g .option-selected').data('lineheight');
       blockDetails.maxLength   = $('#at-maxlength-g').val();
 
-      blockHTML = app.c.textBlockHtmlSnippet(blockDetails);
+      blockHTML = app.ct.textBlockHtmlSnippet(blockDetails);
       $textBlockList.append(blockHTML);
     },
     handleTbgState: function(state){
@@ -1447,11 +1246,13 @@
         'fontFamily',
         'fontSize',
         'halign',
+        'id',
         'isEditable',
         'isManditory',
         'label',
         'lineheight',
         'maxLength',
+        'parentid',
         'spacing',
         'stringSrc',
         'textVal',
@@ -1485,7 +1286,7 @@
         assetPath = '@';
       }
 
-      var docSettings     = app.c.setDocumentSize(),
+      var docSettings     = app.ct.setDocumentSize(),
           canvasScale     = app.templateType === 'default' ? 2.0174 : 1,
           cordData        = [],
           baseObj         = {},
@@ -1529,10 +1330,10 @@
             // Convert that into MM
             // Multiply that by the ratio based on the document size. E.g A3 is 1.4142 Bigger than A4.
             elDimensions  = [
-                              app.c.convertUnit((el.width * scalex) * canvasScale, app.mmSize) * docSettings[2],
-                              app.c.convertUnit((el.height * scaley) * canvasScale, app.mmSize) * docSettings[2],
-                              app.c.convertUnit(el.top * canvasScale, app.mmSize) * docSettings[2],
-                              app.c.convertUnit(el.left * canvasScale, app.mmSize) * docSettings[2],
+                              app.utils.convertUnit((el.width * scalex) * canvasScale, app.mmSize) * docSettings[2],
+                              app.utils.convertUnit((el.height * scaley) * canvasScale, app.mmSize) * docSettings[2],
+                              app.utils.convertUnit(el.top * canvasScale, app.mmSize) * docSettings[2],
+                              app.utils.convertUnit(el.left * canvasScale, app.mmSize) * docSettings[2],
                               destDocWidth,
                               destDocHeight
                             ];
@@ -1546,13 +1347,13 @@
             '_align': el.halign,
             '_editable': 'True',
             '_id': 'Group' + i,
-            '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
-            '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
+            '_lowerleftx': app.utils.calcLowerLeftX(elDimensions),
+            '_lowerlefty': app.utils.calcLowerLeftY(elDimensions),
             '_mandatory': 'False',
             '_orientate': 'north',
             '_spacing': el.spacing,
-            '_upperrightx': app.c.calcUpperRightX(elDimensions),
-            '_upperrighty': app.c.calcUpperRightY(elDimensions),
+            '_upperrightx': app.utils.calcUpperRightX(elDimensions),
+            '_upperrighty': app.utils.calcUpperRightY(elDimensions),
             '_verticalalign': el.valign
           };
           el.objects.forEach(function(tEl, i){
@@ -1560,10 +1361,10 @@
             // Create <text-block>
             var textBlockName  = 'text-block_' + i;         
             baseObj[textBlockGroupName][textBlockName] = {
-                                                          // '_colour': app.c.rgbToCMYK(tEl.fontColor),
+                                                          // '_colour': app.utils.rgbToCMYK(tEl.fontColor),
                                                           '_editable': tEl.isEditable,
                                                           '_font-family': tEl.fontFamily,
-                                                          '_font-size': tEl.fontSize, // app.c.convertUnit(tEl.fontSize, app.ptSize),
+                                                          '_font-size': tEl.fontSize, // app.utils.convertUnit(tEl.fontSize, app.ptSize),
                                                           '_id': 'TextBlockG_' + i,
                                                           '_leading': tEl.lineheight + '%',
                                                           '_mandatory': tEl.isManditory,
@@ -1576,8 +1377,6 @@
             if(typeof(tEl.stringSrc) !== 'undefined'){
               baseObj[textBlockGroupName][textBlockName]['_source'] = assetPath + tEl.stringSrc;             
             }
-            console.log(typeof(tEl.textVal));
-            console.log(tEl.textVal);
             if(typeof(tEl.textVal) !== 'undefined'){
               baseObj[textBlockGroupName][textBlockName]['__text']  = tEl.textVal;
               // app.dummyText.responseText.substr(0, el.maxLength); 
@@ -1592,21 +1391,21 @@
           var textBlockName  = 'text-block_' + i;
           baseObj[textBlockName] = {
                                     '_align': el.halign,
-                                    // '_colour': app.c.rgbToCMYK(el.fontColor),
+                                    // '_colour': app.utils.rgbToCMYK(el.fontColor),
                                     '_editable': el.isEditable,
                                     // '_fitmethod': 'clip',
                                     '_font-family': el.fontFamily,
-                                    '_font-size': el.fontSize, // app.c.convertUnit(el.fontSize, app.ptSize),
+                                    '_font-size': el.fontSize, // app.utils.convertUnit(el.fontSize, app.ptSize),
                                     '_id': 'TextBlock_' + i,
                                     '_leading': el.lineheight + '%',
-                                    '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
-                                    '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
+                                    '_lowerleftx': app.utils.calcLowerLeftX(elDimensions),
+                                    '_lowerlefty': app.utils.calcLowerLeftY(elDimensions),
                                     '_mandatory': el.isManditory,
                                     '_orientate': 'north',                                    
                                     '_textmode': 'multiline',
                                     '_title': el.blockTitle,
-                                    '_upperrightx': app.c.calcUpperRightX(elDimensions),
-                                    '_upperrighty': app.c.calcUpperRightY(elDimensions),
+                                    '_upperrightx': app.utils.calcUpperRightX(elDimensions),
+                                    '_upperrighty': app.utils.calcUpperRightY(elDimensions),
                                     '_verticalalign': el.valign                       
                                   }
           if(el.maxLength > 0 ){
@@ -1615,8 +1414,6 @@
           if(typeof(el.stringSrc) !== 'undefined'){
             baseObj[textBlockName]['_source'] = assetPath + el.stringSrc;
           }
-          console.log(typeof(el.textVal));
-          console.log(el.textVal);
           if(typeof(el.textVal) !== 'undefined'){
             baseObj[textBlockName]['__text']  = el.textVal;
             // app.dummyText.responseText.substr(0, el.maxLength); 
@@ -1633,14 +1430,14 @@
                                     '_fitmethod': 'auto',
                                     '_highresfilename': 'demo-800.jpg', //el.src
                                     '_id': el.blockTitle + i,
-                                    '_lowerleftx': app.c.calcLowerLeftX(elDimensions),
-                                    '_lowerlefty': app.c.calcLowerLeftY(elDimensions),
+                                    '_lowerleftx': app.utils.calcLowerLeftX(elDimensions),
+                                    '_lowerlefty': app.utils.calcLowerLeftY(elDimensions),
                                     '_lowresfilename': 'demo-800.jpg',  //el.src
                                     '_mandatory': el.isManditory,
                                     '_orientate': 'north',
                                     '_title': el.blockTitle,
-                                    '_upperrightx': app.c.calcUpperRightX(elDimensions),
-                                    '_upperrighty': app.c.calcUpperRightY(elDimensions),
+                                    '_upperrightx': app.utils.calcUpperRightX(elDimensions),
+                                    '_upperrighty': app.utils.calcUpperRightY(elDimensions),
                                     '_verticalalign': el.valign
                                   };
           cordData.push(baseObj);
@@ -1651,7 +1448,7 @@
         $.extend( pdfbaseJSON.doc.page, el );
       });
       // console.log(pdfbaseJSON);
-      app.c.generateXML(pdfbaseJSON);
+      app.ct.generateXML(pdfbaseJSON);
     },
     generateXML: function(cordData){
       var x2js      = new X2JS(),
@@ -1665,7 +1462,7 @@
       if(app.isLocalEnv){
         console.log(xmlOutput);
       }else{
-        app.c.createTemplate(xmlOutput);
+        app.ct.createTemplate(xmlOutput);
       }      
     },
     createTemplate: function(xml) {
@@ -1685,53 +1482,27 @@
             }
         });
     },
-    calcLowerLeftX: function(elDimensions){
-      // Width | Height | Top | Left | DocWidth | DocHeight
-      return elDimensions[3]
-    },
-    calcLowerLeftY: function(elDimensions){
-      // Width | Height | Top | Left | DocWidth | DocHeight
-      // docHeight - (top + height)
-      return elDimensions[5] - (elDimensions[2] + elDimensions[1])
-    },
-    calcUpperRightX: function(elDimensions){
-      // Width | Height | Top | Left | DocWidth | DocHeight
-      // documentWidth - (left + width)
-      return elDimensions[3] + elDimensions[0]
-    },
-    calcUpperRightY: function(elDimensions){
-      // Width | Height | Top | Left | DocWidth | DocHeight
-      // docHeight - top 
-      return elDimensions[5] - elDimensions[2]
-    },
-    calcWidth: function(elDimensions){
-      return elDimensions.upperX - elDimensions.lowerX
-    },
-    calcHeight: function(elDimensions){
-      return elDimensions.upperY - elDimensions.lowerY
-    },
 
     /** 
       Click elements
     **/
-    bindClickEvents: function(){
+    bindCreateTemplateClickEvents: function(){
       app.$tempActionBtn    = $('.create-template, .update-template');
-      app.$downloadThumb    = $('#dl-thumb');
+      
       app.$reserCreateTemp  = $('.reset-create-template');
-      app.$toggleGrid       = $('#toggle-grid');
       app.$addTempArea      = $('#add-template-block');
       app.$addBlockToGroup  = $('#at-add-block-to-group');
       app.$saveBlockToGroup = $('#at-save-block-to-group');
       app.$exitBlockToGroup = $('#at-close-block-to-group');
-      app.$stepBtns         = $('.step-option-btn');
+      app.$stepBtns         = $('.step-option-btn:not(.at-from-template)');
       app.$newTempBtn       = $('#at-new-template');
       app.$fromTempBtn      = $('.at-from-template');
       app.$documentSizeBtns = $('input[name=doc-size]');
       app.$textComponentOpt = $('.text-editor-option button');
       app.$templateName     = $('#new-template-name');
       app.$toggleElTriggers = $('.js-toggle-target-el');
-      app.$updateTbBtn      = $('button[data-action=update-tb-from-tbg]');
-      app.$stopTbBtn        = $('button[data-action=stop-tb-from-tbg');
+      app.$updateTbBtn      = $('[data-action=update-tb-from-tbg]');
+      app.$stopTbBtn        = $('[data-action=stop-tb-from-tbg');
 
       // Edit Canvas Component Triggers
       app.$delComponentBtn  = $('#at-remove-component');
@@ -1739,32 +1510,39 @@
       app.$stopComponentBtn = $('#at-stop-update-component');
 
       // Bind to dom elements to functions
-      app.$reserCreateTemp.on('click', app.c.resetTemplate);
-      app.$tempActionBtn.on('click', app.c.createTempInit);
-      app.$downloadThumb.on('click', app.c.covertCanvasToImgDownload);
-      app.$toggleGrid.on('click', app.c.toggleCanvasGrid);
-      app.$documentSizeBtns.on('click', app.c.validateDocSize);
-      app.$newTempBtn.on('click', app.c.createNewTemp);
-      app.$fromTempBtn.on('click', app.c.loadExistingTemp);
-      app.$stepBtns.on('click', app.c.steppedOptionHandler);
-      app.$addTempArea.on('click', app.c.createTempBlockData);
+      app.$reserCreateTemp.on('click', app.ct.resetTemplate);
+      app.$tempActionBtn.on('click', app.ct.createTempInit);
+      app.$downloadThumb.on('click', app.utils.covertCanvasToImgDownload);
+      app.$toggleGrid.on('click', app.utils.toggleCanvasGrid);
+      app.$documentSizeBtns.on('click', app.ct.validateDocSize);
+      app.$newTempBtn.on('click', app.ct.createNewTemp);
+      app.$stepBtns.on('click', function(){
+        app.utils.steppedOptionHandler($(this));
+      });
+      app.$fromTempBtn.on('click', function(){
+        var $this = $(this);
+        app.utils.steppedOptionHandler($this);
+        app.ct.toggleTempState(false);
+        app.ct.loadExistingTemp();
+      });     
+      app.$addTempArea.on('click', app.ct.createTempBlockData);
       app.$addBlockToGroup.on('click', function(){
-        app.c.toggleTempGroupOpts();
-        app.c.resetGroupTextBlock();
+        app.ct.toggleTempGroupOpts();
+        app.ct.resetGroupTextBlock();
       });
-      app.$saveBlockToGroup.on('click', app.c.toggleTempGroupOpts);      
-      app.$updateTbBtn.on('click', app.c.updateBlockFromGroup);
-      app.$stopTbBtn.on('click', app.c.stopBlockFromGroup);
+      app.$saveBlockToGroup.on('click', app.ct.toggleTempGroupOpts);      
+      app.$updateTbBtn.on('click', app.ct.updateBlockFromGroup);
+      app.$stopTbBtn.on('click', app.ct.stopBlockFromGroup);
       app.$exitBlockToGroup.on('click', function(){
-        app.c.toggleTempGroupOpts(false);
-        app.c.resetGroupTextBlock();
+        app.ct.toggleTempGroupOpts(false);
+        app.ct.resetGroupTextBlock();
       });
-      app.$textComponentOpt.on('click', app.c.setSelectedOption);
-      app.$templateName.on('keyup blur', app.c.validateTemplateName);
-      app.$toggleElTriggers.on('click', app.c.toggleElements);
-      app.$delComponentBtn.on('click', app.c.delTempBlock);
-      app.$editComponentBtn.on('click', app.c.editTempBlock);
-      app.$stopComponentBtn.on('click', app.c.stopTempBlock);
+      app.$textComponentOpt.on('click', app.ct.setSelectedOption);
+      app.$templateName.on('keyup blur', app.ct.validateTemplateName);
+      app.$toggleElTriggers.on('click', app.ct.toggleElements);
+      app.$delComponentBtn.on('click', app.ct.delTempBlock);
+      app.$editComponentBtn.on('click', app.ct.editTempBlock);
+      app.$stopComponentBtn.on('click', app.ct.stopTempBlock);
       $('body').on('click', 'button[data-action=remove-tb-from-tbg]', function(){
         $(this).parent().remove();
         if( $('#at-text-block-group-list li').length > 0){
@@ -1772,8 +1550,8 @@
         }
       });
       $('body').on('click', 'button[data-action=edit-tb-from-tbg]', function(){
-        app.c.handleTbgState(true);   
-        app.c.editBlockFromGroup($(this));
+        app.ct.handleTbgState(true);   
+        app.ct.editBlockFromGroup($(this));
       });
     },
 
@@ -1800,7 +1578,7 @@
           app.templateId = null;
         } 
         // Remove selected states and grid before saving img
-        app.c.cleanCanvas();
+        app.utils.cleanCanvas();
         // Create an image from the canvas and add it to the relevant div
         var imgElement = ReImg.fromCanvas(document.querySelector('#c')).toImg(),
         $output = $('#i');
@@ -1808,20 +1586,12 @@
         // Save the image data so this can be used later when saving the image for the template
         app.imagedata = app._canvas.toDataURL('image/png');
         // Enable the grid again
-        app.c.toggleCanvasGrid(true);
+        app.utils.toggleCanvasGrid(true);
         // Begin creating the templates' cooridnates/XML
-        app.c.generateCords( app.c.generateJSON() );
+        app.ct.generateCords( app.ct.generateJSON() );
       }
     },
-    covertCanvasToImgDownload: function(){
-      // Remove selected states and grid before saving img
-      app.c.cleanCanvas();
-      app.imagedata = app._canvas.toDataURL('image/png');
-      console.log(app.imagedata);
-      this.href = app.imagedata;
-      app.c.toggleCanvasGrid(true);
-    }
   };
 
-  app.c.initCreate();
+  app.ct.initCreateTemp();
 })();
