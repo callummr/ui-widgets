@@ -14,18 +14,18 @@ var app = app || {};
 		**/ 
 		initCreateProduct: function(){
 			app.cp.loadProductList();
-			app.cp.bindCreateProductClickEvents();
+			app.cp.bindCreateProductDomEvents();
 		},
 
 		/**
 			DOM MANIPULATION
 		**/
-		setActiveBlock: function(){
-			var $firstBlockitem = $('#product-blocks-list .list-group-item:first-child');
-			$firstBlockitem.find('.cp-block-container').removeClass('hidden');
-			$firstBlockitem.find('button').addClass('toggle-active');
-			app.cp.setActiveCanvasObj($firstBlockitem.data('prodblockid'));
-		},
+		// setActiveBlock: function(){
+		// 	var $firstBlockitem = $('#product-blocks-list .list-group-item:first-child');
+		// 	$firstBlockitem.find('.cp-block-container').removeClass('hidden');
+		// 	$firstBlockitem.find('button').addClass('toggle-active');
+		// 	app.cp.setActiveCanvasObj($firstBlockitem.data('prodblockid'));
+		// },
 		toggleOptions: function($el, secondaryClass){
 	    	// Expects an element that has been clicked, which sits inside a container
 	    	// Check if the button clicked is already active.
@@ -197,7 +197,7 @@ var app = app || {};
 	    	$('#product-blocks-list').append(blockListingString);
 
 	    	// Filter all canvas objects except the grid which is the first object
-	    	app.utils.createFilteredCanvasObjects();
+	    	// app.utils.createFilteredCanvasObjects();
 	    		
 	    	app.cp.reformatTextBlockGroups();
 	    	// app.cp.setActiveBlock();
@@ -229,14 +229,15 @@ var app = app || {};
 	    	return imgBlockString;
 	    },
 	    createTextBlockGroupBlockSettings: function(tbgBlock){
+	    	// console.log(tbgBlock);
 	    	var tbgBlockString = '',
 	    		blockId 	   = tbgBlock._id.replace(' ', '');
 
 	    	tbgBlockString+= '<li class="clearfix list-group-item" data-prodblockid="' + blockId + '">';
 	    		tbgBlockString+= '<button type="button" class="btn btn-info pull-top-right" data-action="toggle-product-block">X</button>';
-	    		tbgBlockString+= '<h2 class="block-item-heading">' + tbgBlock._title + '</h2>';
+	    		tbgBlockString+= '<h2 class="block-item-heading">' + tbgBlock._id + '</h2>';
     			tbgBlockString+= '<div class="cp-block-container hidden">';			    		
-		    		tbgBlockString+= '<input type="text" class="form-control" value="' + tbgBlock._title +'" />';
+		    		// tbgBlockString+= '<input type="text" class="form-control" value="' + tbgBlock._title +'" />';
 		    		// Block Spacing Setting
 		    		tbgBlockString+= app.cp.createSpacingSetting(blockId, tbgBlock._spacing);
 		    		tbgBlockString+= '<div class="clearfix">';
@@ -271,6 +272,8 @@ var app = app || {};
 	    	}	    	
 		    		// Block Title
 		    		tBlockString+= '<input type="text" class="form-control" value="' + tBlock._title +'" />';
+		    		// Set the text value for the user
+		    		tBlockString+= app.cp.createTextSettings(blockId, tBlock, tBlock._maxlen);
 		    		// FFACE
 		    		tBlockString+= app.cp.createFontFaceSetting(blockId, tBlock['_font-family']);
 		    		// SIZE	    		
@@ -290,9 +293,7 @@ var app = app || {};
 			    	tBlockString+= '<div class="clearfix">';
 			    		// Editable & Manditory Settings
 			    		tBlockString+= app.cp.createUserSettings(blockId, tBlock._editable, tBlock._mandatory);
-			    	tBlockString+= '</div>';
-		    		// Set the text value for the user
-		    		tBlockString+= app.cp.createTextSettings(blockId, tBlock);
+			    	tBlockString+= '</div>';		    		
 
 		    if(fromTbg === false){
 		    		tBlockString+= '</div>';
@@ -323,8 +324,7 @@ var app = app || {};
 				blockSettings.valign        = typeof(data._verticalalign) !== 'undefined' ? data._verticalalign : '';
 	        } else if(data.block =='tb'){
 	         	blockType = 'tb';
-				blockSettings.blocktype     = 'new-text-block';   
-				blockSettings.blockTitle    = typeof(data._title) !== 'undefined' ? data._title : '';
+				blockSettings.blocktype     = 'new-text-block';  
 				blockSettings.halign        = typeof(data._align) !== 'undefined' ? data._align : 'left';
 				blockSettings.isEditable    = typeof(data._editable) !== 'undefined' ? data._editable : 'false';
 				blockSettings.isManditory   = typeof(data._mandatory) !== 'undefined' ? data._mandatory : 'false';
@@ -351,7 +351,8 @@ var app = app || {};
 	          blockSettings.valign        = typeof(data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
 	        }
 	        // Set parent id, to the root element
-	        blockSettings.parentid    = typeof(data._id) !== 'undefined' ? data._id : '';
+	        blockSettings.blockTitle  = typeof(data._title) !== 'undefined' ? data._title : '';
+	        // blockSettings.parentId    = typeof(data._id) !== 'undefined' ? data._id : '';
 	        blockSettings.id    	  = typeof(data._id) !== 'undefined' ? data._id : '';
 	        // Convert to booleans
 	        blockSettings.isEditable  = 'true' ? true : false;
@@ -394,9 +395,17 @@ var app = app || {};
 	        	app.cp.createProductTextBlock(blockSettings);
 	        } else if(data.block === 'tbg'){
 	        	app.textBlockGroups.push({
-					id: blockSettings.parentid,
+	        		height: blockSettings.height,
+					id: blockSettings.id,
+					spacing: parseInt(blockSettings.spacing),
+					parentTitle: blockSettings.blockTitle,
+					parentEditable: blockSettings.isEditable,
+					parentManditory: blockSettings.isManditory,
+					parentHalign: blockSettings.halign,
+					parentValign: blockSettings.valign,
+					parentHeight: blockSettings.height,
+					parentWidth: blockSettings.width,
 					width: blockSettings.width,
-					height: blockSettings.height
 				});
 	         	data['text-block'].forEach(function(block, i){
 		            // console.log(block);
@@ -411,16 +420,26 @@ var app = app || {};
 		            innerBlockSettings.fontColor   = app.utils.cmykToRGB(block._colour);
 		            innerBlockSettings.fontSize    = typeof(block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
 		            innerBlockSettings.lineheight  = typeof(block._leading)  !== 'undefined' ? String(block._leading).replace('%', '') : '100';
-		            innerBlockSettings.id          = typeof(block._id) !== 'undefined' ? block._id : 'false';
-		            innerBlockSettings.parentid    = blockSettings.parentid; // Take from the parent element
-		            innerBlockSettings.parentWidth = blockSettings.width;    // Take from the parent element
+		            innerBlockSettings.id          = typeof(block._id) !== 'undefined' ? block._id : 'false';           
 		            innerBlockSettings.label       = typeof(block._title) !== 'undefined' ? block._title : 'false';
 		            innerBlockSettings.maxLength   = typeof(block._maxlen) !== 'undefined' ? block._maxlen : '';
 		            innerBlockSettings.valign      = blockSettings.valign;  // Take from the parent element
 		            innerBlockSettings.top		   = blockSettings.top;     // Take from the parent element
 		            innerBlockSettings.width	   = blockSettings.width;   // Take from the parent element
 		            innerBlockSettings.left   	   = blockSettings.left;    // Take from the parent element	            
-		            innerBlockSettings.spacing     = blockSettings.spacing; // Take from the parent element	            
+		            innerBlockSettings.spacing     = blockSettings.spacing; // Take from the parent element	
+
+		            // Settings need to pass through additional parent information
+		            innerBlockSettings.parentId    	   = blockSettings.id;
+		            innerBlockSettings.parentTitle 	   = blockSettings.blockTitle;
+					innerBlockSettings.parentEditable  = blockSettings.isEditable;
+					innerBlockSettings.parentManditory = blockSettings.isManditory;
+					innerBlockSettings.parentHalign    = blockSettings.halign;
+					innerBlockSettings.parentValign    = blockSettings.valign;
+					innerBlockSettings.parentHeight    = blockSettings.height;
+					innerBlockSettings.parentWidth     = blockSettings.width;
+
+		                 
 		            //console.log(block._source);
 		            if(typeof(block._source) !== 'undefined' && block._source !== ''){
 		              innerBlockSettings.stringSrc = block._source;
@@ -428,7 +447,7 @@ var app = app || {};
 		            if(typeof(block.__text) !== 'undefined'){
 		              innerBlockSettings.textVal = block.__text;
 		            }
-		            //console.log(innerBlockSettings);
+		            // console.log(innerBlockSettings);
 		            app.cp.createProductTextBlock(innerBlockSettings);
 	          	});
 	        }
@@ -455,7 +474,7 @@ var app = app || {};
 		    _block['halign']        = blockSettings.halign;
 		    _block['isEditable']    = blockSettings.isEditable; 
 		    _block['isManditory']   = blockSettings.isManditory;  
-		    _block['parentid']      = blockSettings.parentid;
+		    // _block['parentId']      = blockSettings.parentId;
 		    _block['id']      		= blockSettings.id;
 		    _block['valign']        = blockSettings.valign;
 
@@ -467,109 +486,143 @@ var app = app || {};
 	    	// Add the new component to the canvas. This needs to be done, before we can update the background img of the object
 	    	app._canvas.add(_block).renderAll();
 	    },
-	    createProductTextBlock: function(blockSettings){
-	   		// Create the fabric js element on the canvas using the settings from 'blockSettings' object
-	   		
+	    createProductTextBlock: function(settings){
+	   		// Create the fabric js element on the canvas using the settings from 'settings' object
+	   		var cTBSettings = settings;
 	    	// Set the text of the element
-	    	// console.log(blockSettings);
-	    	if(typeof(blockSettings.stringSrc) !== 'undefined'){
+	    	// console.log(cTBSettings);
+	    	if(typeof(cTBSettings.stringSrc) !== 'undefined'){
 	    		// Ajax request to the source of the asset.	    		
-	    		blockSettings.textVal = 'Organised in aid of Macmillan Cancer Support, registered charity in England and Wales (261017), Scotland (SC039907) and the Isle of Man (604). Also operating in Northern Ireland.';
+	    		cTBSettings.textVal = 'Organised in aid of Macmillan Cancer Support, registered charity in England and Wales (261017), Scotland (SC039907) and the Isle of Man (604). Also operating in Northern Ireland.';
 	    		// If text is from a source, then it should not be editable.
-	    		blockSettings.isEditable === false;
-	    	} else if(typeof(blockSettings.textVal) === 'undefined' || blockSettings.textVal === ''){
-	    		blockSettings.textVal  = 'Default Text';
+	    		cTBSettings.isEditable === false;
+	    	} else if(typeof(cTBSettings.textVal) === 'undefined' || cTBSettings.textVal === ''){
+	    		cTBSettings.textVal  = 'Default Text';
 	    	}
 
 	    	// Create Boolean to test if this block is from a source file or free text
-	    	var fromTextSrc = typeof(blockSettings.stringSrc) !== 'undefined' ? true : false;
+	    	var fromTextSrc = typeof(cTBSettings.stringSrc) !== 'undefined' ? true : false;
 
-	      	var _block,
+	      	var _ptblock,
 	      		_formattedBlock;
 
-	      	_block = new fabric.Text(blockSettings.textVal, {
-	      				  										fill: app.utils.cmykToRGB(blockSettings.fontColor),	
-										                        fontFamily: blockSettings.fontFamily,
-										                        fontSize: parseInt(blockSettings.fontSize), // Need to convert PT to Pixel here
+	      	_ptblock = new fabric.Text(cTBSettings.textVal, {
+	      				  										fill: app.utils.cmykToRGB(cTBSettings.fontColor),	
+										                        fontFamily: cTBSettings.fontFamily,
+										                        fontSize: parseInt(cTBSettings.fontSize), // Need to convert PT to Pixel here
 											      				hasBorders: true,
 										                        hasRotatingPoint: false,
-										                        height: blockSettings.height,
-										                        left: blockSettings.left,
-										                        // lineHeight: String(blockSettings.lineheight).replace('%', ''), TODO
+										                       //  height: cTBSettings.height,
+										                        left: cTBSettings.left,
+										                        // lineHeight: String(cTBSettings.lineheight).replace('%', ''), TODO
 										                        lockRotation: true,
 										                        selectable: false,                                             
-										                        textAlign: blockSettings.halign,
-										                        top: blockSettings.top, 
-										                        width: blockSettings.width
+										                        textAlign: cTBSettings.halign,
+										                        top: cTBSettings.top, 
+										                        // width: cTBSettings.width
 															});
 
 	      	// This additional property is required within the wrapCanvasText function
 	      	if(fromTextSrc){
-	      		_block['text-block-type'] = 'text';
-	      		blockSettings.textblocktype = 'text';
+	      		_ptblock['text-block-type'] = 'text';
+	      		cTBSettings.textblocktype = 'text';
 	      	} else{
-	      		_block['text-block-type'] = 'itext';
-	      		blockSettings.textblocktype = 'itext';
+	      		_ptblock['text-block-type'] = 'itext';
+	      		cTBSettings.textblocktype = 'itext';
 	      	}
+
+	      	// app._canvas.add(_ptblock).renderAll();
 
 	      	// Sort the wrapping out for the text element, requires:
 	      	// fabric block, the canvas, maxWidth, maxHeight, alignment
 	
-	      	_formattedBlock	= app.utils.wrapCanvasText(_block, app._canvas, blockSettings.width, 0, blockSettings.halign);
-	      	_formattedBlock.width = blockSettings.width;
+	      	_formattedBlock	= app.utils.wrapCanvasText(_ptblock, app._canvas, cTBSettings.width, 0, cTBSettings.halign);
 	    	
-	    	// console.log(blockSettings);
-	    	 console.log(_formattedBlock.width);
+	    	// console.log(_formattedBlock);
+	    	// console.log(_formattedBlock.width);
 	      
 	    	// Add additional block proprties to the newly formatted block;
-	    	var _updatedBlock = app.utils.setTextBlockSettings(_formattedBlock, blockSettings);
-	    	console.log(_updatedBlock.width);
+	    	_formattedBlock['blocktype']     = cTBSettings.blocktype;
+			_formattedBlock['blockTitle']    = cTBSettings.blockTitle;
+			_formattedBlock['halign']        = cTBSettings.halign;
+			_formattedBlock['isEditable']    = cTBSettings.isEditable; 
+			_formattedBlock['isManditory']   = cTBSettings.isManditory;			
+			_formattedBlock['id']      		 = cTBSettings.id;
+			_formattedBlock['valign']        = cTBSettings.valign;
+
+			_formattedBlock['origWidth']	= cTBSettings.width,
+			_formattedBlock['origHeight']	= cTBSettings.height,
+      
+			_formattedBlock['fontColor']     = cTBSettings.fontColor;
+			_formattedBlock['fontFamily']    = cTBSettings.fontFamily;
+			_formattedBlock['fontSize']      = parseInt(cTBSettings.fontSize);
+			_formattedBlock['lineheight']    = String(cTBSettings.lineheight).replace('%', '');
+			_formattedBlock['maxLength']     = parseInt(cTBSettings.maxLength);
+			_formattedBlock['textVal']       = cTBSettings.textVal;
+			_formattedBlock['textblocktype'] = cTBSettings.textblocktype;
+
+			if(typeof(cTBSettings.parentId) !== 'undefined'){
+				// console.log(cTBSettings.parentHeight, cTBSettings.parentWidth)
+				_formattedBlock['parentId'] = cTBSettings.parentId;
+				_formattedBlock['parentTitle'] = cTBSettings.parentTitle;
+				_formattedBlock['parentEditable'] = cTBSettings.parentEditable;
+				_formattedBlock['parentManditory'] = cTBSettings.parentManditory;
+				_formattedBlock['parentHalign'] = cTBSettings.parentHalign;
+				_formattedBlock['parentValign'] = cTBSettings.parentValign;
+				_formattedBlock['parentHeight']    = cTBSettings.parentHeight;
+				_formattedBlock['parentWidth']   = cTBSettings.parentWidth;
+				_formattedBlock['spacing']   = cTBSettings.spacing;
+			}
+
+			if(typeof(cTBSettings.stringSrc) !== 'undefined'){
+				_formattedBlock['stringSrc'] = cTBSettings.stringSrc;
+			}
 
 	      	// Add the new component to the canvas. This needs to be done, before we can update the background img of the object
-	      	app._canvas.add(_updatedBlock).renderAll();
-	      	// console.log(app._canvas);
+	      	app._canvas.add(_formattedBlock).renderAll();
 	    },
 
 	    deactiveCanvasObj: function(){
+	    	// Make the _activeEl variable null
+	    	app._activeEditEl = null;
+	    	// Then deselect the element from the canvas and re-render the canvas
 	    	app._canvas.deactivateAll().renderAll();
 	    },
 	    reformatTextBlockGroups:function(){
+	    	// There is an error in the block.
+	    	app.filteredCanvasObjs = app._canvas._objects.filter(function(block){
+	    								return typeof(block.id) !== 'undefined'
+	    							 });
+	    	// console.log(app.filteredCanvasObjs);
 	    	// For each text block group in the array, format the text blocks inside it.
 	    	app.textBlockGroups.forEach(function(block){
+	    		// console.log(block);
 	    		app.filteredCanvasObjs.forEach(function(obj,i){
-	    			// console.log(block.id, obj.parentid, obj);
-	    			if(block.id === obj.parentid){
-	    				var prevObjIndex = i > 0 ? i - 1 : 0;
-	    				// console.log(prevObjIndex, app.filteredCanvasObjs[prevObjIndex].top, app.filteredCanvasObjs[prevObjIndex].height, app.filteredCanvasObjs[prevObjIndex].spacing );
+	    			// console.log(obj);
+    				if(block.id === obj.parentId){
+	    				var prevObjIndex = i === 0 ? 0 : i - 1;
 	    				obj.set({
-	    					width: block.parentWidth,
-	    					top: app.filteredCanvasObjs[prevObjIndex].top + app.filteredCanvasObjs[prevObjIndex].height + 10 // Need to add spacing
-	    				});	    				
+	    					width: block.width,
+	    					top: app.filteredCanvasObjs[prevObjIndex].top + app.filteredCanvasObjs[prevObjIndex].height + block.spacing
+	    				});
+	    				app._canvas.renderAll();
+	    				// console.log(obj);				    			
 	    			}
-	    			app._canvas.renderAll();
 	    		});
-	    		// Find the elements were the group matches the id + -group
-	    		// Then apply make the width 100% of its parent
-	    		// Then set the top value based off of the objects around it.
+	    	// 	// Find the elements were the group matches the id + -group
+	    	// 	// Then apply make the width 100% of its parent
+	    	// 	// Then set the top value based off of the objects around it.
 	    	});
 	    },	    	    
-	    updateCanvasBlockText: function(){
-	    	var $textarea	   = $(this),
+	    updateCanvasBlockText: function($el){
+	    	console.log($el)
+	    	var $textarea	   = $el,
 	    		newTextVal 	   = $textarea.val(),
-	    		canvasBlockId  = $textarea.parents('[data-prodblockid]').data('prodblockid') || $textarea.parent('[data-prodblockid]').data('prodblockid');
+	    		canvasBlockId  = $textarea.parent().data('prodblockid') || $textarea.parents('[data-prodblockid]').data('prodblockid');
 
-	    	// before running the foreach check if a variable exists with the obj that is needed to be updated.
-
-	    	if(app._activeEditEl === null){
-	    		app.filteredCanvasObjs.forEach(function(block){
-		    		if(block.id === canvasBlockId){
-		    			app._activeEditEl = block;
-		    		}	    		
-		    	});
-	    	}
-
-	    	// console.log(app.filteredCanvasObjs, canvasBlockId, app._activeEditEl);
-	    	app._canvas.setActiveObject(app._activeEditEl);
+	    	// Set the active canvas obj
+	    	app.cp.setActiveCanvasObj(canvasBlockId);
+	    	// Update the active canvas objects text and textVal values
 	    	app._activeEditEl.set({
 	    		text: newTextVal,
 	    		textVal: newTextVal
@@ -581,17 +634,22 @@ var app = app || {};
 	    	app._canvas.renderAll();
 	    },
 	    setActiveCanvasObj: function(id){
-	    	// This function sets the relevant canvas object to its active state 
+	    	// This function sets the relevant canvas object to its active state
 	    	var _canvasObjs = app._canvas._objects;
-	    	_canvasObjs.forEach(function(obj, i){
-	    		if(obj.parentid === id){
-	    			app._canvas.setActiveObject(_canvasObjs[i]);
-	    		}
-	    	});
+	    	if(app._activeEditEl === null){
+		    	_canvasObjs.forEach(function(obj, i){
+		    		if(obj.id === id){
+		    			app._activeEditEl = obj;
+		    			app._canvas.setActiveObject(_canvasObjs[i]);
+		    		}
+		    	});
+		    }
+		    console.log(app._activeEditEl)
 	    },
 	    setBlockControlTextarea:function(activeObj){
-	    	var $targetTextarea = $('[data-prodblockid=' + activeObj.target.parentid + '] textarea');
-	    	$targetTextarea.val(activeObj.target.text);
+	    	var $targetTextarea = $('[data-prodblockid=' + activeObj.target.parentId + '] textarea');
+	    	// Debounce the textarea being updated.
+	    	$.debounce($targetTextarea.val(activeObj.target.text), 500);	    	
 	    },
 	    setModifedBlockScale: function(obj){
 	    	//console.log(obj);
@@ -601,6 +659,22 @@ var app = app || {};
 	    		scaleY: 1,
 	    		width: obj.width * obj.scaleX,
 	    	});
+	    	app._canvas.renderAll();
+	    },
+	    updateCanvasObjSetting: function(){
+	    	var $this = $(this),
+	    		canvasBlockId  = $this.parent().data('prodblockid') || $this.parents('[data-prodblockid]').data('prodblockid');
+
+	    	// Set the relevant object to its active state
+	    	app.cp.setActiveCanvasObj(canvasBlockId);
+	    	// console.log(app._canvas._objects);
+	    	// Returns an object to that sets the correct property with the new value
+	    	var objSetting = app.utils.selectCanvasPropertyToEdit($this);	    	
+		    // Updated the selected objects relevant properties
+		    console.log(app._activeEditEl);
+	    	app._activeEditEl.set(objSetting);
+	    	console.log(app._activeEditEl);
+	    	// Re-Render the canvas to show the update
 	    	app._canvas.renderAll();
 	    },
 	    toggleIsVarient: function(){
@@ -617,9 +691,10 @@ var app = app || {};
 			app._canvas.on('object:selected', function(e) {
 				// Get the id of the selected element 
 				var _activeObj = app._canvas.getActiveObject();
+				// console.log($('[data-prodblockid=' + _activeObj.parentId + ']').find('[data-action=toggle-product-block]'));
 				// console.log(_activeObj);
 				// Show the relevant blocks' settings that has been selected
-				$('[data-prodblockid=' + _activeObj.parentid + ']').find('[data-action=toggle-product-block]').click();				
+				$('[data-prodblockid=' + _activeObj.parentId + ']').find('[data-action=toggle-product-block]').click();				
 			});
 			// This event handles when an IText Field has beem edited
 			app._canvas.on('text:changed', function(e){
@@ -676,7 +751,8 @@ var app = app || {};
 	    		blockSpacing  = typeof(spacing) !== 'undefined' ? spacing : 10;
 
 			spacingString+= '<h3 class="block-item-heading">Text block Spacing</h3>';
-			spacingString+= '<input type="number" value="' + blockSpacing + '" id="at-spacing-'+ id +'" class="form-control">';
+			spacingString+= '<input type="number" value="' + blockSpacing + '" id="at-spacing-'+ id +'" class="form-control" ';
+				spacingString+= 'data-action="update-canvas-control" data-canvas-setting-type="sp">';
 			spacingString+= '<hr>';
 
 			return spacingString;
@@ -711,7 +787,10 @@ var app = app || {};
 				// console.log(fontColour);
 				// console.log(blockColour);
 				var isChecked = blockColour === fontColour.rgb ? 'checked' : '';
-						fontColorString+= '<input type="radio" id="block-' + fontColour.rgb.replace(/,/g, '') + '" name="color-default" value="' + fontColour.rgb + '" ' + isChecked + '>';
+						fontColorString+= '<input type="radio" ';
+							fontColorString+= 'id="block-' + fontColour.rgb.replace(/,/g, '') + '" ';
+							fontColorString+= 'name="color-default" data-action="update-canvas-control" data-canvas-setting-type="fc" ';
+							fontColorString+= 'value="' + fontColour.rgb + '" ' + isChecked + '>';
 						fontColorString+= '<label for="block-' + fontColour.rgb.replace(/,/g, '') + '">' + fontColour.name + '</label>';
 				});
 
@@ -726,7 +805,10 @@ var app = app || {};
 				var isChecked = blockFFace === font.ffname ? 'checked' : '';
 				// console.log(font);
 				// console.log(blockFFace);
-				fontFaceString+= '<input type="radio" id="block-' +  font.ffname.toLowerCase() + '-fface" name="ff-defualt" value="' + font.ffname + '" '+ isChecked +'>';
+				fontFaceString+= '<input type="radio" ';
+					fontFaceString+= 'id="block-' +  font.ffname.toLowerCase() + '-fface" ';
+					fontFaceString+= 'name="ff-defualt" data-action="update-canvas-control" data-canvas-setting-type="ff"';
+					fontFaceString+= 'value="' + font.ffname + '" '+ isChecked +'>';
 				fontFaceString+= '<label for="block-' + font.ffname.toLowerCase() + '-fface">' + font.fftitle + '</label>';
 			});
 
@@ -741,7 +823,9 @@ var app = app || {};
 				var isChecked = blockFSize === fsize.size ? 'checked' : '';
 				// console.log(fsize.size);
 				// console.log(blockFSize);
-				fontSizeString+= '<input type="radio" id="block-' + fsize.size + '-fsize" name="fsize-default" value="' + fsize.size + '" '+ isChecked +'>';
+				fontSizeString+= '<input type="radio" id="block-' + fsize.size + '-fsize" ';
+						fontSizeString+= 'name="fsize-default" data-action="update-canvas-control" data-canvas-setting-type="fs" ';
+						fontSizeString+= 'value="' + fsize.size + '" '+ isChecked +'>';
 				fontSizeString+= '<label for="block-' + fsize.size + '-fsize">' + fsize.sizeName + '</label>';
 			});
 
@@ -753,7 +837,8 @@ var app = app || {};
 
 	    	lineHeightString+= '<div class="col-md-7">';
 				lineHeightString+= '<h3 class="block-item-heading">Line Height</h3>';
-				lineHeightString+= '<input type="number" value="' + blockLineHeight + '" id="at-maxlength'+ id +'" class="form-control">';
+				lineHeightString+= '<input type="number" data-action="update-canvas-control" data-canvas-setting-type="lh" ';
+					lineHeightString+= 'value="' + blockLineHeight + '" id="at-maxlength'+ id +'" class="form-control" min="75" max="150">';
 			lineHeightString+= '</div>';
 
 			return lineHeightString;
@@ -764,7 +849,8 @@ var app = app || {};
 
 	    	spacingString+= '<div class="col-md-5">';
 				spacingString+= '<h3 class="block-item-heading">Max length</h3>';
-				spacingString+= '<input type="number" value="' + blockMaxlength + '" id="at-maxlength'+ id +'" class="form-control">';
+				spacingString+= '<input type="number" data-action="update-canvas-control" data-canvas-setting-type="ml" ';
+					spacingString+= 'value="' + blockMaxlength + '" id="at-maxlength'+ id +'" class="form-control">';
 			spacingString+= '</div>';
 
 			return spacingString;
@@ -803,30 +889,36 @@ var app = app || {};
 			alignmentString+= '<h3 class="block-item-heading">Horizontal &amp; Vertical positioning</h3>';
 			alignmentString+= '<div class="col-md-6">';
 				alignmentString+= '<span>';
-					alignmentString+= '<input type="radio" id="' + id + '-h-left" class="hidden show-border-when-selected" name="ap-h-pos" ' + halignLeft + ' value="left">';
+					alignmentString+= '<input type="radio"  data-action="update-canvas-control" data-canvas-setting-type="ah" ';
+						alignmentString+= 'id="' + id + '-h-left" class="hidden show-border-when-selected" name="ap-h-pos" ' + halignLeft + ' value="left">';
 	          		alignmentString+= '<label class="align-icon align-left" for="' + id + '-h-left"></label>';
 	          	alignmentString+= '</span>';
 	          	alignmentString+= '<span>';
-	          		alignmentString+= '<input type="radio" id="' + id + '-h-center" class="hidden show-border-when-selected" name="ap-h-pos" ' + halignCenter + ' value="center">';
+	          		alignmentString+= '<input type="radio" data-action="update-canvas-control" data-canvas-setting-type="ah" ';
+	          			alignmentString+= 'id="' + id + '-h-center" class="hidden show-border-when-selected" name="ap-h-pos" ' + halignCenter + ' value="center">';
 	          		alignmentString+= '<label class="align-icon align-center" for="' + id + '-h-center"></label>';
 	          	alignmentString+= '</span>';
 	          	alignmentString+= '<span>';
-	          		alignmentString+= '<input type="radio" id="' + id + '-h-right" class="hidden show-border-when-selected" name="ap-h-pos" ' + halignRight + ' value="right">';
+	          		alignmentString+= '<input type="radio" data-action="update-canvas-control" data-canvas-setting-type="ah" ';
+	          			alignmentString+= 'id="' + id + '-h-right" class="hidden show-border-when-selected" name="ap-h-pos" ' + halignRight + ' value="right">';
 	          		alignmentString+= '<label class="align-icon align-right" for="' + id + '-h-right"></label>';
 	          	alignmentString+= '</span>';
 	        alignmentString+= '</div>';
 	         	
 			alignmentString+= '<div class="col-md-6">';
 				alignmentString+= '<span>';
-					alignmentString+= '<input type="radio" id="' + id + '-v-top" class="hidden" name="ap-v-pos" ' + valignTop + ' value="top">';
+					alignmentString+= '<input type="radio" data-action="update-canvas-control" data-canvas-setting-type="av" ';
+						alignmentString+= 'id="' + id + '-v-top" class="hidden" name="ap-v-pos" ' + valignTop + ' value="top">';
 	          		alignmentString+= '<label class="align-icon align-top" for="' + id + '-v-top"></label>';
 	          	alignmentString+= '</span>';
 	          	alignmentString+= '<span>';
-	          		alignmentString+= '<input type="radio" id="' + id + '-v-middle" class="hidden" name="ap-v-pos" ' + valignCenter + ' value="center">';
+	          		alignmentString+= '<input type="radio" data-action="update-canvas-control" data-canvas-setting-type="av" ';
+	          			alignmentString+= ' id="' + id + '-v-middle" class="hidden" name="ap-v-pos" ' + valignCenter + ' value="center">';
 	          		alignmentString+= '<label class="align-icon align-middle" for="' + id + '-v-middle"></label>';
 	          	alignmentString+= '</span>';
 	          	alignmentString+= '<span>';
-	          		alignmentString+= '<input type="radio" id="' + id + '-v-bottom" class="hidden" name="ap-v-pos" ' + valignBottom + ' value="bottom">';
+	          		alignmentString+= '<input type="radio" data-action="update-canvas-control" data-canvas-setting-type="av" ';
+	          			alignmentString+= ' id="' + id + '-v-bottom" class="hidden" name="ap-v-pos" ' + valignBottom + ' value="bottom">';
 	          		alignmentString+= '<label class="align-icon align-bottom" for="' + id + '-v-bottom"></label>';		            	
 	          	alignmentString+= '</span>';
 	        alignmentString+= '</div>';
@@ -841,7 +933,8 @@ var app = app || {};
 			userSettings+= '<div class="col-md-6">';
 				userSettings+= '<div class="onoffswitch">';
 					userSettings+= '<h3 class="block-item-heading">Manditory?</h3>';
-				    userSettings+= '<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" ' + isEditable + ' id="at-manditory-' + id + '">';
+				    userSettings+= '<input type="checkbox" data-action="update-canvas-control" data-canvas-setting-type="ma" ';
+				    	userSettings+= 'name="onoffswitch" class="onoffswitch-checkbox" ' + isEditable + ' id="at-manditory-' + id + '">';
 				    userSettings+= '<label class="onoffswitch-label" for="at-manditory-' + id + '">';
 				        userSettings+= '<span class="onoffswitch-inner"></span>';
 				        userSettings+= '<span class="onoffswitch-switch"></span>';
@@ -851,7 +944,8 @@ var app = app || {};
 			userSettings+= '<div class="col-md-6">';
 				userSettings+= '<div class="onoffswitch">';
 					userSettings+= '<h3 class="block-item-heading">Editable?</h3>';
-				    userSettings+= '<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" ' + isManditory + ' id="at-editable-' + id + '">';
+				    userSettings+= '<input type="checkbox" data-action="update-canvas-control" data-canvas-setting-type="ed" ';
+				    	userSettings+= 'name="onoffswitch" class="onoffswitch-checkbox" ' + isManditory + ' id="at-editable-' + id + '">';
 				    userSettings+= '<label class="onoffswitch-label" for="at-editable-' + id + '">';
 				        userSettings+= '<span class="onoffswitch-inner"></span>';
 				        userSettings+= '<span class="onoffswitch-switch"></span>';
@@ -861,13 +955,14 @@ var app = app || {};
 
 	    	return userSettings;
 	    },
-	    createTextSettings: function(id, block){
-	    	// console.log(block);
-	    	var blockTextSettings = '',
+	    createTextSettings: function(id, block, maxLength){
+	     	var blockTextSettings = '',
 	    		fromSource		  = typeof(block._source) !== 'undefined' && block._source !== '' ? true : false,
 	    		disabledAttr	  = '',
+	    		hasMaxLength	  = typeof(maxLength) !== 'undefined' && maxLength > 0,
+	    		maxLengthAttr	  = hasMaxLength === true ? 'maxlength="' + maxLength + '"' : '',
 	    		blockText;
-	    	// console.log(fromSource);
+	    	// console.log(block);
 
 	    	// If the blocks text value is from an external source, retreive the text
 	    	if(fromSource === true){
@@ -879,10 +974,19 @@ var app = app || {};
 	    		blockText = typeof(block.__text) !== 'undefined' ? block.__text : '';
 	    	}
 
-	    	blockTextSettings+= '<h3 class="block-item-heading">Block Text</h3>';
-	    	blockTextSettings+= '<textarea class="form-control" data-action="update-block-text" ' + disabledAttr + '>';
+	    	blockTextSettings+= '<label for="text-block-' + id + '" class="block-item-heading">Block Text</label>';
+	    	blockTextSettings+= '<textarea id="text-block-' + id + '" class="form-control" data-action="update-block-text" ' + disabledAttr + ' ' + maxLengthAttr + '>';
 	    		blockTextSettings+= blockText
 	    	blockTextSettings+= '</textarea>';
+
+	    	// Only apply a maxlength if there is one.
+	    	if(hasMaxLength){
+	    		var charsRemaining = parseInt(maxLength) - blockText.length;
+	    		if(charsRemaining < 0){
+	    			charsRemaining = 0;
+	    		}
+				blockTextSettings+= '<p>Characters remaining: <span class="badge">' + charsRemaining +'</span></p>';
+	    	}  	
 
 	    	return blockTextSettings;
 	    },	  
@@ -891,36 +995,65 @@ var app = app || {};
 		/** 
 	      DOCUMENT EVENT HANDLER
 	    **/
-	    bindCreateProductClickEvents: function(){
+	    bindCreateProductDomEvents: function(){
 	    	var $body = $('body');
 	    	$body.on('click', '[data-action=load-from-product]', app.cp.loadExistingProduct);
 	    	$body.on('click', '[data-action=edit-text-block-defaults]', app.cp.toggleEditTbFromTbg);
 	    	$body.on('click', '[data-action=close-text-block-defaults]', app.cp.closeEditTbFromTbg);
 	    	$body.on('click', '[data-action=toggle-product-block]', function(){
+	    		app.cp.deactiveCanvasObj();
 	    		app.cp.toggleOptions($(this), '.cp-block-container');
 	    	});
-	    	$body.on('keyup', '[data-action=update-block-text]', app.cp.updateCanvasBlockText);
-	    	$body.on('blur', '[data-action=update-block-text]', function(){
-	    		// Deselect the previously selected canvas obj
-	    		app.cp.deactiveCanvasObj();
-
-	    		console.log(app._activeEditEl.origWidth);
-	    		var blockSettings   = app.utils.createTextBlockSettings(app._activeEditEl),
-	    			_formattedBlock = app.utils.wrapCanvasText(app._activeEditEl, app._canvas, app._activeEditEl.origWidth, 0, app._activeEditEl.textAlign),
-	    			_updatedBlock   = app.utils.setTextBlockSettings(_formattedBlock, blockSettings);
-	    		console.log(_formattedBlock);
-	    		// Remove the old block
-	    		app._canvas.remove(app._activeEditEl);
-	    		// Add the newly reformatted block
-	    		app._canvas.add(_updatedBlock).renderAll();
-	    		// console.log(app._canvas);
-	    		// Make the activeEditEl null as there is not longer an active element.
-	    		app._activeEditEl = null;
-	    		// Update the objects on the canvas
-	    		app.utils.createFilteredCanvasObjects();
+	    	// Debounce this event, so it doesnt occur on every keypress/focus as the next process is processor heavy.
+	    	// https://code.google.com/p/jquery-debounce/
+	    	// When focusing or typing on these textareasm update the relevant canvas object with the new text value
+	    	$body.on('keyup focus', '[data-action=update-block-text]', function(){
+	    		$.debounce(app.cp.updateCanvasBlockText($(this)), 500);
 	    	});
+	    	// After finishing editing a canvas objects's text, handle that event
+	    	$body.on('blur', '[data-action=update-block-text]', app.cp.textareaBlurHandler);
+
+	    	// PRODUCT CREATION TOOLS
+	    	// Saves a new product's XML
+	    	$('[data-action=save-product]').on('click', function(){
+	    		// Generate the Canvas's JSON and then group any text block groups into groups.
+	    		var _flattenedCanvasData = app.utils.generateFlattendedJSON(app.utils.generateJSON());
+	    		app.utils.generateCords(_flattenedCanvasData)
+	    	});
+	    	// Listens for change and click events, and then updates the active canvas object with the new value
+	    	$body.on('change keyup', '[data-action=update-canvas-control]', app.cp.updateCanvasObjSetting);
+	    	// Downloads an image of what is on the canvas 
       		app.$downloadThumb.on('click', app.utils.covertCanvasToImgDownload);
+
+      		// UI CONTROLS
+      		// Determines whether to create a new template/Sub template or not when creating a product
       		$('#non-variant').on('click', app.cp.toggleIsVarient);
+      		
+	    },
+	    textareaBlurHandler: function(){
+	    	// console.log(app._activeEditEl);
+	    	// console.log(app._canvas);
+	    	app.cp.deactiveCanvasObj();	    			
+    		// var blockSettings   = app.utils.createTextBlockSettings(app._activeEditEl),
+    		// 	_formattedBlock = app.utils.wrapCanvasText(app._activeEditEl, app._canvas, app._activeEditEl.origWidth, 0, app._activeEditEl.textAlign),
+    		// 	_updatedBlock   = app.utils.setTextBlockSettings(_formattedBlock, blockSettings);
+    		// // console.log(_formattedBlock);
+    		// // Remove the old block
+    		// // console.log(app._activeEditEl)
+    		// app._canvas.remove(app._canvas.getActiveObject()).renderAll();
+    		// // console.log(app._canvas.getActiveObject(), app._activeEditEl);
+    		// // console.log(app._canvas);
+    		// app.cp.deactiveCanvasObj();
+
+    		// // Add the newly reformatted block
+    		// //console.log(_updatedBlock);
+    		// app._canvas.add(_updatedBlock).renderAll();
+    		// // console.log(app._canvas);
+    		// // Make the activeEditEl null as there is not longer an active element.
+    		// app._activeEditEl = null;
+    		// Update the objects on the canvas
+    		// This function crashes the browser
+    		// app.utils.createFilteredCanvasObjects();
 	    }
 	};
 	app.cp.initCreateProduct();
