@@ -1,12 +1,13 @@
 var app = app || {};
-(function(){
+$(document).ready(function(){
 	'use strict';
 	// $ = dom elements
 	// _ = fabric elements
 
 	// Canvas Elements/Settings
-	app._canvas;
-	app._grid;
+	app._ct_canvas;
+	app._cp_canvas;
+	// Grid Squares
 	app.gridSquare      = 24;
 	// Units/Measurements
 	app.ptSize          = 0.75; // 1px > 1pt
@@ -22,6 +23,11 @@ var app = app || {};
 	app.tempGroupCnt    = 0;
 	app.tempGBlockCnt   = 0;
 	app.filteredCanvasObjs;
+
+	// State Handlers
+	app.isCreateTemplate = false;
+	app.isCreateProduct  = false;
+	app.isUpdateProduct  = false;
 
 	app.fontColours		=	[
 								{
@@ -99,14 +105,12 @@ var app = app || {};
 							]
 
 	// DOM elements
-	app.$downloadThumb  = $('[data-action=download-thumbnail]');
-	app.$toggleGrid     = $('[data-action=toggle-grid]');
-
 	app.$tempBlockName  = $('#at-block-title');
 
 	// Enviornment Check
-	app.templateDatURL  = '';
 	app.isLocalEnv      = document.location.hostname ===  "widget.macmillan.org.uk";
+	app.templateDatURL  = '';
+	
 	// Sets the default templates and some example text for textblocks
 	if(app.isLocalEnv){
 		app.dummyText = $.get('assets/data/dummy-text.txt', function(data){return data}, 'text');
@@ -217,6 +221,9 @@ var app = app || {};
 	      // X, Y, % of A4.
 	      // console.log(app.orientation);
 	      // console.log(app.docDimesions);
+
+	      console.log(app.orientation, app.templateType, app.docDimesions);
+
 	      if(app.templateType !== 'default'){
 	       	return [88,55, 1]      // Business Card 
 	      } else{
@@ -253,40 +260,39 @@ var app = app || {};
 			CREATE CANVAS & CANVAS ELEMENTS FUNCTIONS
 	    **/
 
-	    drawGrid: function(gSize){
-	      var gridLines = [];
+	    drawGrid: function(gSize, _canvas){
+	      var gridLines = [],
+	      	  _grid;
 	      for (var i = 0; i < 50; i++) {
 	        gridLines.push(new fabric.Line([ i * app.gridSquare, 0, i * app.gridSquare, gSize], { stroke: '#ccc'}));
 	        gridLines.push(new fabric.Line([ 0, i * app.gridSquare, gSize, i * app.gridSquare], { stroke: '#ccc'}));
 	      }
 	      //console.log(gridLines);
-	      app._grid = new fabric.Group(gridLines, {
+	      _grid = new fabric.Group(gridLines, {
 	                  left: 0,
 	                  top: 0,
 	                  selectable: false
 	                });
-	      app._canvas.add(app._grid);
-	      app._canvas.renderAll();
+	      _canvas.add(_grid).renderAll();
 	    },	    
-	    cleanCanvas: function(){
-	      app._grid['visible'] = false;
-	      app._canvas.deactivateAll().renderAll();
+	    cleanCanvas: function(_canvas){
+	      _canvas._objects[0]['visible'] = false;
+	      _canvas.deactivateAll().renderAll();
 	    },	    
-	    toggleCanvasGrid: function(toggle){
-	      var $this = $(this);
-	      if( $this.hasClass('grid-disabled') ){
-	        $this.removeClass('grid-disabled');
-	        app._grid['visible'] = true;
+	    toggleCanvasGrid: function($el, toggle, _canvas){
+	      if($el.hasClass('grid-disabled')){
+	        $el.removeClass('grid-disabled');
+	        _canvas._objects[0]['visible'] = true;
 	      }else{
-	        $this.addClass('grid-disabled');
-	        app._grid['visible'] = false;
+	        $el.addClass('grid-disabled');
+	        _canvas._objects[0]['visible'] = false;
 	      }
 
 	      // Show the grid, after saving the image and generating PDF
 	      if(toggle === true){
-	        app._grid['visible'] = true;
+	        _canvas._objects[0]['visible'] = true;
 	      }
-	      app._canvas.renderAll();
+	      _canvas.renderAll();
 	    },
 	    setCanvasSettings: function(docWidth, docHeight){
 	    	var settings = {};
@@ -318,32 +324,32 @@ var app = app || {};
 			if((docWidth === 420 && docHeight === 594) || (docHeight=== 420 && docWidth === 594)){
 				// A2 = 420x594 or 594x420
 				settings.canvasScale = 2;
-				app.isLocalEnv === true ? app.docDimesions = ['A2'] : [];
+				if (app.isLocalEnv === true) app.docDimesions = ['A2'];
 			}
 			else if((docWidth === 297 && docHeight === 420) || (docHeight=== 297 && docWidth === 420)){
 				// A3 = 297x420 or 420x297
 				settings.canvasScale = 1.4142;
-				app.isLocalEnv === true ? app.docDimesions = ['A3'] : [];
+				if (app.isLocalEnv === true) app.docDimesions = ['A3'];
 			} else if((docWidth === 210 && docHeight === 297) || (docHeight=== 210 && docWidth === 297)){
 				// A4 = 210x297 or 297x210
 				settings.canvasScale = 1;
-				app.isLocalEnv === true ? app.docDimesions = ['A4'] : [];
+				if (app.isLocalEnv === true) app.docDimesions = ['A4'];
 			} else if((docWidth === 148 && docHeight === 210) || ((docHeight === 148 || docHeight === 148.5) && docWidth === 210)){
 				// A5 = 148x210 or 210x148
 				settings.canvasScale = 0.7071;
-				app.isLocalEnv === true ? app.docDimesions = ['A5'] : [];    
+				if (app.isLocalEnv === true) app.docDimesions = ['A5'];    
 			} else if((docWidth === 105 && docHeight === 148) || (docHeight >= 104 && docHeight <= 105 && docWidth === 148)){
 				// A6 = 105x148 or 148x105
 				settings.canvasScale = 0.5;
-				app.isLocalEnv === true ? app.docDimesions = ['A6'] : [];
+				if (app.isLocalEnv === true) app.docDimesions = ['A6'];
 			} else if((docWidth === 74 && docHeight === 105) || (docHeight === 74 && docWidth === 105)){
 			// A7 = 74x105 or 105x74
 				settings.canvasScale = 0.3536;
-				app.isLocalEnv === true ? app.docDimesions = ['A7'] : [];
+				if (app.isLocalEnv === true) app.docDimesions = ['A7'];
 			} else if(docWidth === 85 && docHeight === 55){
 				// Business Card = 85x55
 				settings.canvasScale = 1;
-				app.isLocalEnv === true ? app.docDimesions = ['Business Card'] : [];
+				if (app.isLocalEnv === true) app.docDimesions = ['Business Card'];
 			}
 			return settings;
 	    },
@@ -694,7 +700,8 @@ var app = app || {};
 		            break;
 		        case 'lh':
 		            return {
-		            	lineheight: updatedVal
+		            	lineheight: updatedVal,
+		            	lineHeight: updatedVal / 100
 		            }
 		            break;
 		        case 'ah':
@@ -721,7 +728,12 @@ var app = app || {};
 		            	spacing: updatedVal
 		            }
 		            break;
-		        }
+		        case 'ib':
+		            return {
+		            	imgSrc: updatedVal
+		            }
+		        	break;
+		    }
 		},
 
 		/**
@@ -806,21 +818,32 @@ var app = app || {};
 	    },
 	    bindGlobalCanvasEvents: function(){
 	    	// This event handler stops elements being moved outside of the canvas element when moving an element on the canvas
-			app._canvas.on('object:moving', function(e) {
-				app.utils.constrainGridMovement(e);
-			});
-			// This event handler stops elements being moved outside of the canvas element when and element is being modified (resized)
-			app._canvas.on('object:modified', function(e) {
-				app.utils.constrainGridMovement(e);
-			});
+	    	if(typeof(app._ct_canvas) !== 'undefined'){
+	    		app._ct_canvas.on('object:moving,', function(e) {
+					app.utils.constrainGridMovement(e);
+				});
+				// This event handler stops elements being moved outside of the canvas element when and element is being modified (resized)
+				app._ct_canvas.on('object:modified', function(e) {
+					app.utils.constrainGridMovement(e);
+				});
+	    	}
+	    	if(typeof(app._cp_canvas) !== 'undefined'){
+	    		app._cp_canvas.on('object:moving,', function(e) {
+					app.utils.constrainGridMovement(e);
+				});
+				// This event handler stops elements being moved outside of the canvas element when and element is being modified (resized)
+				app._cp_canvas.on('object:modified', function(e) {
+					app.utils.constrainGridMovement(e);
+				});
+	    	}	
 	    },
 
 	    /**
       		Functions needed to prepare template for export
 	    **/
-	    generateJSON: function(){
+	    generateJSON: function(_canvas){
 	      // Pass through additional attributes to generated JSON
-	      var canvasData = app._canvas.toJSON([
+	      var canvasData = _canvas.toJSON([
 	        'blockId',
 	        'blockTitle',
 	        'blocktype',
@@ -829,13 +852,14 @@ var app = app || {};
 	        'fontSize',
 	        'halign',
 	        'id',
+	        'imgSrc',
 	        'isEditable',
 	        'isManditory',
 	        'label',
 	        'lineheight',
 	        'maxLength',
 	        'spacing',
-	        'stringSrc',
+	        'stringSrc',	        
 	        'textVal',
 	        'valign',	        
 	        'parentId',
@@ -1064,16 +1088,17 @@ var app = app || {};
 	        }
 	        // Otherwise it will be treated as an image block
 	        else{
-	          var imgBlockName = 'image_' + i;
+	          var imgBlockName = 'image_' + i,
+	          	  imgURL 	   =  typeof(el.imgSrc) !== 'undefined' || el.imgSrc !== null ? el.imgSrc : 'demo-800.jpg'
 	          baseObj[imgBlockName] = {
 	                                    '_align': el.halign,
 	                                    '_editable': el.isEditable,
 	                                    '_fitmethod': 'auto',
-	                                    '_highresfilename': 'demo-800.jpg', //el.src
+	                                    '_highresfilename': imgURL,
 	                                    '_id': el.blockTitle + i,
 	                                    '_lowerleftx': app.utils.calcLowerLeftX(elDimensions),
 	                                    '_lowerlefty': app.utils.calcLowerLeftY(elDimensions),
-	                                    '_lowresfilename': 'demo-800.jpg',  //el.src
+	                                    '_lowresfilename': imgURL,
 	                                    '_mandatory': el.isManditory,
 	                                    '_orientate': 'north',
 	                                    '_title': el.blockTitle,
@@ -1099,24 +1124,36 @@ var app = app || {};
 	      xmlOutput = xmlOutput.replace(/text-block_[0-9][0-9]?/g, 'text-block');
 	      xmlOutput = xmlOutput.replace(/image_[0-9][0-9]?/g, 'image');
 
+	      // Update the hidden field with the generated XML
+	      $('#pdfItemAdmin1_hdnXML').val(xmlOutput);
+
 	      // console.log(app.templateId);
 	      if(app.isLocalEnv){
 	        console.log(xmlOutput);
 	      }else{
-	        app.utils.createTemplate(xmlOutput);
+
+	      	if(app.isCreateTemplate){
+	      		app.utils.createTemplate(xmlOutput);
+	      	} else if(app.isCreateProduct || app.isUpdateProduct){
+	      		// Make sure a hidden checkbox is checked as the BE needs to know this.
+	      		$('#pdfItemAdmin1_chkIsPDF').prop('checked', true);
+	      		// Mimic a click on the storefront button that updates/creates a product
+	      		$('#btnSubmit').click();
+	      	}	        
 	      }      
 	    },
 	    createTemplate: function(xml) {
 	      // Function receives the generated XML from what has been created on the canvas
 	      // Then POST's that data to the backend to create a new template
 	      console.log(xml);
+	      console.log({tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions, id: app.templateId});
 	      $.ajax({
 	            url: '/be/api/PDF/Template.ashx',
 	            type: 'POST',
 	            dataType: 'json',
 	            data: {tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions, id: app.templateId},
 	            success: function (data) {
-	                alert('call...sent');
+	                alert('Template Created. Please click "Add product" to use this template');
 	            },
 	            error: function(data){
 	              console.log(data);
@@ -1167,13 +1204,29 @@ var app = app || {};
 	    validateTextBlock: function(_block){
 
 	    },
-	    covertCanvasToImgDownload: function(){
+	    covertCanvasToImgDownload: function($el, _canvas){
 	      // Remove selected states and grid before saving img
-	      app.utils.cleanCanvas();
-	      app.imagedata = app._canvas.toDataURL('image/png');
+	      app.utils.cleanCanvas(_canvas);
+	      app.imagedata = _canvas.toDataURL('image/png');
 	      // console.log(app.imagedata);
-	      this.href = app.imagedata;
-	      app.utils.toggleCanvasGrid(true);
+	      $el[0].href = app.imagedata;
+	      app.utils.toggleCanvasGrid($el, true, _canvas);
 	    },
+	    generateCanvasPreviewImg: function(_canvas, prefix){
+	    	// @ _canvas = farbic canvas object | {}
+	    	// @ prefix  = prefix for the hidden canvas | string
+
+	    	// Remove selected states and grid before saving img
+	    	console.log(_canvas);
+	        app.utils.cleanCanvas(_canvas);
+	        // Create an image from the canvas and add it to the relevant div
+	        var imgElement = ReImg.fromCanvas($('#' + prefix +'_canvas')[0]).toImg(),
+	            $output    = $('#' + prefix +'_image');
+	        $output.html('').append(imgElement);
+	        // Save the image data so this can be used later when saving the image for the template
+	        app.imagedata = _canvas.toDataURL('image/png');
+	        // Enable the grid again
+	        app.utils.toggleCanvasGrid(app.$tmplToggleBtn, true, _canvas);
+	    }
 	};
-})();
+})

@@ -6,6 +6,66 @@
 	<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
+	<!-- Only include these fields locally -->
+	<!-- <input type="hidden" id="pdfItemAdmin1_hdnXML"> -->
+	<input type="hidden" id="pdfItemAdmin1_hdnXML" value="<doc scalex='1' scaley='1' assetspath='C:\Projects\bemac_discovery\BeMacDiscovery\Assets\'><page width='148' height='105'><pdf align='left' editable='false' id='bglayer' lowerleftx='0' lowerlefty='0' orientate='north' title='background' upperrightx='148' upperrighty='105' verticalalign='top'/><text-block-group align='left' editable='True' id='Group0' lowerleftx='84.5' lowerlefty='28' mandatory='False' orientate='north' spacing='10' upperrightx='140.5' upperrighty='88.5' verticalalign='top' maxlen='150'><text-block editable='True' font-family='FuturaBT-Heavy' font-size='16' id='TextBlockG_0' leading='100%' mandatory='False' textmode='multiline' title='Title'>Name of Event</text-block><text-block editable='True' font-family='FuturaBT-Heavy' font-size='15' id='TextBlockG_1' leading='125%' mandatory='False' textmode='multiline' title='Medium Text'>20 Month 2013 11am to 4pm Name of venue&#x2F;location Street address, town, county</text-block><text-block editable='True' font-family='FuturaBT-Heavy' font-size='10' id='TextBlockG_2' leading='125%' mandatory='False' textmode='multiline' title='Small Text'>Please bring this ticket with you.</text-block></text-block-group><text-block align='left' editable='true' font-family='FuturaBT-Medium' font-size='7' id='TextBlock_1' leading='100%' lowerleftx='7.5' lowerlefty='5.5' mandatory='true' orientate='north' textmode='multiline' title='Terms and Conditions' upperrightx='138.5' upperrighty='10' verticalalign='bottom' source='C:\Projects\bemac_discovery\BeMacDiscovery\Assets\Terms.txt'/><image align='right' editable='true' fitmethod='auto' highresfilename='demo-800.jpg' id='Logo2' lowerleftx='7.5' lowerlefty='14' lowresfilename='demo-800.jpg' mandatory='true' orientate='north' title='Logo' upperrightx='140' upperrighty='31' verticalalign='bottom'/></page></doc>">
+	<input type="hidden" id="pdfItemAdmin1_hdnTemplateId">
+
+	<label for="pdfItemAdmin1_chkIsPD" class="hidden">
+	    This checkbox could be hidden or not used at all, but we need some way of knowing that the user actually wanted to add a PDF and that is what this checkbox is currently used for...
+	    <input type="checkbox" id="pdfItemAdmin1_chkIsPDF">
+	</label>
+
+	<input type="hidden" name="pdfItemAdmin1$hdnBlockAssets" id="pdfItemAdmin1_hdnBlockAssets">
+	<!-- END -->
+
+	<!-- <div class="product-asset-lib-container hidden" id="asset-lib">	
+		<h2>Assets Library</h2>
+	        
+        <div class="form-group">
+        	<h3>Upload File</h3>
+            <input type="file" name="file" id="btnFileUpload" />
+        </div>
+
+        <div class="form-group">
+        	<h3>Add Tags:</h3>
+        	<input type="text" id="txtTag" class="form-control" />
+        </div>
+
+        <div class="clearfix">
+            <button type="button" id="btnSave" class="btn btn-info pull-right">Save</button>
+         </div>
+
+        <h3>Search Assets</h3>
+
+	    <hr>
+	    <div class="form-group">
+	        <h4>File name:</h4>
+	        <input type="text" id="txtSearchFilename"  class="form-control"/>
+	    </div>
+	    <div class="form-group">
+	    	<h4>Tags:</h4>
+	        <input type="text" id="txtSearchTags"  class="form-control"/>
+	    </div>
+
+        <div class="clearfix">
+        	<button type="button" id="btnSearchAssets" class="btn btn-info pull-right">Search</button>
+        </div>
+
+        <hr>
+
+	     <div id="assetsFound">	     
+	     	<p>...Assets found, will display here.</p>	     
+	     </div>
+
+	     <div style="float:left" class="hidden"> 
+		    <div style="border: 1px black solid;width:600px;height:400px">
+		    	Page
+		    	<div data-blockid="1" style="border: 1px black solid;width:50%;height:50%" class="droppable"></div>
+		    </div>
+		 </div>
+	</div> -->
+
 	<div class="row product-container">
 		<div class="container" data-template="build-product">
 			<h1>Create Product</h1>
@@ -16,7 +76,108 @@
 
 			<div class="stepped-option" data-step="1">
 				<div class="col-md-5">
+					<!-- Asset Library for blocks -->
+
+					<div class="hidden" id="block-asset-lib">	
+						<h2>Assets Library</h2>
+					        
+				        <div class="form-group">
+				        	<h3>Upload File</h3>
+				            <input type="file" name="file" id="btnFileUpload" />
+				        </div>
+
+				        <div class="form-group">
+				        	<h3>Add Tags:</h3>
+				        	<input type="text" id="txtTag" class="form-control" />
+				        </div>
+
+				        <div class="clearfix">
+				            <button type="button" id="btnSave" class="btn btn-info pull-right">Save</button>
+				         </div>
+
+				        <h3>Search Assets</h3>
+
+					    <hr>
+					    <div class="form-group">
+					        <h4>File name:</h4>
+					        <input type="text" id="txtSearchFilename"  class="form-control"/>
+					    </div>
+					    <div class="form-group">
+					    	<h4>Tags:</h4>
+					        <input type="text" id="txtSearchTags"  class="form-control"/>
+					    </div>
+
+				        <div class="clearfix">
+				        	<button type="button" id="btnSearchAssets" class="btn btn-info pull-right">Search</button>
+				        </div>
+
+				        <hr>
+
+					     <div id="assetsFound">
+					     	<button type="button" class="btn btn-warning pull-top-right" data-action="close-asset-library">Close</button>   
+					     	<ul id="asset-lib-item-list" class="clearfix list-group">
+					     		<li class="list-group-item">
+					     			<input type="checkbox" name="block-asset-item" id="asset_1" class="hidden asset-lib-selection-checkbox" value="1"/>
+					     			<label for="asset_1" class="asset-lib-label">
+					     				<img src="assets/img/demo-thumbs/1.jpg" alt="Asset 1" class="asset-lib-thumb" />
+					     				<span class="asset-lib-item-name">Asset 1  Asset 1 Asset 1</span>					     				
+					     			</label>
+					     		</li>
+					     		<li class="list-group-item">
+					     			<input type="checkbox" name="block-asset-item" id="asset_2" class="hidden asset-lib-selection-checkbox" value="2" />
+					     			<label for="asset_2" class="asset-lib-label">
+					     				<img src="assets/img/demo-thumbs/2.jpg" alt="Asset 2" class="asset-lib-thumb" />
+					     				<span class="asset-lib-item-name">Asset 2</span>					     				
+					     			</label>
+					     		</li>
+					     		<li class="list-group-item">
+					     			<input type="checkbox" name="block-asset-item" id="asset_3" class="hidden asset-lib-selection-checkbox" value="3"/>
+					     			<label for="asset_3" class="asset-lib-label">					     				
+					     				<img src="assets/img/demo-thumbs/3.jpg" alt="Asset 3" class="asset-lib-thumb" />
+					     				<span class="asset-lib-item-name">Asset 3</span>
+					     			</label>
+					     		</li>
+					     		<li class="list-group-item">
+					     			<input type="checkbox" name="block-asset-item" id="asset_4" class="hidden asset-lib-selection-checkbox" value="4"/>
+					     			<label for="asset_4" class="asset-lib-label">					     				
+					     				<img src="assets/img/demo-thumbs/4.jpg" alt="Asset 4" class="asset-lib-thumb" />
+					     				<span class="asset-lib-item-name">Asset 4</span>
+					     			</label>
+					     		</li>
+
+					     		<li class="list-group-item">
+					     			<input type="checkbox" id="asset_4" class="hidden asset-lib-selection-checkbox" value="4"/>
+					     			<label for="asset_4" class="asset-lib-label">					     				
+					     				<img src="assets/img/demo-thumbs/4.jpg" alt="Asset 4" class="asset-lib-thumb" />
+					     				<span class="asset-lib-item-name">Asset 4</span>
+					     			</label>
+					     		</li>
+					     		<li class="list-group-item">
+					     			<input type="checkbox" id="asset_4" class="hidden asset-lib-selection-checkbox" value="4"/>
+					     			<label for="asset_4" class="asset-lib-label">					     				
+					     				<img src="assets/img/demo-thumbs/4.jpg" alt="Asset 4" class="asset-lib-thumb" />
+					     				<span class="asset-lib-item-name">Asset 4</span>
+					     			</label>
+					     		</li>
+					     		<li class="list-group-item">
+					     			<input type="checkbox" id="asset_4" class="hidden asset-lib-selection-checkbox" value="4"/>
+					     			<label for="asset_4" class="asset-lib-label">					     				
+					     				<img src="assets/img/demo-thumbs/4.jpg" alt="Asset 4" class="asset-lib-thumb" />
+					     				<span class="asset-lib-item-name">Asset 4</span>
+					     			</label>
+					     		</li>
+					     	</ul>
+					     	<hr>
+					     	<button type="button" class="btn btn-primary" data-action="save-block-assets" data-boundblockid="">Save Assets</button> 
+					     </div>
+					</div>
+
 					<ul id="product-blocks-list" class="list-group"></ul>
+
+					<div class="image-preview">
+						<div id="cp_image"></div>
+					</div>					
+
 					<!-- Template -->
 					<table class="table hidden">
 						<tr>
@@ -48,7 +209,7 @@
 							<img src="" alt="">
 							<input type="checkbox" name="asset-library-img" value="path/to/img.jpg">
 						</li>
-					</ul>
+					</ul>					
 				</div>
 
 				<div class="col-md-7 stepped-option" data-step="1">
@@ -66,20 +227,27 @@
 						<span class="badge">Orientation: </span> <span id="template-orientation"></span> 
 					</div>
 
-					<div id="canvas-container"></div>
+					<div id="product-canvas-container"></div>
 					<!-- <canvas id="c" width="396.85" height="561.25"></canvas> -->
 				</div>
 			</div>
 		</div>
 	</div>
+
 	<script src="assets/js/libs/jquery-1.11.3.js"></script>
+	<script src="assets/js/libs/jquery-ui.1.11.4.min.js"></script>
+	<script src="assets/js/libs/jquery.ui.widget.js" type="text/javascript"></script>
+	<script src="assets/js/libs/jquery.iframe-transport.js" type="text/javascript"></script>
+	<script src="assets/js/libs/jquery.fileupload.js" type="text/javascript"></script>
 	<script src="assets/js/libs/fabrics.js"></script>
 	<script src="assets/js/libs/reimg.js"></script>
 	<!-- <script src="assets/js/libs/jspdf.js"></script> -->
-	<script src="assets/js/libs/xml2json.js"></script>
+	<script src="assets/js/libs/xml2json.js"></script>	
 	<script src="assets/js/libs/jquery.debounce-1.0.5.js"></script>
+
 	<script src="assets/js/utils.js"></script>
-	<!-- <script src="assets/js/create-template.js"></script> -->
+	<script src="assets/js/create-template.js"></script>
 	<script src="assets/js/create-product.js"></script>
+	<script src="assets/js/asset-library.js"></script>	
 </body>
 </html>

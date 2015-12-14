@@ -1,0 +1,25 @@
+{ "BlockId": 1, "AssetId": 1, "Def": 0 }
+{ "BlockId": 1, "AssetId": 2, "Def": 1 } 
+{ "BlockId": 1, "AssetId": 3, "Def": 0 } 
+
+or
+
+{
+	"BlockId": 1,
+	"Assets: [
+				{
+					AssetId": 1,
+					"Def": 0
+				},
+				{
+					AssetId": 2,
+					"Def": 1
+				},
+				{
+					AssetId": 3,
+					"Def": 0
+				}
+			 ]
+}
+
+

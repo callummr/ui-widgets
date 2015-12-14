@@ -6,6 +6,9 @@
 	<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
+	<!-- Field only required locally -->
+	<input type="hidden" id="pdfItemAdmin1_hdnXML" value="">
+
 	<div class="row template-container">
 		<div class="container" data-template="build-template">
 			<h1>Template Creator</h1>
@@ -129,7 +132,7 @@
 						<hr>
 						<div>
 							<label for="template-text-block" class="at-control">
-								<span class="badge">Text Block</span>
+								<span class="badge">Text</span>
 								<input type="radio" id="template-text-block" class="at-control reset-to-default js-toggle-target-el" name="template-block-type" value="new-template-text-block" data-targetel="new-template-text-block" data-toggle-group="template-options" checked>
 							</label>
 							<label for="template-text-block-group" class="at-control">
@@ -137,7 +140,7 @@
 								<input type="radio" id="template-text-block-group" class="at-control js-toggle-target-el" name="template-block-type" value="new-template-text-block-group" data-targetel="new-template-text-block-group" data-toggle-group="template-options">
 							</label>
 							<label for="template-image-block" class="at-control">
-								<span class="badge">Image Block</span>
+								<span class="badge">Image</span>
 								<input type="radio" id="template-image-block" class="at-control js-toggle-target-el" name="template-block-type" value="new-template-image-block" data-targetel="new-template-image-block" data-toggle-group="template-options">
 							</label>
 							
@@ -444,7 +447,7 @@
 				</ul> -->
 
 				<div class="image-preview">
-					<div id="i" class="empty-on-reset"></div>
+					<div id="ct_image" class="empty-on-reset"></div>
 				</div>
 			</div>
 
@@ -465,19 +468,25 @@
 					<span class="badge">Orientation: </span> <span id="template-orientation" class="empty-on-reset"></span> 
 				</div>
 
-				<div id="canvas-container" class="empty-on-reset"></div>
+				<div id="template-canvas-container" class="empty-on-reset"></div>
 				<!-- <canvas id="c" width="396.85" height="561.25"></canvas> -->
 			</div>
 		</div>
 	</div>
 	<script src="assets/js/libs/jquery-1.11.3.js"></script>
+	<script src="assets/js/libs/jquery-ui.1.11.4.min.js"></script>
+	<script src="assets/js/libs/jquery.ui.widget.js" type="text/javascript"></script>
+	<script src="assets/js/libs/jquery.iframe-transport.js" type="text/javascript"></script>
+	<script src="assets/js/libs/jquery.fileupload.js" type="text/javascript"></script>
 	<script src="assets/js/libs/fabrics.js"></script>
 	<script src="assets/js/libs/reimg.js"></script>
 	<!-- <script src="assets/js/libs/jspdf.js"></script> -->
 	<script src="assets/js/libs/xml2json.js"></script>	
 	<script src="assets/js/libs/jquery.debounce-1.0.5.js"></script>
+
 	<script src="assets/js/utils.js"></script>
 	<script src="assets/js/create-template.js"></script>
-	<!--<script src="assets/js/create-product.js"></script> -- >
+	<script src="assets/js/create-product.js"></script>
+	<script src="assets/js/asset-library.js"></script>	
 </body>
 </html>

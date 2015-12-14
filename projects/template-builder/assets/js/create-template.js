@@ -1,5 +1,5 @@
 var app = app || {};
-(function(){
+$(document).ready(function(){
   'use strict';
 
   // $ = dom elements
@@ -117,15 +117,15 @@ var app = app || {};
           docHeight   = parseInt(canvasData.doc.page._height);
 
       // Set the ID of the Canvas      
-      canvasEl.setAttribute('id', 'c');
+      canvasEl.setAttribute('id', 'ct_canvas');
 
       var canvasSettings = app.utils.setCanvasSettings(docWidth, docHeight);
       canvasEl.width  = canvasSettings.width;
       canvasEl.height = canvasSettings.height;
 
-      document.getElementById('canvas-container').appendChild(canvasEl);
-      app._canvas = new fabric.Canvas('c', { selection: false, backgroundColor: '#FFF' });
-      app.utils.drawGrid(396); // Pass in the width dynamically so the whole grid is covered
+      document.getElementById('template-canvas-container').appendChild(canvasEl);
+      app._ct_canvas = new fabric.Canvas('ct_canvas', { selection: false, backgroundColor: '#FFF' });
+      app.utils.drawGrid(396, app._ct_canvas); // Pass in the width dynamically so the whole grid is covered
       // Add all of the elements to the page.
       app.ct.createTempBlockFromXML(canvasData.doc.page, canvasSettings.canvasScale);
       app.ct.bindCreateTemplateCanvasEvents();
@@ -188,8 +188,8 @@ var app = app || {};
     **/
     resetTemplate: function(){
       // Check if the canvas exists before trying to clear it.
-      if(app._canvas){
-        app._canvas.clear();
+      if(app._ct_canvas){
+        app._ct_canvas.clear();
       }      
       app.docDimesions  = [];
       app.gEditActive   = false;
@@ -261,9 +261,7 @@ var app = app || {};
       // (http://stackoverflow.com/questions/5034529/size-of-html5-canvas-via-css-versus-element-attributes)
       var canvasEl = document.createElement('canvas'),
           size;
-      
-      app.ct.setTemplateDetails();
-      canvasEl.setAttribute('id', 'c');
+       canvasEl.setAttribute('id', 'ct_canvas');
 
       // Check if the document size desired template should be a regular paper size or business card.
       // All regular paper sizes use the same bases size (A4), but business cards are different.
@@ -286,11 +284,12 @@ var app = app || {};
         canvasEl.width    = 332;  // 88mm / 332.5984251968px
         canvasEl.height   = 207;  // 55mm / 207.874015748px
       }
+      app.ct.setTemplateDetails();
 
-      document.getElementById('canvas-container').appendChild(canvasEl);
-      app._canvas       = new fabric.Canvas('c', { selection: false, backgroundColor: '#FFF' });
+      document.getElementById('template-canvas-container').appendChild(canvasEl);
+      app._ct_canvas       = new fabric.Canvas('ct_canvas', { selection: false, backgroundColor: '#FFF' });
       app.ct.bindCreateTemplateCanvasEvents();
-      app.utils.drawGrid(396); // Pass in the width dynamically so the whole grid is covered
+      app.utils.drawGrid(396, app._ct_canvas); // Pass in the width dynamically so the whole grid is covered
     },  
     setTemplateDetails: function(){
       var $orientationDetail = $('#template-orientation');
@@ -478,7 +477,7 @@ var app = app || {};
         // (el.width * scalex) * canvasScale, app.mmSize
         blockSettings.height  = app.utils.calcHeight(blockDimensions);
         blockSettings.left    = blockDimensions.lowerX;
-        blockSettings.top     = app._canvas.height - blockDimensions.upperY;
+        blockSettings.top     = app._ct_canvas.height - blockDimensions.upperY;
         blockSettings.width   = app.utils.calcWidth(blockDimensions);
         // console.log(blockSettings);
 
@@ -591,7 +590,7 @@ var app = app || {};
             _block.add(block);
           });
         // Add the group to the canvas
-        app._canvas.add(_block); 
+        app._ct_canvas.add(_block); 
       }else if($textBlockList.find('li').length > 0){
         // Use the settings from 'blockSettings' object if this is a new group
         var _tblocks = app.ct.createTempBlockGroupItem($textBlockList.find('li'), blockSettings.spacing);
@@ -622,7 +621,7 @@ var app = app || {};
         _tblockg['valign']      = blockSettings.valign;
 
         // Add the group to the canvas
-        app._canvas.add(_tblockg);        
+        app._ct_canvas.add(_tblockg);        
       }else{
         alert('No text blocks added to text block group. Please try again');
       }
@@ -630,7 +629,7 @@ var app = app || {};
       // Empty the list when complete
       $textBlockList.empty();
       // Add the group to the canvas
-      app._canvas.renderAll();  
+      app._ct_canvas.renderAll();  
 
       // Empty the input field with the previous component name.
       app.ct.resetCreateTempBlock();
@@ -673,7 +672,7 @@ var app = app || {};
       // console.log('Before adding: ', _block);
       // console.log(blockType);
       // Add the new component to the canvas. This needs to be done, before we can update the background img of the object
-      app._canvas.add(_block);
+      app._ct_canvas.add(_block);
       
       // Set the relevant background image for block, based on blocktype
       app.ct.setTempBlockBackgroundImg(_block, app.ct.setBlockType($('input[name=template-block-type]:checked').val()));
@@ -748,14 +747,14 @@ var app = app || {};
       // console.log(_block);
       // console.log(blockType);
       // Add the new component to the canvas. This needs to be done, before we can update the background img of the object
-      app._canvas.add(_block);
+      app._ct_canvas.add(_block);
       // Set the relevant background image for block, based on blocktype
       app.ct.setTempBlockBackgroundImg(_block, blockType);
       // Empty the input field with the previous component name.
       app.ct.resetCreateTempBlock();
     },
     editTempBlock: function(){
-      var _block    = app._canvas.getActiveObject(),
+      var _block    = app._ct_canvas.getActiveObject(),
           blockType = app.ct.setBlockType($('input[name=template-block-type]:checked').val());
       // console.log(blockType);
       // console.log(_block);
@@ -788,7 +787,7 @@ var app = app || {};
             app.ct.createTempBlockGroup( $('#at-text-block-group-list').find('li'), _block);
           }else{
             alert('The text block does not contain any text blocks, so it will be removed.');
-            app._canvas.remove(_block);
+            app._ct_canvas.remove(_block);
           }
       }
       // Set non-specific block settings
@@ -805,7 +804,7 @@ var app = app || {};
       // Reset the component creation tool.
       app.ct.resetCreateTempBlock();
       // De-select the element previously selected on the canvas
-      app._canvas.deactivateAll().renderAll();
+      app._ct_canvas.deactivateAll().renderAll();
       // Upadate Global Edit State
       app.gEditActive = false;
     },    
@@ -868,7 +867,7 @@ var app = app || {};
     },
     setTempBlockSettings: function(_selectedEl){
       console.log(_selectedEl);
-      var test = app._canvas.getActiveGroup();
+      var test = app._ct_canvas.getActiveGroup();
       console.log(test);
       // Set the block type name
       // template-text-block-group
@@ -1005,16 +1004,16 @@ var app = app || {};
                 source: img,
                 repeat: repeatSetting
             });
-          app._canvas.renderAll();
+          app._ct_canvas.renderAll();
         });
       }
     },
     delTempBlock: function(){
       // Get the select fabric object and remove it.
-      var _activeObject = app._canvas.getActiveObject();
+      var _activeObject = app._ct_canvas.getActiveObject();
       console.log(_activeObject);
       // Remove the item from the canvas
-      app._canvas.remove(_activeObject).renderAll();
+      app._ct_canvas.remove(_activeObject).renderAll();
       // Reset the component creation tool.
       app.ct.resetCreateTempBlock();
       // Upadate Global Edit State
@@ -1022,14 +1021,14 @@ var app = app || {};
     },
     stopTempBlock: function(){
       // De-select the element previously selected on the canvas
-      app._canvas.deactivateAll().renderAll();
+      app._ct_canvas.deactivateAll().renderAll();
       // Reset the component creation tool.
       app.ct.resetCreateTempBlock();
       // Upadate Global Edit State
       app.gEditActive = false;
     },
     toggleTempState: function(isEditing){
-      console.log(isEditing);
+      // console.log(isEditing);
       if(isEditing === true){
         $('.disabled-in-edit-state').addClass('hidden');
         $('.enabled-in-edit-state').removeClass('hidden');
@@ -1040,15 +1039,15 @@ var app = app || {};
     },
     bindCreateTemplateCanvasEvents: function(){
       // This event handles whether to enter edit mode or not
-      app._canvas.on('object:selected', function(e) {
+      app._ct_canvas.on('object:selected', function(e) {
         // Set the global edit state
         app.gEditActive = true;
         // Set the block settings to what the currently selected blocks settings are
-        app.ct.setTempBlockSettings(app._canvas.getActiveObject());
+        app.ct.setTempBlockSettings(app._ct_canvas.getActiveObject());
         // Show the edit options
         app.ct.toggleTempState(true);
       });
-      app._canvas.on('mouse:down', function(e) {
+      app._ct_canvas.on('mouse:down', function(e) {
         // console.log(e);
         // console.log(typeof(e.target) !== 'undefined');
         // console.log(typeof(e.target._objects) !== 'undefined');
@@ -1227,8 +1226,14 @@ var app = app || {};
       // Bind to dom elements to functions
       app.$reserCreateTemp.on('click', app.ct.resetTemplate);
       app.$tempActionBtn.on('click', app.ct.createTempInit);
-      app.$downloadThumb.on('click', app.utils.covertCanvasToImgDownload);
-      app.$toggleGrid.on('click', app.utils.toggleCanvasGrid);
+      app.$tmplToggleBtn = $('.template-container [data-action=toggle-grid]');
+      app.$tmplToggleBtn.on('click', function(){
+        app.utils.toggleCanvasGrid($(this), false, app._ct_canvas);
+      });
+      $('.template-container [data-action=download-thumbnail]').on('click', function(){
+        console.log(app._ct_canvas);
+        app.utils.covertCanvasToImgDownload($(this), app._ct_canvas);
+      });
       app.$documentSizeBtns.on('click', app.ct.validateDocSize);
       app.$newTempBtn.on('click', app.ct.createNewTemp);
       app.$stepBtns.on('click', function(){
@@ -1288,25 +1293,21 @@ var app = app || {};
 
       // Check that if is is an update, they have confirmed they are happy to make it. Otherwise this request is to create a new template
       if(!$(this).hasClass('update-template') || confrimation === true){
+        // Set what type of request this is. Required by the utils.generateXML 
+        app.isCreateTemplate = true;        
+        app.isCreateProduct  = false;
+        app.isUpdateProduct  = false;
         // We are creating a template, rather than updating.
         if(typeof(confrimation) === 'undefined'){
           app.templateId = null;
         } 
-        // Remove selected states and grid before saving img
-        app.utils.cleanCanvas();
-        // Create an image from the canvas and add it to the relevant div
-        var imgElement = ReImg.fromCanvas(document.querySelector('#c')).toImg(),
-        $output = $('#i');
-        $output.html('').append(imgElement);
-        // Save the image data so this can be used later when saving the image for the template
-        app.imagedata = app._canvas.toDataURL('image/png');
-        // Enable the grid again
-        app.utils.toggleCanvasGrid(true);
+        // Create a preview image on the page of what is on the canvas
+        app.utils.generateCanvasPreviewImg(app._ct_canvas, 'ct');
         // Begin creating the templates' cooridnates/XML
-        app.utils.generateCords( app.utils.generateJSON() );
+        app.utils.generateCords( app.utils.generateJSON(app._ct_canvas) );
       }
     },
   };
 
   app.ct.initCreateTemp();
-})();
+});
