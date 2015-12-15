@@ -53,7 +53,8 @@ $(document).ready(function(){
       .done(function(data){
         // Filter the response and then create JSON        
         var templatesData = JSON.parse(app.utils.filterResponse(data)),
-            tempString = '';
+            tempString    = '',
+            imgPath       = app.isLocalEnv ? '../' : '../../';
         // console.log(templatesData);
         // console.log(JSON.parse(data));
 
@@ -62,7 +63,7 @@ $(document).ready(function(){
             tempString += '<input type="radio" id="template' + template.ID +'" name="template-url" value="' + template.ID +'" class="template-selection hidden">';
             tempString += '<label for="template' + template.ID +'" class="thumbnail">';
               tempString += '<span class="template-name">' + template.Name + '</span>';
-              tempString += '<img src="../templates/' + template.ID +'.jpg" alt="' + template.Name + '" class="">';
+              tempString += '<img src="' + imgPath + 'templates/' + template.ID +'.jpg" alt="' + template.Name + '" class="" />';
             tempString += '</label>';          
           tempString += '</div>';
         });
@@ -100,8 +101,10 @@ $(document).ready(function(){
         }
         // Set the dimensions of the template
         $('#template-size-options').text(app.docDimesions.join(','));
-        // Set the name of the template so the user can see once in the edit mode.s
-        $('#template-name').text($selectedInput.next().find('.template-name').text());       
+        // Set the name of the template so the user can see once in the edit modes
+        // *** NEED TO ADD A TEXT FIELD TO SET THE NAME OF A TEMPLATE **///
+        app.templateName = $selectedInput.next().find('.template-name').text();
+        $('#template-name').text(app.templateName );     
         $('#template-tools-navigation').addClass('col-md-4');
 
         app.ct.loadTempFromJSON(tempJSON);        
@@ -195,7 +198,8 @@ $(document).ready(function(){
       app.gEditActive   = false;
       app.tbgEditActive = false;
       app.tempGroupCnt  = 0;
-      app.tempGBlockCnt = 0
+      app.tempGBlockCnt = 0;
+
       // Reset the create template tool back to its default
       app.ct.resetCreateTempBlock();
       $('.empty-on-reset').empty();
@@ -208,7 +212,7 @@ $(document).ready(function(){
       $('.active-option').fadeOut(100, function(){
         $('.stepped-option').removeClass('active-option');
         $('.stepped-option[data-step=0]').addClass('active-option').fadeIn(100);
-      });
+      });      
     },
     resetCreateTempBlock: function(){
       console.log('Called');
@@ -294,7 +298,10 @@ $(document).ready(function(){
     setTemplateDetails: function(){
       var $orientationDetail = $('#template-orientation');
       // Set the template name
-      $('#template-name').text(app.templateName);
+      console.log(app.templateName);
+      // When validation is enabled, the below line can be uncommented.
+      // $('#template-name').text(app.templateName);
+      $('#template-name').text( $('#new-template-name').val() );
 
       // Store the set document varaitions sizes to an array
       $('input[name=doc-size]').each(function() {
@@ -1167,10 +1174,11 @@ $(document).ready(function(){
     **/
     validateTemplateName: function(){
       app.$newTempBtn.removeAttr('disabled');
+      app.templateName = $.trim($(this).val());
       // var $this = $(this);
       // if($this.val().length > 2){
       //   app.$newTempBtn.removeAttr('disabled');
-      //   app.templateName = $.trim($this.val());
+      //   );
       // }else{
       //   app.$newTempBtn.attr('disabled', 'disabled');
       // }
@@ -1302,12 +1310,14 @@ $(document).ready(function(){
           app.templateId = null;
         } 
         // Create a preview image on the page of what is on the canvas
-        app.utils.generateCanvasPreviewImg(app._ct_canvas, 'ct');
+        app.utils.generateCanvasPreviewImg(app.$tmplToggleBtn,app._ct_canvas, 'ct');
         // Begin creating the templates' cooridnates/XML
         app.utils.generateCords( app.utils.generateJSON(app._ct_canvas) );
       }
     },
   };
 
-  app.ct.initCreateTemp();
+  if( $('[data-template=build-template]').length > 0 ){
+    app.ct.initCreateTemp();
+  }  
 });

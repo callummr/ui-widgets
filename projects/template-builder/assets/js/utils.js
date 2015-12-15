@@ -78,6 +78,10 @@ $(document).ready(function(){
 								},
 								{
 									ffname: 'FuturaBT-Heavy',
+									fftitle: 'Heavy'
+								},
+								{
+									ffname: 'Macmillan-Headline',
 									fftitle: 'Headline'
 								}
 							];
@@ -280,19 +284,21 @@ $(document).ready(function(){
 	      _canvas.deactivateAll().renderAll();
 	    },	    
 	    toggleCanvasGrid: function($el, toggle, _canvas){
-	      if($el.hasClass('grid-disabled')){
-	        $el.removeClass('grid-disabled');
-	        _canvas._objects[0]['visible'] = true;
-	      }else{
-	        $el.addClass('grid-disabled');
-	        _canvas._objects[0]['visible'] = false;
-	      }
+	    	console.log($el);
+		    if($el.hasClass('grid-disabled')){
+		        $el.removeClass('grid-disabled');
+		        _canvas._objects[0]['visible'] = true;
+		    } else{
+		    	$el.addClass('grid-disabled');
+		    	_canvas._objects[0]['visible'] = false;
+		    }
+
 
 	      // Show the grid, after saving the image and generating PDF
-	      if(toggle === true){
-	        _canvas._objects[0]['visible'] = true;
-	      }
-	      _canvas.renderAll();
+	      	if(toggle === true){
+	        	_canvas._objects[0]['visible'] = true;
+	      	}
+	      	_canvas.renderAll();
 	    },
 	    setCanvasSettings: function(docWidth, docHeight){
 	    	var settings = {};
@@ -728,7 +734,7 @@ $(document).ready(function(){
 		            	spacing: updatedVal
 		            }
 		            break;
-		        case 'ib':
+		        case 'bi':
 		            return {
 		            	imgSrc: updatedVal
 		            }
@@ -1146,17 +1152,39 @@ $(document).ready(function(){
 	      // Function receives the generated XML from what has been created on the canvas
 	      // Then POST's that data to the backend to create a new template
 	      console.log(xml);
-	      console.log({tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions, id: app.templateId});
+	      // Template name can not be null/empty.
+	      app.templateName = app.templateName || 'Template Name Not Set';
+	      // console.log({tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions, id: app.templateId});
 	      $.ajax({
 	            url: '/be/api/PDF/Template.ashx',
 	            type: 'POST',
 	            dataType: 'json',
 	            data: {tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions, id: app.templateId},
 	            success: function (data) {
-	                alert('Template Created. Please click "Add product" to use this template');
+	            	alert('Template Created. Please click "Add product" to use this template');
+	            	// Reset the template creation tool
+	            	if(app.isCreateTemplate){
+	            		app.ct.resetTemplate();
+	            		// After creating a template, empty the template list... then re-load the template list.
+					    $('#dynamic-templates').empty();
+					    app.ct.loadTempList();
+	            	}	                
 	            },
 	            error: function(data){
-	              console.log(data);
+	            	// This check is added because request is being successful, but triggering error state.
+	            	if(data.status === 200){
+	            		alert('Template Created. Please click "Add product" to use this template');
+	            		// Reset the template creation tool
+		            	if(app.isCreateTemplate){
+		            		app.ct.resetTemplate();
+		            		// After creating a template, empty the template list... then re-load the template list.
+					    	$('#dynamic-templates').empty();
+					    	app.ct.loadTempList()
+		            	}		                
+	            	} else{
+	            		alert('Template Creation failed');
+	            		console.log(data);
+	            	}	            	
 	            }
 	        });
 	    },
@@ -1210,9 +1238,10 @@ $(document).ready(function(){
 	      app.imagedata = _canvas.toDataURL('image/png');
 	      // console.log(app.imagedata);
 	      $el[0].href = app.imagedata;
+	      console.log('Called from covertCanvasToImgDownload');
 	      app.utils.toggleCanvasGrid($el, true, _canvas);
 	    },
-	    generateCanvasPreviewImg: function(_canvas, prefix){
+	    generateCanvasPreviewImg: function($el,_canvas, prefix){
 	    	// @ _canvas = farbic canvas object | {}
 	    	// @ prefix  = prefix for the hidden canvas | string
 
@@ -1226,7 +1255,7 @@ $(document).ready(function(){
 	        // Save the image data so this can be used later when saving the image for the template
 	        app.imagedata = _canvas.toDataURL('image/png');
 	        // Enable the grid again
-	        app.utils.toggleCanvasGrid(app.$tmplToggleBtn, true, _canvas);
+	        app.utils.toggleCanvasGrid($el, true, _canvas);
 	    }
 	};
 })

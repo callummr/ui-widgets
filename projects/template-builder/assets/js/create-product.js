@@ -37,7 +37,7 @@ $(document).ready(function(){
 				// 	$('.product-container').addClass('col-md-9').find('[data-template=build-product]').removeClass('container');
 				// 	$('.product-asset-lib-container').addClass('col-md-3').removeClass('hidden');
 				// }
-			}else{
+			} else{
 				console.log('XML is not empty');
 				// Set the type of operation that is taking place
 				app.isUpdateProduct = true;
@@ -256,8 +256,11 @@ $(document).ready(function(){
 
 	    	// Filter all canvas objects except the grid which is the first object
 	    	// app.utils.createFilteredCanvasObjects();
-	    		
+	    	
+	    	// Reformat text blocks that are inside a text block group, so they do not exceed the boundaries of its parent	
 	    	app.cp.reformatTextBlockGroups();
+	    	// Create a list of assets for each image block
+	        app.cp.createImageBlockAssetList();
 	    	// app.cp.setActiveBlock();
 	    	// console.log(app._cp_canvas);
 	    },
@@ -265,7 +268,8 @@ $(document).ready(function(){
 	    // HTML BLOCKS
 	    createImageBlockSettings: function(imgBlock){
 	    	var imgBlockString = '',
-	    		blockId		   = imgBlock._id.replace(' ', '');
+	    		blockId		   = imgBlock._id.replace(/ /g, '');
+	    	// console.log(blockId);
 	    	// console.log(imgBlock);
 	    	imgBlockString+= '<li class="clearfix list-group-item" data-prodblockid="' + blockId + '" data-block-type="block-item">';
 	    		imgBlockString+= '<button type="button" class="btn btn-info pull-top-right" data-action="toggle-product-block">X</button>';
@@ -294,7 +298,7 @@ $(document).ready(function(){
 	    createTextBlockGroupBlockSettings: function(tbgBlock){
 	    	// console.log(tbgBlock);
 	    	var tbgBlockString = '',
-	    		blockId 	   = tbgBlock._id.replace(' ', '');
+	    		blockId 	   = tbgBlock._id.replace(/ /g, '');
 
 	    	tbgBlockString+= '<li class="clearfix list-group-item" data-prodblockid="' + blockId + '" data-block-type="text-block-group-item">';
 	    		tbgBlockString+= '<button type="button" class="btn btn-info pull-top-right" data-action="toggle-product-block">X</button>';
@@ -322,7 +326,7 @@ $(document).ready(function(){
 	    },
 	    createTextBlockBlockSettings: function(tBlock, fromTbg){
 	    	var tBlockString = '',
-	    		blockId 	 = tBlock._id.replace(' ', '');
+	    		blockId 	 = tBlock._id.replace(/ /g, '');
 
 	    	if(fromTbg === false){
 	    		tBlockString+= '<li class="clearfix list-group-item" data-prodblockid="' + blockId + '" data-block-type="text-block-item">';
@@ -560,9 +564,9 @@ $(document).ready(function(){
 		              innerBlockSettings.textVal = block.__text;
 		            }
 		            // console.log(innerBlockSettings);
-		            app.cp.createProductTextBlock(innerBlockSettings);
+		            app.cp.createProductTextBlock(innerBlockSettings);		            
 				}
-	        }
+	        }	        
 	        // console.log(blockSettings);
 	    },
 	    createProductImageBlock: function(blockSettings){
@@ -587,8 +591,8 @@ $(document).ready(function(){
 		    _block['isEditable']    = blockSettings.isEditable; 
 		    _block['isManditory']   = blockSettings.isManditory;  
 		    _block['imgSrc']   		= blockSettings.imgSrc;  
-		    // _block['parentId']      = blockSettings.parentId;
-		    _block['id']      		= blockSettings.id;
+		    // _block['parentId']      = blockSettings.parentId.replace(/ /g, '');
+		    _block['id']      		= blockSettings.id.replace(/ /g, '');
 		    _block['valign']        = blockSettings.valign;
 
 		    if(_block.imgSrc !== null){
@@ -664,7 +668,7 @@ $(document).ready(function(){
 			_formattedBlock['halign']        = cTBSettings.halign;
 			_formattedBlock['isEditable']    = cTBSettings.isEditable; 
 			_formattedBlock['isManditory']   = cTBSettings.isManditory;			
-			_formattedBlock['id']      		 = cTBSettings.id;
+			_formattedBlock['id']      		 = cTBSettings.id.replace(/ /g, ''),
 			_formattedBlock['valign']        = cTBSettings.valign;
 
 			_formattedBlock['origWidth']	= cTBSettings.width,
@@ -680,7 +684,7 @@ $(document).ready(function(){
 
 			if(typeof(cTBSettings.parentId) !== 'undefined'){
 				// console.log(cTBSettings.parentHeight, cTBSettings.parentWidth)
-				_formattedBlock['parentId'] = cTBSettings.parentId;
+				_formattedBlock['parentId'] = cTBSettings.parentId.replace(/ /g, ''),
 				_formattedBlock['parentTitle'] = cTBSettings.parentTitle;
 				_formattedBlock['parentEditable'] = cTBSettings.parentEditable;
 				_formattedBlock['parentManditory'] = cTBSettings.parentManditory;
@@ -761,6 +765,7 @@ $(document).ready(function(){
 		    		}
 		    	});
 		    }
+		    console.log(app._cp_canvas);
 		    console.log(app._activeEditEl);
 	    },
 	    setBlockControlTextarea:function(activeObj){
@@ -788,9 +793,9 @@ $(document).ready(function(){
 	    	// Returns an object to that sets the correct property with the new value
 	    	var objSetting = app.utils.selectCanvasPropertyToEdit($this);	    	
 		    // Updated the selected objects relevant properties
-		    console.log(app._activeEditEl);
+		    //console.log(app._activeEditEl);
 	    	app._activeEditEl.set(objSetting);
-	    	console.log(app._activeEditEl);
+	    	//console.log(app._activeEditEl);
 	    	// Re-Render the canvas to show the update
 	    	app._cp_canvas.renderAll();
 	    },
@@ -807,6 +812,8 @@ $(document).ready(function(){
 	    	// Get the canvas object id from the relevant block
 	    	var canvasObjId = $el.data('blockid'),
 	    		imgURL		= $el.data('img-url');
+
+	    	//console.log(canvasObjId, imgURL);
 
 	    	// Sets the relevant canvas object to active state
 	    	app.cp.setActiveCanvasObj(canvasObjId);
@@ -883,7 +890,7 @@ $(document).ready(function(){
 	    	app.$blockAssetLibrary.removeClass('hidden');
 	    	$('#asset-lib-item-list').removeClass('hidden');  	
 	    	// Update the active block id to the block that is being edited
-	    	app.activeImageBlockId = $(this).data('id');
+	    	app.activeImageBlockId = $(this).data('id').replace(/ /g, '');
 	    	// Set the id on the save asset button, to the block id that is being edited.
 	    	app.$saveBlockAssetBtn.data('boundblockid', app.activeImageBlockId);
 	    },
@@ -992,15 +999,15 @@ $(document).ready(function(){
 	    	// Iterate over all image blocks
 	    	$('[data-block-type=block-item]').each(function(){
 	    		var blockAssetData = {
-	    			BlockId: $(this).data('prodblockid'),
+	    			BlockId: String($(this).data('prodblockid')).replace(/\D/g, ''), // Replace all non-digits
 	    			Assets: []
 	    		};
 	    		// Within each image block, find the blocks' list of assets
 	    		$(this).find('.block-asset-item-list-wrapper input[name^=asset-default-block]').each(function(){
 	    			var $this 	  = $(this),
 	    				assetData = {
-		    				AssetId: $this.data('assetid'),
-							Def: $this.is(':checked') ? 1 : 0
+		    				AssetId: String($this.data('assetid')).replace(/\D/g, ''), // Replace all non-digits,
+							Def: $this.is(':checked') ? 1 : 0 // Return 1 if the image has been selected as a default
 		    			};
 		    		// console.log(assetData);
 	    			blockAssetData.Assets.push(assetData)
@@ -1008,8 +1015,52 @@ $(document).ready(function(){
 	    		// console.log(blockAssetData)
 	    		blockJSON.push(blockAssetData);
 	    	});
+	    	console.log(blockJSON);
 	    	// Update the hidden field so the backend can use this data when the form is posted
-	    	$('#pdfItemAdmin1_hdnBlockAssets').val(JSON.stringify(blockJSON));
+	    	app.$blockAssetsJSONel.val(JSON.stringify(blockJSON));
+	    },
+	    createImageBlockAssetList: function(){
+	    	// Check if there is any assetBlock JSON
+	    	var blockAssetJSON = JSON.stringify(app.$blockAssetsJSONel.val());
+	    	console.log(blockAssetJSON, blockAssetJSON !== '[]');
+	    	if(blockAssetJSON !== '[]'){
+	    		blockAssetJSON = JSON.parse(app.$blockAssetsJSONel.val());
+	    		$('[data-block-type=block-item]').each(function(i){
+	    			var $this 		  = $(this),
+	    				blockId 	  = $this.data('prodblockid'),
+	    				assetListItem = '';
+
+	    			// Add a list item, for each asset in the block's asset
+	    			// Check if the array has multiple items.
+	    			console.log(typeof(blockAssetJSON[i]) !== 'undefined' && typeof(blockAssetJSON[i].Assets.length) !== 'undefined');
+
+	    			if(typeof(blockAssetJSON[i]) !== 'undefined' && typeof(blockAssetJSON[i].Assets.length) !== 'undefined'){	    				 
+	    				blockAssetJSON[i].Assets.forEach(function(asset){
+	    					// 0 = The asset is not the default. 1 = 
+	    					var isChecked = asset.Def === 0 ? '' : 'checked',
+	    						assetId   = asset.AssetId,
+	    						imgURL;
+	    					// Change img path based on enviornment
+	    					if(app.isLocalEnv){
+	    						imgURL = 'assets/img/demo-thumbs/' + assetId + '.jpg';
+	    					} else{
+	    						// This needs updating
+	    						imgURL = 'assets/img/demo-thumbs/' + assetId + '.jpg';
+	    					}
+	    					// Create an asset list item and append to the assetListItem string.
+	    					assetListItem+= app.cp.createBlockImgAssetItem(assetId, blockId, isChecked, imgURL);
+	    				});
+	    			} else{
+	    				console.log('Other Scenerio to do...')
+	    				// assetListItem = app.cp.createBlockImgAssetItem();
+	    			}
+
+	    			console.log(assetListItem);				
+
+	    			// After the HTML has been appended, show the list. By default it is hidden
+	    			$this.find('.block-asset-item-list').removeClass('hidden').append(assetListItem);
+	    		});
+	    	}	    	
 	    },
 
 
@@ -1023,7 +1074,7 @@ $(document).ready(function(){
 				productString += '<input type="radio" id="template' + product.ID +'" name="template-url" value="' + product.ID +'" class="template-selection hidden">';
 				productString += '<label for="template' + product.ID +'" class="thumbnail">';
 				 	productString += '<span class="template-name">' + product.Name + '</span>';
-				 	productString += '<img src="../templates/' + product.ID +'.jpg" alt="' + product.Name + '" class="">';
+				 	productString += '<img src="../templates/' + product.ID +'.jpg" alt="' + product.Name + '" />';
 				 	productString += '<button type="button" class="btn btn-primary step-option-btn" data-tempid="' + product.ID + '" data-action="load-from-product" data-step-action="forward">Use Product</button>';
 				productString += '</label>';          
 			productString += '</div>';
@@ -1050,7 +1101,7 @@ $(document).ready(function(){
     		if(typeof(tbBlocks.length) !== 'undefined'){
     			tbBlocks.forEach(function(tbBlock, i){
 	    			// console.log(tbBlock);
-	    			var blockId = tbBlock._id.replace(' ', '');
+	    			var blockId = tbBlock._id.replace(/ /g, '');
 	    			tbBlockList += '<li class="list-group-item" data-tbg-parent="tbg-' + id + '" id="tb-' + blockId +'">';
 	    				tbBlockList += tbBlock._title;
 	    				tbBlockList += '<button type="button" class="btn btn-sm btn-info pull-right" data-action="edit-text-block-defaults">Edit</button>';
@@ -1062,7 +1113,7 @@ $(document).ready(function(){
 		    		// console.log(tbBlockList);
 	    		});
     		}else{
-    			var blockId = tbBlocks._id.replace(' ', '');
+    			var blockId = tbBlocks._id.replace(/ /g, '');
     			tbBlockList += '<li class="list-group-item" data-tbg-parent="tbg-' + id + '" id="tb-' + blockId +'">';
     				tbBlockList += tbBlocks._title;
     				tbBlockList += '<button type="button" class="btn btn-sm btn-info pull-right" data-action="edit-text-block-defaults">Edit</button>';
@@ -1097,6 +1148,8 @@ $(document).ready(function(){
 	    createFontFaceSetting: function(id, fface){
 	    	var fontFaceString = '',
 	    		blockFFace	   = typeof(fface) !== 'undefined' ? fface : 'FuturaBT-Book' ;
+
+	    	blockFFace = blockFFace.replace(' ', '-'); // The macmillan headline font contains a space that needs to be removed
 
 		  	fontFaceString+= '<h3 class="block-item-heading">Font Face</h3>';
 			app.fontFaces.forEach(function(font){
@@ -1291,21 +1344,20 @@ $(document).ready(function(){
 	    createBlockImgAssetItem: function(assetId, blockId, isChecked, imgUrl){
 	    	// This function creates a unordered list, that contains the block's image options
 	    	var assetItemString = '';
-	    	console.log(imgUrl)
-	    		// img-url'
+	    	// console.log(imgUrl)
 
 	        	assetItemString+= '<tr>';
 	        		assetItemString+= '<td>';
-	        			assetItemString+= '<button type="button" data-action="update-block-img-on-canvas"  data-blockid="' + blockId + '" ';
+	        			assetItemString+= '<button type="button" data-action="update-block-img-on-canvas" data-blockid="' + blockId + '" ';
 	        					assetItemString+= 'data-img-url="' + imgUrl + '" class="show-asset-on-canvas-btn">';
-	        				assetItemString+= '<img src="' + imgUrl + '" alt="image name" data-assetid="' + assetId + '" class="block-asset-thumb">';
+	        				assetItemString+= '<img src="' + imgUrl + '" alt="image name" data-assetid="' + assetId + '" class="block-asset-thumb" />';
 	        			assetItemString+= '</button>';
 	        		assetItemString+= '</td>';
 	        		assetItemString+= '<td>';
 	        			assetItemString+= '<input type="radio" '+ isChecked +' data-action="update-canvas-control" ';
 	        				   assetItemString+= 'data-canvas-setting-type="bi" data-assetid="' + assetId + '" ';
-	        			       assetItemString+= 'value="assets/img/demo-thumbs/' + assetId + '.jpg" name="asset-default-block_' + blockId + '" ';
-	        			       assetItemString+= 'id="block_' + blockId + '_asset_' + assetId + ' ">';
+	        			       assetItemString+= 'value="' + imgUrl +'" name="asset-default-block_' + blockId + '" ';
+	        			       assetItemString+= 'id="block_' + blockId + '_asset_' + assetId + '">';
 	        			assetItemString+= '<label for="block_' + blockId + '_asset_' + assetId + '">image name</label>';
 	        		assetItemString+= '</td>';
 	        		assetItemString+= '<td>';
@@ -1340,6 +1392,18 @@ $(document).ready(function(){
 	    	// After finishing editing a canvas objects's text, handle that event
 	    	$body.on('blur', '[data-action=update-block-text]', app.cp.textareaBlurHandler);
 
+	    	// Listens for change and click events, and then updates the active canvas object with the new value
+	    	$body.on('change keyup', '[data-action=update-canvas-control]', app.cp.updateCanvasObjSetting);
+
+	    	app.$productToggleBtn = $('.product-container [data-action=toggle-grid]');	    	
+      		app.$productToggleBtn.on('click', function(){
+	        	app.utils.toggleCanvasGrid($(this), false, app._cp_canvas);
+	     	});
+	     	// Downloads an image of what is on the canvas 
+      		$('.product-container [data-action=download-thumbnail]').on('click', function(){
+      			app.utils.covertCanvasToImgDownload($(this), app._cp_canvas);
+      		});
+
 	    	// PRODUCT CREATION TOOLS
 	    	// Saves a new product's XML
 	    	$('[data-action=save-product]').on('click', function(){
@@ -1350,20 +1414,9 @@ $(document).ready(function(){
 	    		// Generate the Canvas's JSON and then group any text block groups into groups.
 	    		var _flattenedCanvasData = app.utils.generateFlattendedJSON(app.utils.generateJSON(app._cp_canvas));
 	    		// Create a preview image on the page of what is on the canvas
-	    		app.utils.generateCanvasPreviewImg(app._cp_canvas, 'cp');
+	    		app.utils.generateCanvasPreviewImg(app.$productToggleBtn, app._cp_canvas, 'cp');
 	    		app.utils.generateCords(_flattenedCanvasData);
-	    	});
-	    	// Listens for change and click events, and then updates the active canvas object with the new value
-	    	$body.on('change keyup', '[data-action=update-canvas-control]', app.cp.updateCanvasObjSetting);
-
-	    	var $productToggleBtn = $('.product-container [data-action=toggle-grid]');	    	
-      		$productToggleBtn.on('click', function(){
-	        	app.utils.toggleCanvasGrid($(this), false, app._cp_canvas);
-	     	});
-	     	// Downloads an image of what is on the canvas 
-      		$('.product-container [data-action=download-thumbnail]').on('click', function(){
-      			app.utils.covertCanvasToImgDownload($(this), app._cp_canvas);
-      		});
+	    	});	    	
 
       		// Initiate the usage of the asset Library
       		$body.on('click', '[data-action=add-images-to-block]', app.cp.initAssetLibrary);
@@ -1408,5 +1461,8 @@ $(document).ready(function(){
     		// app.utils.createFilteredCanvasObjects();
 	    }
 	};
-	app.cp.initCreateProduct();
+
+	if( $('[data-template=build-product]').length > 0 ){
+		app.cp.initCreateProduct();
+	}	
 });

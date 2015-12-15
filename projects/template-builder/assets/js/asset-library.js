@@ -1,6 +1,35 @@
 var app = app || {};
 $(document).ready(function () {
 
+    app.al = {
+        initAssetLibrary: function(){
+            app.al.bindAssetLibraryDOMEvents();
+        },
+
+        /**
+            DOM MANIPULATION
+        **/
+        toggleAssetLibFeatures: function(){
+            var $this      =  $(this),
+                targetElId = $this.data('targetid');
+
+            $('[data-id=' + targetElId + ']').removeClass('hidden').siblings('div').addClass('hidden');
+        },
+
+
+        /**
+            UI HANDLERS
+        **/
+        bindAssetLibraryDOMEvents: function(){
+            $('[data-action=toggle-asset-lib-functions]').on('click', app.al.toggleAssetLibFeatures);
+        }
+
+    };
+
+    // Refactor the code below and add it to the app.ap object.
+
+    app.al.initAssetLibrary();
+
     var BaseUrl = "http://ssodev-be.macmillan.org.uk/be/api/pdf/";
 
     //***************     ASSET CREATE  ***************************
