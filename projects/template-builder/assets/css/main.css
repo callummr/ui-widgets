@@ -50,6 +50,9 @@
 
 
 /* Create Product Styles */
+.save-product-btn{
+	margin-right: 20px;
+}
 .show-border-when-selected:checked + label{
 	border: solid 1px #000;
 }

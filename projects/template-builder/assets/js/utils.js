@@ -284,7 +284,7 @@ $(document).ready(function(){
 	      _canvas.deactivateAll().renderAll();
 	    },	    
 	    toggleCanvasGrid: function($el, toggle, _canvas){
-	    	console.log($el);
+	    	// console.log($el);
 		    if($el.hasClass('grid-disabled')){
 		        $el.removeClass('grid-disabled');
 		        _canvas._objects[0]['visible'] = true;
@@ -1233,6 +1233,7 @@ $(document).ready(function(){
 
 	    },
 	    covertCanvasToImgDownload: function($el, _canvas){
+	    	console.log('Called');
 	      // Remove selected states and grid before saving img
 	      app.utils.cleanCanvas(_canvas);
 	      app.imagedata = _canvas.toDataURL('image/png');
@@ -1251,7 +1252,7 @@ $(document).ready(function(){
 	        // Create an image from the canvas and add it to the relevant div
 	        var imgElement = ReImg.fromCanvas($('#' + prefix +'_canvas')[0]).toImg(),
 	            $output    = $('#' + prefix +'_image');
-	        $output.html('').append(imgElement);
+	        $output.empty().append(imgElement);
 	        // Save the image data so this can be used later when saving the image for the template
 	        app.imagedata = _canvas.toDataURL('image/png');
 	        // Enable the grid again

@@ -130,7 +130,7 @@
 						     		</li>
 						     	</ul>
 						     	<hr>
-						     	<button type="button" class="btn btn-primary" data-action="save-block-assets" data-boundblockid="">Save Assets</button> 
+						     	<button type="button" class="btn btn-primary hidden" data-action="save-block-assets" data-boundblockid="">Save Assets</button> 
 						    </div>
 						</div>
 					</div>
@@ -157,10 +157,10 @@
 
 				<div class="col-md-7 stepped-option" data-step="1">
 					<button type="button" class="btn btn-default" data-action="toggle-grid" style="margin-right: 20px">Toggle Grid</button>
-					<button type="button" class="btn btn-info" data-action="save-product">Save Product</button>				
-					<a class="btn btn-warning" data-action="download-thumbnail" download="template-thumbnail.png">Download Thumbnail</a>				
+					<a class="btn btn-info save-product-btn" data-action="save-product" download>Save Product</button>				
+					<a class="btn btn-warning" data-action="download-thumbnail" download>Download Thumbnail</a>				
 					<hr>
-					<label for="non-variant"><input type="checkbox" id="non-variant" checked>Non varient</label>
+					<label for="save-as-new-template"><input type="checkbox" id="save-as-new-template">Save as a new template?</label>
 					<hr>
 					<!-- Size of canvas is relative to A4: 210mm x 297mm (px > mm = 0.376065) -->
 					<!-- Canvas is half than pixel to mm -->
