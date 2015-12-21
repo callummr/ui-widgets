@@ -120,7 +120,7 @@ $(document).ready(function(){
 		app.dummyText = $.get('assets/data/dummy-text.txt', function(data){return data}, 'text');
 		app.templateDatURL = 'assets/data/data.templates.txt';
 	}else{
-		app.dummyText = $.get('../assets/data/dummy-text.txt', function(data){return data}, 'text');
+		app.dummyText = $.get('/be/assets/data/dummy-text.txt', function(data){return data}, 'text');
 		app.templateDatURL = '/be/api/PDF/Template.ashx';
 	}
 
@@ -1125,36 +1125,37 @@ $(document).ready(function(){
 	    generateXML: function(cordData){
 	      var x2js      = new X2JS(),
 	          xmlOutput = x2js.json2xml_str(cordData);
-	      // Need to update the object names so they dont contain the _[number] prefix so the XML is correct
-	      xmlOutput = xmlOutput.replace(/text-block-group_[0-9][0-9]?/g, 'text-block-group');
-	      xmlOutput = xmlOutput.replace(/text-block_[0-9][0-9]?/g, 'text-block');
-	      xmlOutput = xmlOutput.replace(/image_[0-9][0-9]?/g, 'image');
+	      	// Need to update the object names so they dont contain the _[number] prefix so the XML is correct
+	      	xmlOutput = xmlOutput.replace(/text-block-group_[0-9][0-9]?/g, 'text-block-group');
+	      	xmlOutput = xmlOutput.replace(/text-block_[0-9][0-9]?/g, 'text-block');
+	     	 xmlOutput = xmlOutput.replace(/image_[0-9][0-9]?/g, 'image');
 
-	      // Update the hidden field with the generated XML
-	      $('#pdfItemAdmin1_hdnXML').val(xmlOutput);
+	      	// Update the hidden field with the generated XML
+	      	$('#pdfItemAdmin1_hdnXML').val(xmlOutput);
 
-	      // console.log(app.templateId);
-	      if(app.isLocalEnv){
-	        console.log(xmlOutput);
-	      }else{
+	      	// console.log(app.templateId);
+	      	console.log(xmlOutput);
 
-	      	if(app.isCreateTemplate){
-	      		app.utils.createTemplate(xmlOutput);
-	      	} else if(app.isCreateProduct || app.isUpdateProduct){
-	      		// Make sure a hidden checkbox is checked as the BE needs to know this.
-	      		$('#pdfItemAdmin1_chkIsPDF').prop('checked', true);
-	      		// Mimic a click on the storefront button that updates/creates a product
-	      		$('#btnSubmit').click();
-	      	}	        
-	      }      
+	      	if(!app.isLocalEnv){
+		      	if(app.isCreateTemplate){
+		      		// Create a new template
+		      		app.utils.createTemplate(xmlOutput);
+		      	} else if(app.isCreateProduct || app.isUpdateProduct){
+		      		// Make sure a hidden checkbox is checked as the BE needs to know this.
+		      		$('#pdfItemAdmin1_chkIsPDF').prop('checked', true);		
+		      		      		
+		      		// Mimic a click on the storefront button that updates/creates a product
+		      		$('#btnSubmit').click();	       
+		        }  
+	      	}    
 	    },
 	    createTemplate: function(xml) {
 	      // Function receives the generated XML from what has been created on the canvas
 	      // Then POST's that data to the backend to create a new template
-	      console.log(xml);
+	      // console.log(xml);
 	      // Template name can not be null/empty.
 	      app.templateName = app.templateName || 'Template Name Not Set';
-	      // console.log({tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions, id: app.templateId});
+	      console.log({tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions, id: app.templateId});
 	      $.ajax({
 	            url: '/be/api/PDF/Template.ashx',
 	            type: 'POST',
@@ -1233,13 +1234,11 @@ $(document).ready(function(){
 
 	    },
 	    covertCanvasToImgDownload: function($el, _canvas){
-	    	console.log('Called');
 	      // Remove selected states and grid before saving img
 	      app.utils.cleanCanvas(_canvas);
 	      app.imagedata = _canvas.toDataURL('image/png');
 	      // console.log(app.imagedata);
 	      $el[0].href = app.imagedata;
-	      console.log('Called from covertCanvasToImgDownload');
 	      app.utils.toggleCanvasGrid($el, true, _canvas);
 	    },
 	    generateCanvasPreviewImg: function($el,_canvas, prefix){

@@ -9,10 +9,13 @@ $(document).ready(function () {
     app._activeEditEl = null;
     app.activeImageBlockId;
 
-    app.$productBlockList = $('#product-blocks-list');
-    app.$blockAssetLibrary = $('#block-asset-lib');
-    app.$saveBlockAssetBtn = $('[data-action=save-block-assets]');
-    app.$blockAssetsJSONel = $('#pdfItemAdmin1_hdnBlockAssets');
+    app.$productBlockList 	  = $('#product-blocks-list');
+    app.$blockAssetLibrary 	  = $('#block-asset-lib');
+    app.$saveBlockAssetBtn 	  = $('[data-action=save-block-assets]');
+    app.$blockAssetsJSONel 	  = $('#pdfItemAdmin1_hdnBlockAssets');
+    app.$hiddenAssetId	   	  = $('#pdfItemAdmin1_hdnTemplateId');    
+    app.$hiddenDimensions     = $('#pdfItemAdmin1_hdnTemplateDimensions');
+    app.$hiddenTemplateName   = $('#pdfItemAdmin1_hdnTemplateName');
 
     app.cp = {
         /**
@@ -21,10 +24,19 @@ $(document).ready(function () {
         initCreateProduct: function () {
             // Check if the user is creating a new product from a template, or updating a product.
             // If a user is updating then the hdnXML field will not be empty
-            // console.log($('#hdnXML').val().length > 0, $('#pdfItemAdmin1_hdnXML').val().length > 0, app.isLocalEnv, !app.isLocalEnv);
             var $hiddenXmlEl = $('#pdfItemAdmin1_hdnXML');
-            // console.log( $hiddenXmlEl.val() );
-            // console.log( $hiddenXmlEl.val() === '', typeof($hiddenXmlEl) === 'undefined' );
+
+            // Set templateID of the loaded templates ID
+            app.templateId = app.$hiddenAssetId.val() || '';
+
+            // Set the name of the h1 so the user knows what product they are editing
+            var productName = $('#txtName').val() || 'Product';
+            $('#product-name').text('Editing Product :: ' + productName );
+
+            // Set the template name
+            var fromtemplateName = app.$hiddenTemplateName.val();
+            $('#from-template-name').text(fromtemplateName + ' (id: ' + app.templateId + ') ');
+            
             if ($hiddenXmlEl.val() === '' || typeof ($hiddenXmlEl) === 'undefined') {
                 console.log('Empty XML');
                 // Set the type of operation that is taking place
@@ -32,13 +44,9 @@ $(document).ready(function () {
                 app.isUpdateProduct = false;
                 // Show a user a list of templates to select from.
                 app.cp.loadProductList();
-                // This is a temporary UI change
-                // if(!app.isLocalEnv){
-                // 	$('.product-container').addClass('col-md-9').find('[data-template=build-product]').removeClass('container');
-                // 	$('.product-asset-lib-container').addClass('col-md-3').removeClass('hidden');
-                // }
-            } else {
-                console.log('XML is not empty');
+            } else{
+                console.log('XML is not empty');                
+
                 // Set the type of operation that is taking place
                 app.isUpdateProduct = true;
                 app.isCreateProduct = false;
@@ -53,16 +61,11 @@ $(document).ready(function () {
                 $('[data-step="1"]').fadeIn(100, function () {
                     $(this).addClass('active-option');
                 })
-                // Set templateID to the loaded templates ID
-                app.templateId = $('#pdfItemAdmin1_hdnTemplateId');
-                // $('#pdfItemAdmin1_hdnTemplateId').val(app.templateId); // NEED TO ADD THE NAME
-                // app.docDimesions = productData[0].Dimensions.replace(' ', '').split(','); // NEED TO ADD THE DIMENSIONS
-                app.docDimesions = ['A4'];
-                $('#template-size-options')
-                // Set the dimensions of the template
-                // $('#template-size-options').text(app.docDimesions.join(',')); // NEED TO ADD THE NAME OF THE SITES
-                // Set the name of the template so the user can see once in the edit modes
-                // $('#template-name').text($this.next().find('.template-name').text()); // NEED TO SET THE NAME
+                // Create an array containing the products available dimensions.
+                app.docDimesions = app.$hiddenDimensions.val().split(',');
+
+                // Set the products available dimensions
+			    app.cp.setProductDimensions();
 
                 // Create the Canvas Element based of JSON created from the XML				
                 app.cp.loadProductFromJSON(productJSON);
@@ -137,7 +140,7 @@ $(document).ready(function () {
             app.templateId = $this.data('tempid');
 
             // Set templateID hidden field to the loaded templates ID.
-            $('#pdfItemAdmin1_hdnTemplateId').val(app.templateId);
+            app.$hiddenAssetId.val(app.templateId);
 
             if (app.isLocalEnv) {
                 ajaxUrl = 'assets/xml/' + app.templateId + '.xml';
@@ -156,28 +159,55 @@ $(document).ready(function () {
 			    if (app.isLocalEnv) {
 			        productData = data;
 			        productJSON = x2js.xml2json(productData);
-			        // app.docDimesions is set Locally as a dummy value in setCanvasSettings
+			        // Set the doc dimenions based of data attribte on $this
+			        app.docDimesions = ['Business Card'];
 			    } else {
 			        productData = JSON.parse(app.utils.filterResponse(data));
 			        productJSON = x2js.xml_str2json(productData[0].XML);
-			        app.docDimesions = productData[0].Dimensions.replace(' ', '').split(',');
+			        app.docDimesions = productData[0].Dimensions.replace(' ', '').split(',');			        
 			    }
+			    // Set the products available dimensions
+			    app.cp.setProductDimensions();
+
 			    // Set the dimensions of the template
 			    $('#template-size-options').text(app.docDimesions.join(','));
+
 			    // Set the name of the template so the user can see once in the edit modes
 			    $('#template-name').text($this.next().find('.template-name').text());
+
 			    // Create the Canvas Element based of JSON created from the XML
-			    app.cp.loadProductFromJSON(productJSON);
+			    app.cp.loadProductFromJSON(productJSON);			    
+
 			}).fail(function () {
 			    alert('Load product request failed');
 			});
         },
+        setProductDimensions: function(){
+        	console.log(app.docDimesions);
+			var patt = new RegExp('A[0-9]'),
+				res;
+        	// Handle business card options
+        	app.docDimesions.forEach(function(size){
+        		// Test for A-Something format doc size. If found remove the business card option.
+        		// Otherwise remove all of the A- options
+        		res = patt.test(size);
+        		if(res === true){
+        			// Remove the business type option as a user cannot change an A4 document into a business card
+        			$('.doc-size-business').parent().remove();
+        			$('input[value="' + size + '"]').prop('checked', true);
+        		} else{
+        			// Remove all A- options as a user cannot change an Business Card to an A- document
+        			$('input[id^=a]').parent().remove();
+        			$('input[value="' + size + '"]').prop('checked', true).attr('disabled', 'disabled');
+        		}
+        	});
+        },
         loadProductFromJSON: function (canvasData) {
             // console.log(canvasData);
             // console.log(canvasData.doc);
-            var canvasEl = document.createElement('canvas'),
-			  	docWidth = parseInt(canvasData.doc.page._width),
-			  	docHeight = parseInt(canvasData.doc.page._height),
+            var canvasEl 	   = document.createElement('canvas'),
+			  	docWidth 	   = parseInt(canvasData.doc.page._width),
+			  	docHeight 	   = parseInt(canvasData.doc.page._height),
 			  	canvasSettings = app.utils.setCanvasSettings(docWidth, docHeight);
 
             // Set the ID of the Canvas      
@@ -829,15 +859,6 @@ $(document).ready(function () {
             // Re-Render the canvas to show the update
             app._cp_canvas.renderAll();
         },
-        // toggleIsVarient: function () {
-        //     // Make all canvas objects selectable
-        //     app.filteredCanvasObjs.forEach(function (block) {
-        //         block.set({ selectable: true });
-        //     });
-        //     // Remove the checkbox option
-        //     $(this).parent().next().remove().end()
-	    		 //   .remove();
-        // },
         removeProductBlock: function($el, isfromSingleBlock){
         	// This functions removes a UI element and the relevant object from the canvas
         	var id 				= $el.data('id'),
@@ -908,7 +929,34 @@ $(document).ready(function () {
         		// Removes the block from the DOM
         		$this.parent().remove();
         },
-        
+        isCreateNewTemplateRequired: function(){
+        	// Check whether to create new template when creating a product
+      		if($('#save-as-new-template').is(':checked')){
+      			// Update the template name by getting the user to type in to a prompt
+      			var tName = prompt("Please enter a name for the new template you are creating.");
+      			// Set the template name
+      			app.templateName = tName;
+      			app.$hiddenTemplateName.val(tName);
+
+      			// Clear the template ID and hidden field
+      			app.templateId = '';
+      			app.$hiddenAssetId.val('');
+
+      			// Set the dimensions
+      			var dimensionsString = '';
+      			$('input[name=doc-size]').each(function(){
+      				var $this = $(this)
+      				if($this.is(':checked')){
+      					dimensionsString+= $this.val() + ',';
+      				}      				
+      			});
+      			// Remove the last comma from the string
+      			dimensionsString = dimensionsString.slice(0, -1);
+
+      			app.$hiddenDimensions.val(dimensionsString);
+      			console.log(app.$hiddenTemplateName.val(), app.$hiddenAssetId.val(), app.$hiddenDimensions.val());
+      		}
+        },
         bindCreateProductCanvasEvents: function () {
             // This event handles whether to enter edit mode or not
             app._cp_canvas.on('object:selected', function (e) {
@@ -1074,6 +1122,10 @@ $(document).ready(function () {
 
         createImageBlockAssetJSON: function () {
             var blockJSON = [];
+
+            // Remove the JSON that was previously in the field.
+            app.$blockAssetsJSONel.val('');
+
             // Iterate over all image blocks
             $('[data-block-type=block-item]').each(function () {
                 var blockAssetData = {
@@ -1513,9 +1565,18 @@ $(document).ready(function () {
             // Saves a new product's XML
             $('[data-action=save-product]').on('click', function () {
             	// // Download and image of the product
-            	app.utils.covertCanvasToImgDownload($(this), app._cp_canvas);
+            	var confirmDownloadImg = confirm('Would you like to save the product image?');
+            	if(confirmDownloadImg === true){
+            		app.utils.covertCanvasToImgDownload($(this), app._cp_canvas);	
+            	}
+            	// Slight bug with this.. if you click 'cancel' on the prompt it doesnt download a thumbnail
+            	// If you then click the button again and chose to download the image it works
+            	// If you were then to click save again and select 'cancel', it still downloads an image.
+
                 // Set what type of request this is. Required by the utils.generateXML
                 app.isCreateTemplate = false;
+                // Check if a new template needs to be created
+                app.cp.isCreateNewTemplateRequired();
                 // Create JSON for each image block
                 app.cp.createImageBlockAssetJSON();
                 // Generate the Canvas's JSON and then group any text block groups into groups.
@@ -1544,8 +1605,6 @@ $(document).ready(function () {
             });
 
             // UI CONTROLS
-            // Determines whether to create a new template/Sub template or not when creating a product
-            // $('#non-variant').on('click', app.cp.toggleIsVarient);
         },
         textareaBlurHandler: function () {
             // console.log(app._activeEditEl);
