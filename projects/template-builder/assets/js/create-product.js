@@ -390,7 +390,7 @@ _$(document).ready(function () {
 	                tBlockString += '<button type="button" class="btn btn-info pull-top-right" data-action="toggle-product-block">X</button>';
 	                // Need to hidden active class to button conditionally;
 	                tBlockString += '<div class="cp-block-container hidden">';
-            } else {
+            } else{
 	                tBlockString += '<div class="clearfix text-block-defaults-container" data-prodblockid="' + blockId + '">';
 	                tBlockString += '<h2 class="block-item-heading">' + tBlock._title + '</h2>';
             }
@@ -410,10 +410,14 @@ _$(document).ready(function () {
 	            // Lineheight Setting
 	            tBlockString += app.cp.createlineHeightSetting(blockId, tBlock._leading);
             tBlockString += '</div>';
-            tBlockString += '<div class="clearfix">';
-            // V Align & H Align Settings
-            tBlockString += app.cp.createAlignmentSettings(blockId, tBlock._align, tBlock.__verticalalign);
-            tBlockString += '</div>';
+            // Only include these options if the the block being created is not in a text block group
+            if(fromTbg === false){
+            	tBlockString += '<div class="clearfix">';
+		            // V Align & H Align Settings
+		            tBlockString += app.cp.createAlignmentSettings(blockId, tBlock._align, tBlock.__verticalalign);
+	            tBlockString += '</div>';
+            }
+            
             tBlockString += '<div class="clearfix">';
 	            // Editable & Manditory Settings
 	            tBlockString += app.cp.createUserSettings(blockId, tBlock._editable, tBlock._mandatory);
@@ -1030,8 +1034,6 @@ _$(document).ready(function () {
                 console.log('Clicked');
                 // Get the id of the selected element 
                 var _activeObj = app._cp_canvas.getActiveObject();
-                // console.log(_$('[data-prodblockid=' + _activeObj.parentId + ']').find('[data-action=toggle-product-block]'));
-                // console.log(_activeObj);
                 // Show the relevant blocks' settings that has been selected
                 // _$('[data-prodblockid=' + _activeObj.parentId + ']').find('[data-action=toggle-product-block]').click();
             });
@@ -1081,6 +1083,7 @@ _$(document).ready(function () {
             _$('#asset-lib-item-list').removeClass('hidden');
             // Update the active block id to the block that is being edited
             app.activeImageBlockId = _$(this).data('id').replace(/ /g, '');
+            console.log(app.activeImageBlockId);
             // Set the id on the save asset button, to the block id that is being edited.
             app._$saveBlockAssetBtn.data('boundblockid', app.activeImageBlockId);
         },
@@ -1100,33 +1103,41 @@ _$(document).ready(function () {
 
             _$checkedAssetsEls.each(function (i) {
                 // Get the ID of the Asset and IMG URL				
-                var _$this = _$(this),
+                var _$this  = _$(this),
 					assetId = _$this.val(),
-					imgURL = _$this.next().find('img').attr('src'),
+					imgUrl  = _$this.next().find('img').attr('src'),
+					blockId = _$this.attr('id').replace('block_', '').replace('/_asset_[0-9][0-9]?/g', ''),
 					isChecked;
+					
+				console.log(_$this.attr('id'), blockId);
 
                 // Check if this is the first asset to be added. If it is, then show the list
                 if (i === 0 && _$blockAssetTable.find('tr').length <= 0) {
                     _$blockAssetTable.removeClass('hidden');
                     isChecked = 'checked';
+
+                    // Set the canvas image to the new default
+                    app.cp.setActiveCanvasObj(blockId);
+	            	console.log(app._activeEditEl, blockId);
+	            	app.cp.setCanvasObjImage(imgUrl, app._activeEditEl.width, app._activeEditEl.height);
                 } else {
                     isChecked = '';
                 }
-                // console.log(_$blockAssetTable);
-                // console.log(_$blockAssetTable.find('img[data-assetid=' + assetId + ']'));
-                // console.log(_$blockAssetTable.find('img[data-assetid=' + assetId + ']').length);
+
                 // Check if the image asset already exists in the list. If it doesnt, then add it to the list
                 if (_$blockAssetTable.find('img[data-assetid=' + assetId + ']').length === 0) {
-                    assetList += app.cp.createBlockImgAssetItem(assetId, app.activeImageBlockId, isChecked, imgURL);
+                    assetList += app.cp.createBlockImgAssetItem(assetId, app.activeImageBlockId, isChecked, imgUrl);
                 }
             });
 
             // Add the items to the list
             _$blockAssetTable.append(assetList);
+
             // Update the UI and reset app.activeImageBlockId && the save buttons boundblockid
             app.cp.updateActiveAssetBlock();
         },
         updateActiveAssetBlock: function () {
+        	console.log('Called')
             // Change the UI to show the block being edited again.
             app._$productBlockList.removeClass('hidden');
             app._$blockAssetLibrary.addClass('hidden');
@@ -1134,7 +1145,6 @@ _$(document).ready(function () {
             if (app.isLocalEnv) {
                 _$('#asset-lib-item-list').addClass('hidden');
                 _$('[name=block-asset-item]').prop('checked', false);
-
             } else {
                 _$('#asset-lib-item-list').empty().addClass('hidden');
             }
@@ -1143,11 +1153,8 @@ _$(document).ready(function () {
             // Update the search fields so they are empty.
             _$('#txtSearchFilename, #txtSearchTags').val('');
 
-            // Update the search field controls
-            // TO DO
-            // Update the active block id to null
-            app.activeImageBlockId = '';
             // Remove the id on the save asset button
+            app.activeImageBlockId = '';            
             app._$saveBlockAssetBtn.data('boundblockid', app.activeImageBlockId);
         },
         removeAssetFromBlock: function (_$el) {
@@ -1721,6 +1728,7 @@ _$(document).ready(function () {
             });
             // Remove an asset from a block
             app._$body.on('click', '[data-action=remove-block-img]', function(e){
+            	alert('Clicked');
             	e.preventDefault();
             	app.cp.removeAssetFromBlock(_$(this));
             });

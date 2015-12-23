@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Create Product</title>
+	<!-- Load the webfonts before canvas -->
+	<style>
+		@font-face {
+		    font-family: 'Macmillan-Headline';
+		    src:url("assets/fonts/macmillan_headline_02_12-webfont.eot");
+		    src:url("assets/fonts/macmillan_headline_02_12-webfont.eot?#iefix") format("embedded-opentype"),
+		  	    url("assets/fonts/macmillan_headline_02_12-webfont.woff") format("woff"),
+		  	    url("assets/fonts/macmillan_headline_02_12-webfont.ttf") format("truetype"),
+		  	    url("assets/fonts/macmillan_headline_02_12-webfont.svg#macmillan_headlineregular") format("svg");
+		    font-weight: normal;
+		    font-style: normal;
+		}
+
+		@font-face{
+			font-family:"FuturaBT-Heavy";
+			src:url("assets/fonts/0084b2cc-4014-4723-9304-027c2d0086cd.eot?#iefix");
+			src:url("assets/fonts/0084b2cc-4014-4723-9304-027c2d0086cd.eot?#iefix") format("eot"),
+				url("assets/fonts/4603b58c-e92d-40e1-a670-1063cdca453b.woff") format("woff"),
+				url("assets/fonts/67b08d64-f836-4b99-ac05-4b1c2e05a949.ttf") format("truetype"),
+				url("assets/fonts/a5f12249-079e-42a0-95bc-27ad0164deb9.svg#a5f12249-079e-42a0-95bc-27ad0164deb9") format("svg");
+		}
+
+		@font-face{
+			font-family:"FuturaBT-Medium";
+			src:url("assets/fonts/7ed1bebb-81a9-4c57-9513-f0538c1b83fc.eot?#iefix");
+			src:url("assets/fonts/7ed1bebb-81a9-4c57-9513-f0538c1b83fc.eot?#iefix") format("eot"),
+				url("assets/fonts/ddc0f223-a296-451a-8681-ad80508eb419.woff") format("woff"),
+				url("assets/fonts/c18fc865-7a4e-45d9-bbb0-4e4553cc4136.ttf") format("truetype"),
+				url("assets/fonts/71710047-b807-47eb-9874-7db8f4904492.svg#71710047-b807-47eb-9874-7db8f4904492") format("svg");
+		}
+
+		@font-face{
+			font-family:"FuturaBT-Book";
+			src:url("assets/fonts/17fe4ab4-6e45-4ea2-bb53-2123063911c3.eot?#iefix");
+			src:url("assets/fonts/17fe4ab4-6e45-4ea2-bb53-2123063911c3.eot?#iefix") format("eot"),
+				url("assets/fonts/142b09e6-c245-4ff7-b01c-325fa824c99e.woff") format("woff"),
+				url("assets/fonts/e4509cd4-7aa0-4068-89bd-95ffd0bfb6d4.ttf") format("truetype"),
+				url("assets/fonts/d37fcd2f-d43f-4eae-b192-c48028c02797.svg#d37fcd2f-d43f-4eae-b192-c48028c02797") format("svg");
+		}
+	</style>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/css/main-user.css">
+</head>
+<body>
+	<!-- Only include these fields locally -->
+	<!-- <input type="hidden" id="pdfItemAdmin1_hdnXML"> -->
+	<input type="hidden" id="pdfItemAdmin1_hdnXML" value="<doc scalex='1' scaley='1' assetspath='C:\Projects\bemac_discovery\BeMacDiscovery\Assets\'><page width='148' height='105'><pdf align='left' editable='false' id='bglayer' lowerleftx='0' lowerlefty='0' orientate='north' title='background' upperrightx='148' upperrighty='105' verticalalign='top'/><text-block-group align='left' editable='True' id='Group0' lowerleftx='84.5' lowerlefty='28' mandatory='False' orientate='north' spacing='10' upperrightx='140.5' upperrighty='88.5' verticalalign='top' maxlen='150'><text-block editable='True' font-family='FuturaBT-Heavy' font-size='16' id='TextBlockG_0' leading='100%' mandatory='False' textmode='multiline' title='Title'>Name of Event</text-block><text-block editable='True' font-family='FuturaBT-Heavy' font-size='15' id='TextBlockG_1' leading='125%' mandatory='False' textmode='multiline' title='Medium Text'>20 Month 2013 11am to 4pm Name of venue&#x2F;location Street address, town, county</text-block><text-block editable='True' font-family='FuturaBT-Heavy' font-size='10' id='TextBlockG_2' leading='125%' mandatory='False' textmode='multiline' title='Small Text'>Please bring this ticket with you.</text-block></text-block-group><text-block align='left' editable='true' font-family='FuturaBT-Medium' font-size='7' id='TextBlock_1' leading='100%' lowerleftx='7.5' lowerlefty='5.5' mandatory='true' orientate='north' textmode='multiline' title='Terms and Conditions' upperrightx='138.5' upperrighty='10' verticalalign='bottom' source='C:\Projects\bemac_discovery\BeMacDiscovery\Assets\Terms.txt'/>
+	<image align='right' editable='true' fitmethod='auto' highresfilename='demo-800.jpg' id='L o g o 2' lowerleftx='7.5' lowerlefty='14' lowresfilename='demo-800.jpg' mandatory='true' orientate='north' title='Logo 1' upperrightx='140' upperrighty='31' verticalalign='bottom'/>
+	<image align='right' editable='true' fitmethod='auto' highresfilename='demo-800.jpg' id='Logo 3 1 ' lowerleftx='7.5' lowerlefty='20' lowresfilename='demo-800.jpg' mandatory='true' orientate='north' title='Logo 2' upperrightx='140' upperrighty='41' verticalalign='bottom'/></page></doc>">
+
+	<input type="hidden" id="pdfItemAdmin1_hdnTemplateId" value="1">
+	<label for="pdfItemAdmin1_chkIsPD" class="hidden">
+	    This checkbox could be hidden or not used at all, but we need some way of knowing that the user actually wanted to add a PDF and that is what this checkbox is currently used for...
+	    <input type="checkbox" id="pdfItemAdmin1_chkIsPDF">
+	</label>
+
+	<input type="hidden" name="pdfItemAdmin1$hdnBlockAssets" id="pdfItemAdmin1_hdnBlockAssets" value='[{"BlockId":15,"Assets":[{"AssetId":1,"Def":0},{"AssetId":2,"Def":1}]}, {"BlockId":12,"Assets":[{"AssetId":4,"Def":1},{"AssetId":3,"Def":0}]}]'>
+
+	<input type="hidden" id="pdfItemAdmin1_hdnTemplateName" value="Lifesaver poster">
+	<input type="hidden" id="pdfItemAdmin1_hdnTemplateDimensions" value="A3,A4,A5">
+
+	<!-- [{"BlockId":15,"Assets":[{"AssetId":30,"Def":0},{"AssetId":33,"Def":1}]}] -->
+	<!-- END -->
+
+	<div class="row product-container pdf-creator-upgrade">
+		<div class="container" data-template="build-product">			
+			<div class="stepped-option active-option" data-step="0">
+	      		<div class="hidden clearfix" id="dynamic-product-templates"></div>
+			</div>
+
+			<div class="stepped-option" data-step="1">
+				<h1><span id="product-name" class="block-item-heading">Create Product</span></h1>
+				<div class="alert alert-info">
+					<p>This product is using template <span id="from-template-name"></span></p>
+				</div>
+				<div class="col-md-5">
+					<!-- Asset Library for blocks -->
+
+					<div class="hidden" id="block-asset-lib">	
+						<h2>Assets Library</h2>
+
+						<button type="button" class="btn btn-info" data-targetid="asset-upload-container" data-action="toggle-asset-lib-functions">Upload new asset</button>
+						<button type="button" class="btn btn-info" data-targetid="asset-search-container" data-action="toggle-asset-lib-functions">Search Asset</button>
+					        
+					    <div class="hidden" data-id="asset-upload-container">
+					    	<!-- In the .net solution a form is loaded into this div -->
+					    	<div class="form-group">
+					        	<h3>Upload File</h3>
+					            <input type="file" name="file" id="btnFileUpload" />
+					        </div>
+
+					        <div class="form-group">
+					        	<h3>Add Tags:</h3>
+					        	<input type="text" id="txtTag" class="form-control" />
+					        </div>
+
+					        <div class="clearfix">
+					            <button type="button" id="btnSave" class="btn btn-info pull-right">Save</button>
+					         </div>
+					    </div>
+
+						<div data-id="asset-search-container">
+					        <h3>Search Assets</h3>
+
+						    <hr>
+						    <div class="form-group">
+						        <h4>File name:</h4>
+						        <input type="text" id="txtSearchFilename"  class="form-control"/>
+						    </div>
+						    <div class="form-group">
+						    	<h4>Tags:</h4>
+						        <input type="text" id="txtSearchTags"  class="form-control"/>
+						    </div>
+
+					        <div class="clearfix">
+					        	<button type="button" id="btnSearchAssets" class="btn btn-info pull-right">Search</button>
+					        </div>
+
+					        <hr>
+
+						    <div id="assetsFound">
+						     	<button type="button" class="btn btn-warning pull-top-right" data-action="close-asset-library">Close</button>   
+						     	<ul id="asset-lib-item-list" class="clearfix list-group">
+						     		<li class="list-group-item">
+						     			<input type="checkbox" name="block-asset-item" id="asset_1" class="hidden asset-lib-selection-checkbox" value="1"/>
+						     			<label for="asset_1" class="asset-lib-label">
+						     				<img src="assets/img/demo-thumbs/1.jpg" alt="Asset 1" class="asset-lib-thumb" />
+						     				<span class="asset-lib-item-name">Asset 1  Asset 1 Asset 1</span>					     				
+						     			</label>
+						     		</li>
+						     		<li class="list-group-item">
+						     			<input type="checkbox" name="block-asset-item" id="asset_2" class="hidden asset-lib-selection-checkbox" value="2" />
+						     			<label for="asset_2" class="asset-lib-label">
+						     				<img src="assets/img/demo-thumbs/2.jpg" alt="Asset 2" class="asset-lib-thumb" />
+						     				<span class="asset-lib-item-name">Asset 2</span>					     				
+						     			</label>
+						     		</li>
+						     		<li class="list-group-item">
+						     			<input type="checkbox" name="block-asset-item" id="asset_3" class="hidden asset-lib-selection-checkbox" value="3"/>
+						     			<label for="asset_3" class="asset-lib-label">					     				
+						     				<img src="assets/img/demo-thumbs/3.jpg" alt="Asset 3" class="asset-lib-thumb" />
+						     				<span class="asset-lib-item-name">Asset 3</span>
+						     			</label>
+						     		</li>
+						     		<li class="list-group-item">
+						     			<input type="checkbox" name="block-asset-item" id="asset_4" class="hidden asset-lib-selection-checkbox" value="4"/>
+						     			<label for="asset_4" class="asset-lib-label">					     				
+						     				<img src="assets/img/demo-thumbs/4.jpg" alt="Asset 4" class="asset-lib-thumb" />
+						     				<span class="asset-lib-item-name">Asset 4</span>
+						     			</label>
+						     		</li>
+
+						     		<li class="list-group-item">
+						     			<input type="checkbox" id="asset_4" class="hidden asset-lib-selection-checkbox" value="4"/>
+						     			<label for="asset_4" class="asset-lib-label">					     				
+						     				<img src="assets/img/demo-thumbs/4.jpg" alt="Asset 4" class="asset-lib-thumb" />
+						     				<span class="asset-lib-item-name">Asset 4</span>
+						     			</label>
+						     		</li>
+						     		<li class="list-group-item">
+						     			<input type="checkbox" id="asset_4" class="hidden asset-lib-selection-checkbox" value="4"/>
+						     			<label for="asset_4" class="asset-lib-label">					     				
+						     				<img src="assets/img/demo-thumbs/4.jpg" alt="Asset 4" class="asset-lib-thumb" />
+						     				<span class="asset-lib-item-name">Asset 4</span>
+						     			</label>
+						     		</li>
+						     		<li class="list-group-item">
+						     			<input type="checkbox" id="asset_4" class="hidden asset-lib-selection-checkbox" value="4"/>
+						     			<label for="asset_4" class="asset-lib-label">					     				
+						     				<img src="assets/img/demo-thumbs/4.jpg" alt="Asset 4" class="asset-lib-thumb" />
+						     				<span class="asset-lib-item-name">Asset 4</span>
+						     			</label>
+						     		</li>
+						     	</ul>
+						     	<hr>
+						     	<button type="button" class="btn btn-primary hidden" data-action="save-block-assets" data-boundblockid="">Save Assets</button> 
+						    </div>
+						</div>
+					</div>
+
+					<ul id="product-blocks-list" class="list-group"></ul>
+
+					<div class="image-preview">
+						<div id="cp_image"></div>
+					</div>					
+				</div>
+
+				<div class="col-md-5 hidden">
+					<button type="button" class="btn btn-info pull-right">Back</button>
+
+					<ul class="asset-library-list">
+						<input type="search" class="form-control" placeholder="Search...">
+						<li class="asset-library-item">
+							<span>Asset Name</span>
+							<img src="" alt="">
+							<input type="checkbox" name="asset-library-img" value="path/to/img.jpg">
+						</li>
+					</ul>					
+				</div>
+
+				<div class="col-md-7 stepped-option" data-step="1">
+					<button type="button" class="btn btn-default" data-action="toggle-grid" style="margin-right: 20px">Toggle Grid</button>
+					<a class="btn btn-info save-product-btn" data-action="save-product" download>Save Product</button>				
+					<a class="btn btn-warning" data-action="download-thumbnail" download>Download Thumbnail</a>	
+					<label for="save-as-new-template"><input type="checkbox" id="save-as-new-template">Save as a new template?</label>
+
+					<hr>
+					
+					<h3>Document sizes</h3>
+					<span class="input-group-addon">
+						<label class="badge" for="a2">A2</label>
+		            	<input type="checkbox" id="a2" name="doc-size" value="A2">
+		          	</span>
+					<span class="input-group-addon">
+						<label class="badge" for="a3">A3</label>
+		            	<input type="checkbox" id="a3" name="doc-size" value="A3">
+		          	</span>
+		          	<span class="input-group-addon">
+		          		<label class="badge" for="a4">A4</label>
+		            	<input type="checkbox" id="a4" name="doc-size" value="A4">
+		          	</span>
+		          	<span class="input-group-addon">
+		          		<label class="badge" for="a5">A5</label>
+		            	<input type="checkbox" id="a5" name="doc-size" value="A5">
+		          	</span>
+		          	<br>
+		          	<span class="input-group-addon">
+		          		<label class="badge" for="a6">A6</label>
+		            	<input type="checkbox" id="a6" name="doc-size" value="A6">
+		          	</span>
+		          	<span class="input-group-addon">
+		          		<label class="badge" for="a7">A7</label>
+		            	<input type="checkbox" id="a7" name="doc-size" value="A7">
+		          	</span>
+		          	<span class="input-group-addon">
+		          		<label class="badge" for="business">Business Card</label>
+		            	<input id="business" class="doc-size-business" type="checkbox" name="doc-size" value="Business Card">
+		          	</span>
+
+					<hr>
+					<!-- Size of canvas is relative to A4: 210mm x 297mm (px > mm = 0.376065) -->
+					<!-- Canvas is half than pixel to mm -->
+					<div class="alert alert-info">
+						<span class="badge"> Orientation: </span> <span id="template-orientation"></span> 
+					</div>
+
+					<div id="product-canvas-container"></div>
+					<!-- <canvas id="c" width="396.85" height="561.25"></canvas> -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="assets/js/libs/jquery-1.11.3.js"></script>
+	<script src="assets/js/libs/xml2json.js"></script>	
+	<script src="assets/js/libs/jquery.debounce-1.0.5.js"></script>
+
+	<script src="assets/js/utils.js"></script>
+	<script src="assets/js/user-landing.js"></script>
+</body>
+</html>

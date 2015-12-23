@@ -1,0 +1,169 @@
+[{
+	"ProductList": {
+		"Categories": {
+			"Fundrasing":{
+				"ProductType":{
+					"Flyers" : {
+						"Product1" : {
+							"name" : "Product1",
+							"id" : "1",
+							"imgUrl" : "path/to/img1.jpg",
+							"co-brandable" : "0"
+						},
+						"Product2" : {
+							"name" : "Product2",
+							"id" : "2",
+							"imgUrl" : "path/to/img2.jpg",
+							"co-brandable" : "1"
+						}
+					},
+					"Advert" : {
+						"Product3" : {
+							"name" : "Product3",
+							"id" : "3",
+							"imgUrl" : "path/to/img3.jpg",
+							"co-brandable" : "0"
+						}
+					},
+					"Business Card" : {
+						"Product4" : {
+							"name" : "Product4",
+							"id" : "4",
+							"imgUrl" : "path/to/img4.jpg",
+							"co-brandable" : "1"
+						},
+						"Product5" : {
+							"name" : "Product5",
+							"id" : "5",
+							"imgUrl" : "path/to/img5.jpg",
+							"co-brandable" : "1"
+						}
+					}
+				}
+			},
+			"Ideas of the month":{
+				"SubCategory" : {
+					"SubCategory1" : {
+						"ProductType": {
+							"Flyers" : {
+								"Product6" : {
+									"name" : "Product6",
+									"id" : "6",
+									"imgUrl" : "path/to/img6.jpg",
+									"co-brandable" : "0"
+								},
+								"Product7" : {
+									"name" : "Product7",
+									"id" : "7",
+									"imgUrl" : "path/to/img7.jpg",
+									"co-brandable" : "1"
+								}
+							}
+						}
+					},
+					"SubCategory2" : {
+						"ProductType": {
+							"Flyers" : {
+								"Product8" : {
+									"name" : "Product8",
+									"id" : "8",
+									"imgUrl" : "path/to/img8.jpg",
+									"co-brandable" : "0"
+								}
+							},
+							"Advert" : {							
+								"Product7" : {
+									"name" : "Product9",
+									"id" : "9",
+									"imgUrl" : "path/to/img9.jpg",
+									"co-brandable" : "1"
+								}
+							}
+						}
+					}
+				}
+				
+			},
+			"Walking for health":{
+				"SubCategory" : {
+					"SubCategory1" : {
+						"SubCateogry-SubCategory1" : {
+							"ProductType":{
+								"Flyers" : {
+									"Product10" : {
+										"name" : "Product10",
+										"id" : "10",
+										"imgUrl" : "path/to/img10.jpg",
+										"co-brandable" : "0"
+									},
+									"Product11" : {
+										"name" : "Product11",
+										"id" : "11",
+										"imgUrl" : "path/to/img11.jpg",
+										"co-brandable" : "1"
+									}
+								},
+								"Adverts" : {
+									"Product12" : {
+										"name" : "Product12",
+										"id" : "12",
+										"imgUrl" : "path/to/img12.jpg",
+										"co-brandable" : "1"
+									}
+								}
+							}
+						},
+						"SubCateogry-SubCategory2" : {
+							"ProductType": {
+								"Flyers" : {
+									"Product10" : {
+										"name" : "Product10",
+										"id" : "10",
+										"imgUrl" : "path/to/img10.jpg",
+										"co-brandable" : "0"
+									}
+								},
+								"Advert" : {
+									"Product11" : {
+										"name" : "Product11",
+										"id" : "11",
+										"imgUrl" : "path/to/img11.jpg",
+										"co-brandable" : "1"
+									}
+								},
+								"Business Card" : {
+									"Product12" : {
+										"name" : "Product12",
+										"id" : "12",
+										"imgUrl" : "path/to/img12.jpg",
+										"co-brandable" : "1"
+									}
+								}
+							}
+						}
+					},
+					"SubCategory2" : {
+						"SubCateogry-SubCategory2" : {
+							"ProductType": {
+								"Flyers" : {
+									"Product13" : {
+										"name" : "Product13",
+										"id" : "13",
+										"imgUrl" : "path/to/img13.jpg",
+										"co-brandable" : "1"
+									},
+									"Product14" : {
+										"name" : "Product14",
+										"id" : "14",
+										"imgUrl" : "path/to/img14.jpg",
+										"co-brandable" : "1"
+									}
+								}
+							}
+						}
+					}
+				}
+			}				
+		}
+	}
+}]
