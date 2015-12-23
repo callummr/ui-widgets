@@ -7,14 +7,14 @@ _$(document).ready(function () {
     // ul = USER LANDING
     app.ul = {
         init: function () {
-            
+            console.log('initiated')
         },
         xxx: function(){
             
         }
     };
 
-    if(true){
+    if(_$('[data-template=user-landing]').length > 0){
         app.ul.init();   
     }    
 });
