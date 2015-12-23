@@ -2,6 +2,46 @@
 <html>
 <head>
 	<title>Create Product</title>
+	<!-- Load the webfonts before canvas -->
+	<style>
+		@font-face {
+		    font-family: 'Macmillan-Headline';
+		    src:url("assets/fonts/macmillan_headline_02_12-webfont.eot");
+		    src:url("assets/fonts/macmillan_headline_02_12-webfont.eot?#iefix") format("embedded-opentype"),
+		  	    url("assets/fonts/macmillan_headline_02_12-webfont.woff") format("woff"),
+		  	    url("assets/fonts/macmillan_headline_02_12-webfont.ttf") format("truetype"),
+		  	    url("assets/fonts/macmillan_headline_02_12-webfont.svg#macmillan_headlineregular") format("svg");
+		    font-weight: normal;
+		    font-style: normal;
+		}
+
+		@font-face{
+			font-family:"FuturaBT-Heavy";
+			src:url("assets/fonts/0084b2cc-4014-4723-9304-027c2d0086cd.eot?#iefix");
+			src:url("assets/fonts/0084b2cc-4014-4723-9304-027c2d0086cd.eot?#iefix") format("eot"),
+				url("assets/fonts/4603b58c-e92d-40e1-a670-1063cdca453b.woff") format("woff"),
+				url("assets/fonts/67b08d64-f836-4b99-ac05-4b1c2e05a949.ttf") format("truetype"),
+				url("assets/fonts/a5f12249-079e-42a0-95bc-27ad0164deb9.svg#a5f12249-079e-42a0-95bc-27ad0164deb9") format("svg");
+		}
+
+		@font-face{
+			font-family:"FuturaBT-Medium";
+			src:url("assets/fonts/7ed1bebb-81a9-4c57-9513-f0538c1b83fc.eot?#iefix");
+			src:url("assets/fonts/7ed1bebb-81a9-4c57-9513-f0538c1b83fc.eot?#iefix") format("eot"),
+				url("assets/fonts/ddc0f223-a296-451a-8681-ad80508eb419.woff") format("woff"),
+				url("assets/fonts/c18fc865-7a4e-45d9-bbb0-4e4553cc4136.ttf") format("truetype"),
+				url("assets/fonts/71710047-b807-47eb-9874-7db8f4904492.svg#71710047-b807-47eb-9874-7db8f4904492") format("svg");
+		}
+
+		@font-face{
+			font-family:"FuturaBT-Book";
+			src:url("assets/fonts/17fe4ab4-6e45-4ea2-bb53-2123063911c3.eot?#iefix");
+			src:url("assets/fonts/17fe4ab4-6e45-4ea2-bb53-2123063911c3.eot?#iefix") format("eot"),
+				url("assets/fonts/142b09e6-c245-4ff7-b01c-325fa824c99e.woff") format("woff"),
+				url("assets/fonts/e4509cd4-7aa0-4068-89bd-95ffd0bfb6d4.ttf") format("truetype"),
+				url("assets/fonts/d37fcd2f-d43f-4eae-b192-c48028c02797.svg#d37fcd2f-d43f-4eae-b192-c48028c02797") format("svg");
+		}
+	</style>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -26,7 +66,7 @@
 	<!-- [{"BlockId":15,"Assets":[{"AssetId":30,"Def":0},{"AssetId":33,"Def":1}]}] -->
 	<!-- END -->
 
-	<div class="row product-container">
+	<div class="row product-container pdf-creator-upgrade">
 		<div class="container" data-template="build-product">			
 			<div class="stepped-option active-option" data-step="0">
 	      		<div class="hidden clearfix" id="dynamic-product-templates"></div>
@@ -47,6 +87,7 @@
 						<button type="button" class="btn btn-info" data-targetid="asset-search-container" data-action="toggle-asset-lib-functions">Search Asset</button>
 					        
 					    <div class="hidden" data-id="asset-upload-container">
+					    	<!-- In the .net solution a form is loaded into this div -->
 					    	<div class="form-group">
 					        	<h3>Upload File</h3>
 					            <input type="file" name="file" id="btnFileUpload" />
@@ -180,7 +221,7 @@
 		          	</span>
 		          	<span class="input-group-addon">
 		          		<label class="badge" for="a4">A4</label>
-		            	<input type="checkbox" id="a4" class="default-setting" name="doc-size" value="A4">
+		            	<input type="checkbox" id="a4" name="doc-size" value="A4">
 		          	</span>
 		          	<span class="input-group-addon">
 		          		<label class="badge" for="a5">A5</label>
@@ -226,8 +267,8 @@
 	<script src="assets/js/libs/jquery.debounce-1.0.5.js"></script>
 
 	<script src="assets/js/utils.js"></script>
-	<!-- <script src="assets/js/create-template.js"></script> -->
 	<script src="assets/js/create-product.js"></script>
 	<script src="assets/js/asset-library.js"></script>	
 </body>
 </html>
+

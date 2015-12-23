@@ -1,23 +1,31 @@
-var app = app || {};
-$(document).ready(function(){
+var app = app || {},
+// Need to add jquery no conflict as storefront already uses 1.3
+_$ = jQuery.noConflict(true);
+
+// Required to use _$ instead of $ to do a multiple versions of jquery being loaded.
+
+_$(document).ready(function(){
 	'use strict';
-	// $ = dom elements
+	// _$ = dom elements
 	// _ = fabric elements
 
 	// Canvas Elements/Settings
 	app._ct_canvas;
 	app._cp_canvas;
+
 	// Grid Squares
 	app.gridSquare      = 24;
+
 	// Units/Measurements
 	app.ptSize          = 0.75; // 1px > 1pt
 	app.mmSize          = 0.2645833333333; // 1px > 1mm
 	app.pxSize          = 3.779527559055; // 1mm > 1px
+
 	// Template Creation Settings/Values
 	app.orientation;
 	app.templateType    = 'default';
 	app.imagedata;
-	app.docDimesions    = [];
+	app.docDimensions   = [];
 	app.templateName;
 	app.templateId      = null;
 	app.tempGroupCnt    = 0;
@@ -109,7 +117,9 @@ $(document).ready(function(){
 							]
 
 	// DOM elements
-	app.$tempBlockName  = $('#at-block-title');
+	app._$tempBlockName  	= _$('#at-block-title');
+	app._$documentSizeBtns  = _$('input[name=doc-size]');
+	app._$body 				= _$('body');
 
 	// Enviornment Check
 	app.isLocalEnv      = document.location.hostname ===  "widget.macmillan.org.uk";
@@ -117,10 +127,10 @@ $(document).ready(function(){
 	
 	// Sets the default templates and some example text for textblocks
 	if(app.isLocalEnv){
-		app.dummyText = $.get('assets/data/dummy-text.txt', function(data){return data}, 'text');
+		app.dummyText = _$.get('assets/data/dummy-text.txt', function(data){return data}, 'text');
 		app.templateDatURL = 'assets/data/data.templates.txt';
 	}else{
-		app.dummyText = $.get('/be/assets/data/dummy-text.txt', function(data){return data}, 'text');
+		app.dummyText = _$.get('/be/assets/data/dummy-text.txt', function(data){return data}, 'text');
 		app.templateDatURL = '/be/api/PDF/Template.ashx';
 	}
 
@@ -139,7 +149,7 @@ $(document).ready(function(){
 	    steppedOptionHandler: function($el){
 	      // console.log($el);
 	      var $this               = $el,
-	          $activeContainer    = $('.active-option'),
+	          $activeContainer    = _$('.active-option'),
 	          activeStep          = $activeContainer.data('step'),
 	          btnPrimaryAction    = $this.data('step-action'),
 	          btnSecondaryAction  = $this.data('step-secondaction');
@@ -147,8 +157,8 @@ $(document).ready(function(){
 	      $activeContainer.fadeOut(100, function(){
 	        $activeContainer.removeClass('active-option');
 	        btnPrimaryAction === 'forward'? activeStep++ : activeStep--;
-	        var $newActiveEl = $('[data-step=' + activeStep + ']');
-	        $newActiveEl.find($('[data-step-target=' + btnSecondaryAction +']')).removeClass('hidden');
+	        var $newActiveEl = _$('[data-step=' + activeStep + ']');
+	        $newActiveEl.find(_$('[data-step-target=' + btnSecondaryAction +']')).removeClass('hidden');
 	        $newActiveEl.fadeIn(100, function(){
 	          $newActiveEl.addClass('active-option');
 	        });
@@ -224,42 +234,60 @@ $(document).ready(function(){
 	    setDocumentSize: function(){
 	      // X, Y, % of A4.
 	      // console.log(app.orientation);
-	      // console.log(app.docDimesions);
+	      // console.log(app.docDimensions);
 
-	      console.log(app.orientation, app.templateType, app.docDimesions);
+	      console.log(app.orientation, app.templateType, app.docDimensions);
 
 	      if(app.templateType !== 'default'){
 	       	return [88,55, 1]      // Business Card 
 	      } else{
-	        if(app.orientation === 'p' && app.docDimesions[0] === 'A2'){
+	        if(app.orientation === 'p' && app.docDimensions[0] === 'A2'){
 	          return [420,594,2]      // A2 Portrait
-	        } else if(app.orientation === 'l' && app.docDimesions[0] === 'A2'){  
+	        } else if(app.orientation === 'l' && app.docDimensions[0] === 'A2'){  
 	          return [594,420,2]      // A2 Landscape
-	        } else if(app.orientation === 'p' && app.docDimesions[0] === 'A3'){
+	        } else if(app.orientation === 'p' && app.docDimensions[0] === 'A3'){
 	          return [297,420,1.4142] // A3 Portrait
-	        } else if(app.orientation === 'l' && app.docDimesions[0] === 'A3'){  
+	        } else if(app.orientation === 'l' && app.docDimensions[0] === 'A3'){  
 	          return [420,297,1.4142] // A3 Landscape
-	        } else if(app.orientation === 'p' && app.docDimesions[0] === 'A4'){
+	        } else if(app.orientation === 'p' && app.docDimensions[0] === 'A4'){
 	          return [210,297,1]      // A4 Portrait
-	        } else if(app.orientation === 'l' && app.docDimesions[0] === 'A4'){  
+	        } else if(app.orientation === 'l' && app.docDimensions[0] === 'A4'){  
 	          return [297,210,1]      // A4 Landscape
-	        } else if(app.orientation === 'p' && app.docDimesions[0] === 'A5'){
+	        } else if(app.orientation === 'p' && app.docDimensions[0] === 'A5'){
 	          return [148,210,0.7071] // A5 Potrait
-	        } else if(app.orientation === 'l' && app.docDimesions[0] === 'A5'){
+	        } else if(app.orientation === 'l' && app.docDimensions[0] === 'A5'){
 	          return [210,148,0.7071] // A5 Landscape
-	        } else if(app.orientation === 'p' && app.docDimesions[0] === 'A6'){
+	        } else if(app.orientation === 'p' && app.docDimensions[0] === 'A6'){
 	          return [105,148,0.5]    // A6 Potrait
-	        } else if(app.orientation === 'l' && app.docDimesions[0] === 'A6'){
+	        } else if(app.orientation === 'l' && app.docDimensions[0] === 'A6'){
 	          return [148,105,0.5]    // A6 Landscape
-	        } else if(app.orientation === 'p' && app.docDimesions[0] === 'A7'){
+	        } else if(app.orientation === 'p' && app.docDimensions[0] === 'A7'){
 	          return [74,105,0.3536]  // A7 Potrait
-	        } else if(app.orientation === 'l' && app.docDimesions[0] === 'A7'){
+	        } else if(app.orientation === 'l' && app.docDimensions[0] === 'A7'){
 	          return [105,74,0.3536]  // A7 Landscape
 	        } 
 	      }     
-	    },
-
-
+	    },	    
+        setProductDimensions: function(){
+        	// console.log(app.docDimensions);
+			var patt = new RegExp('A[0-9]'),
+				res;
+        	// Handle business card options
+        	app.docDimensions.forEach(function(size){
+        		// Test for A-Something format doc size. If found remove the business card option.
+        		// Otherwise remove all of the A- options
+        		res = patt.test(size);
+        		if(res === true){
+        			// Hide the business type option as a user cannot change an A4 document into a business card
+        			_$('.doc-size-business').parent().addClass('hidden');
+        			_$('input[value="' + size + '"]').prop('checked', true).addClass('template-default-size');
+        		} else{
+        			// Hide all A- options as a user cannot change an Business Card to an A- document
+        			_$('input[id^=a]').parent().addClass('hidden');
+        			_$('input[value="' + size + '"]').prop('checked', true).attr('disabled', 'disabled');
+        		}
+        	});
+        },
 	    /**
 			CREATE CANVAS & CANVAS ELEMENTS FUNCTIONS
 	    **/
@@ -293,8 +321,7 @@ $(document).ready(function(){
 		    	_canvas._objects[0]['visible'] = false;
 		    }
 
-
-	      // Show the grid, after saving the image and generating PDF
+	      	// Show the grid, after saving the image and generating PDF
 	      	if(toggle === true){
 	        	_canvas._objects[0]['visible'] = true;
 	      	}
@@ -305,10 +332,10 @@ $(document).ready(function(){
 	    	// Set the orientation
 			if(docWidth < docHeight){
 				app.orientation   = 'p'; // Portrait
-				$('#template-orientation').text('Portrait');
+				_$('#template-orientation').text('Portrait');
 			}else{
 				app.orientation   = 'l'; // Landscape
-				$('#template-orientation').text('Landscape');
+				_$('#template-orientation').text('Landscape');
 			}
 
 	    	// Set the width of the canvas based on asset type. All assets use an A4 as a base, except business cards
@@ -330,34 +357,56 @@ $(document).ready(function(){
 			if((docWidth === 420 && docHeight === 594) || (docHeight=== 420 && docWidth === 594)){
 				// A2 = 420x594 or 594x420
 				settings.canvasScale = 2;
-				if (app.isLocalEnv === true) app.docDimesions = ['A2'];
-			}
-			else if((docWidth === 297 && docHeight === 420) || (docHeight=== 297 && docWidth === 420)){
+			} else if((docWidth === 297 && docHeight === 420) || (docHeight=== 297 && docWidth === 420)){
 				// A3 = 297x420 or 420x297
 				settings.canvasScale = 1.4142;
-				if (app.isLocalEnv === true) app.docDimesions = ['A3'];
 			} else if((docWidth === 210 && docHeight === 297) || (docHeight=== 210 && docWidth === 297)){
 				// A4 = 210x297 or 297x210
 				settings.canvasScale = 1;
-				if (app.isLocalEnv === true) app.docDimesions = ['A4'];
 			} else if((docWidth === 148 && docHeight === 210) || ((docHeight === 148 || docHeight === 148.5) && docWidth === 210)){
 				// A5 = 148x210 or 210x148
-				settings.canvasScale = 0.7071;
-				if (app.isLocalEnv === true) app.docDimesions = ['A5'];    
+				settings.canvasScale = 0.7071;    
 			} else if((docWidth === 105 && docHeight === 148) || (docHeight >= 104 && docHeight <= 105 && docWidth === 148)){
 				// A6 = 105x148 or 148x105
 				settings.canvasScale = 0.5;
-				if (app.isLocalEnv === true) app.docDimesions = ['A6'];
 			} else if((docWidth === 74 && docHeight === 105) || (docHeight === 74 && docWidth === 105)){
-			// A7 = 74x105 or 105x74
+				// A7 = 74x105 or 105x74
 				settings.canvasScale = 0.3536;
-				if (app.isLocalEnv === true) app.docDimesions = ['A7'];
 			} else if(docWidth === 85 && docHeight === 55){
 				// Business Card = 85x55
 				settings.canvasScale = 1;
-				if (app.isLocalEnv === true) app.docDimesions = ['Business Card'];
 			}
 			return settings;
+	    },
+
+	    // Need to refactor the above and below functions so there is only 1 that does both as they are very similar.
+
+	    dimensionlessDocSettings: function(docWidth, docHeight){
+	    	console.log(docWidth, docHeight)
+	    	// Set the level of scaling so the when converting the cooridinates to pixels that are accurate      
+			if((docWidth === 420 && docHeight === 594) || (docHeight=== 420 && docWidth === 594)){
+				// A2 = 420x594 or 594x420
+				return ['A2'];
+			} else if((docWidth === 297 && docHeight === 420) || (docHeight=== 297 && docWidth === 420)){
+				// A3 = 297x420 or 420x297
+				console.log('a3');
+				return ['A3'];
+			} else if((docWidth === 210 && docHeight === 297) || (docHeight=== 210 && docWidth === 297)){
+				// A4 = 210x297 or 297x210
+				return ['A4'];
+			} else if((docWidth === 148 && docHeight === 210) || ((docHeight === 148 || docHeight === 148.5) && docWidth === 210)){
+				// A5 = 148x210 or 210x148
+				return ['A5'];    
+			} else if((docWidth === 105 && docHeight === 148) || (docHeight >= 104 && docHeight <= 105 && docWidth === 148)){
+				// A6 = 105x148 or 148x105
+				return ['A6'];
+			} else if((docWidth === 74 && docHeight === 105) || (docHeight === 74 && docWidth === 105)){
+				// A7 = 74x105 or 105x74
+				return ['A7'];
+			} else if(docWidth === 85 && docHeight === 55){
+				// Business Card = 85x55
+				return ['Business Card'];
+			}	
 	    },
 	    // createFilteredCanvasObjects: function(){
 	    // 	app.filteredCanvasObjs = app._canvas._objects.filter(function(obj, i){
@@ -488,7 +537,7 @@ $(document).ready(function(){
 
 	    //     // console.log(blockType);
 
-	    //     blockSettings.blockTitle  = app.$tempBlockName.val() || 'Block';
+	    //     blockSettings.blockTitle  = app._$tempBlockName.val() || 'Block';
 	    //     blockSettings.halign      = $('input[name=h-pos]:checked').val();
 	    //     blockSettings.height      = blockSize[1];
 	    //     blockSettings.isEditable  = $('#at-editable').is(':checked') ? true : false;
@@ -648,7 +697,8 @@ $(document).ready(function(){
 			        fill: t.fill,	
                     fontFamily: t.fontFamily,
                     fontSize: t.fontSize,
-      				hasBorders: t.hasBorders,
+      				// hasBorders: t.hasBorders,
+      				hasBorders: true,
                     hasRotatingPoint: t.hasRotatingPoint,
                     // height: t.height,
                     left: t.left,
@@ -882,11 +932,11 @@ $(document).ready(function(){
 	      // Remove the grid element group from data
 	      canvasData.objects.shift();
 	      // Add additional properties to the canvas size and orientation is stored.
-	      // console.log(app.docDimesions);
+	      // console.log(app.docDimensions);
 	      canvasData['canvasSize']        = app.templateType;
 	      canvasData['canvasOrientation'] = app.orientation;
 	      canvasData['templateName']      = app.templateName;
-	      canvasData['availableSize']     = app.docDimesions;
+	      canvasData['availableSize']     = app.docDimensions;
 	      console.log(canvasData);     
 	      // console.log(JSON.stringify(canvasData));      
 	      return canvasData.objects
@@ -1117,7 +1167,7 @@ $(document).ready(function(){
 	      });
 	      // Add all of the dynamic elements to template   
 	      cordData.forEach(function(el){
-	        $.extend( pdfbaseJSON.doc.page, el );
+	        _$.extend( pdfbaseJSON.doc.page, el );
 	      });
 	      // console.log(pdfbaseJSON);
 	      app.utils.generateXML(pdfbaseJSON);
@@ -1131,7 +1181,7 @@ $(document).ready(function(){
 	     	 xmlOutput = xmlOutput.replace(/image_[0-9][0-9]?/g, 'image');
 
 	      	// Update the hidden field with the generated XML
-	      	$('#pdfItemAdmin1_hdnXML').val(xmlOutput);
+	      	_$('#pdfItemAdmin1_hdnXML').val(xmlOutput);
 
 	      	// console.log(app.templateId);
 	      	console.log(xmlOutput);
@@ -1143,7 +1193,7 @@ $(document).ready(function(){
 		      	} else if(app.isCreateProduct || app.isUpdateProduct){
 		      		// Make sure a hidden checkbox is checked as the BE needs to know this.
 		      		$('#pdfItemAdmin1_chkIsPDF').prop('checked', true);		
-		      		      		
+
 		      		// Mimic a click on the storefront button that updates/creates a product
 		      		$('#btnSubmit').click();	       
 		        }  
@@ -1155,19 +1205,19 @@ $(document).ready(function(){
 	      // console.log(xml);
 	      // Template name can not be null/empty.
 	      app.templateName = app.templateName || 'Template Name Not Set';
-	      console.log({tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions, id: app.templateId});
-	      $.ajax({
+	      console.log({tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimensions, id: app.templateId});
+	      _$.ajax({
 	            url: '/be/api/PDF/Template.ashx',
 	            type: 'POST',
 	            dataType: 'json',
-	            data: {tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimesions, id: app.templateId},
+	            data: {tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimensions, id: app.templateId},
 	            success: function (data) {
 	            	alert('Template Created. Please click "Add product" to use this template');
 	            	// Reset the template creation tool
 	            	if(app.isCreateTemplate){
 	            		app.ct.resetTemplate();
 	            		// After creating a template, empty the template list... then re-load the template list.
-					    $('#dynamic-templates').empty();
+					    _$('#dynamic-templates').empty();
 					    app.ct.loadTempList();
 	            	}	                
 	            },
@@ -1179,7 +1229,7 @@ $(document).ready(function(){
 		            	if(app.isCreateTemplate){
 		            		app.ct.resetTemplate();
 		            		// After creating a template, empty the template list... then re-load the template list.
-					    	$('#dynamic-templates').empty();
+					    	_$('#dynamic-templates').empty();
 					    	app.ct.loadTempList()
 		            	}		                
 	            	} else{
@@ -1249,8 +1299,8 @@ $(document).ready(function(){
 	    	console.log(_canvas);
 	        app.utils.cleanCanvas(_canvas);
 	        // Create an image from the canvas and add it to the relevant div
-	        var imgElement = ReImg.fromCanvas($('#' + prefix +'_canvas')[0]).toImg(),
-	            $output    = $('#' + prefix +'_image');
+	        var imgElement = ReImg.fromCanvas(_$('#' + prefix +'_canvas')[0]).toImg(),
+	            $output    = _$('#' + prefix +'_image');
 	        $output.empty().append(imgElement);
 	        // Save the image data so this can be used later when saving the image for the template
 	        app.imagedata = _canvas.toDataURL('image/png');

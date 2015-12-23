@@ -8,9 +8,9 @@
  *
  */
 
-(function($) {
+(function(_$) {
 
-$.extend({
+_$.extend({
 
 	debounce : function(fn, timeout, invokeAsap, ctx) {
 

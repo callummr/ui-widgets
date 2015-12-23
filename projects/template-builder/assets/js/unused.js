@@ -31,7 +31,7 @@
     }
 
     toggleEl: function(){
-      var $this = $(this),
+      var $this = _$(this),
           targetElName = $this.attr('data-targetel');
 
       if(!$this.hasClass('toggle-active')){
@@ -92,7 +92,7 @@
 
       // if(textString.length && textString !== null){
         // Disable the add button after it has been added.
-        // $(this).attr('disabled', 'disabled');
+        // _$(this).attr('disabled', 'disabled');
       _textComponent = new fabric.IText( '', {
         editable: true,
         editingBorderColor: 'rga(0,255,0)',

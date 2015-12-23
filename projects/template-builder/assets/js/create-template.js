@@ -1,9 +1,16 @@
 var app = app || {};
-$(document).ready(function () {
+
+// Required to use _$ instead of $ to do a multiple versions of jquery being loaded.
+// jQueryConflict is set in the utils file
+
+_$(document).ready(function () {
     'use strict';
 
-    // $ = dom elements
+    // _$ = dom elements
     // _ = fabric elements
+    app._$templateName       = _$('#template-name');
+    app._$tempNameFromTemp   = _$('#template-name-from-template');
+    app._$tempDimensionsName = _$('#template-size-options');
 
     // State controllers
     app.gEditActive = false; // Global active mode
@@ -20,41 +27,33 @@ $(document).ready(function () {
           Util functions
         **/
         createFileName: function (extension) {
-            var filename = $('.canvas-name-field').val() || 'template-download';
+            var filename = _$('.canvas-name-field').val() || 'template-download';
             return filename + extension
         },
         toggleElements: function () {
-            var $this = $(this),
-                toggleTarget = $this.data('targetel'),
-                toggleGroup = $this.data('toggle-group');
+            var _$this = _$(this),
+                toggleTarget = _$this.data('targetel'),
+                toggleGroup = _$this.data('toggle-group');
 
-            $('.' + toggleGroup).addClass('hidden');
-            $('#' + toggleTarget).removeClass('hidden');
-        },
-        filterResponse: function (data) {
-            // Ugly way of dealing with store front response which contains extra junk in the request.
-            // This cleans up the reponse so it can be parsed as JSON.
-            var response = data,
-                start = response.indexOf('['),
-                fin = response.indexOf(']');
-            return response.substr(start, fin + 1)
+            _$('.' + toggleGroup).addClass('hidden');
+            _$('#' + toggleTarget).removeClass('hidden');
         },
 
         /**
           Working with existing templates
         **/
         loadTempList: function () {
-            $('#static-templates').remove();
-            $('#dynamic-templates').removeClass('hidden');
-            $.ajax({
+            _$('#static-templates').remove();
+            _$('#dynamic-templates').removeClass('hidden');
+            _$.ajax({
                 url: app.templateDatURL,
                 dataType: 'text'
             })
             .done(function (data) {
-                // Filter the response and then create JSON        
-                    var templatesData = JSON.parse(app.utils.filterResponse(data)),
-                        tempString = '',
-                        imgPath;
+              // Filter the response and then create JSON        
+              var templatesData = JSON.parse(app.utils.filterResponse(data)),
+                  tempString = '',
+                  imgPath;
 
               if(app.isLocalEnv){
                 imgPath = '../templates/'
@@ -62,37 +61,46 @@ $(document).ready(function () {
                 imgPath = globalUrls.templateFolder;
               }
                 
+              // console.log(templatesData);
+              // console.log(JSON.parse(data));
 
-                // console.log(templatesData);
-                // console.log(JSON.parse(data));
-
-
-                templatesData.forEach(function (template) {
-                    tempString += '<div class="col-xs-6 col-md-3">';
-                    tempString += '<input type="radio" id="template' + template.ID + '" name="template-url" value="' + template.ID + '" class="template-selection hidden">';
-                    tempString += '<label for="template' + template.ID + '" class="thumbnail">';
-                    tempString += '<span class="template-name">' + template.Name + '</span>';
-                    tempString += '<img src="' + imgPath + template.ID + '.jpg" alt="' + template.Name + '" class="" />';
-                    tempString += '</label>';
-                    tempString += '</div>';
-                });
-                $('#dynamic-templates').append(tempString);
-                $('#dynamic-templates .template-selection').first().prop('checked', true);
+              templatesData.forEach(function (template) {
+                  tempString += '<div class="col-xs-6 col-md-3">';
+                  tempString += '<input type="radio" id="template' + template.ID + '" name="template-url" value="' + template.ID + '" class="template-selection hidden">';
+                  tempString += '<label for="template' + template.ID + '" class="thumbnail">';
+                  tempString += '<span class="template-name">' + template.Name + '</span>';
+                  tempString += '<img src="' + imgPath + template.ID + '.jpg" alt="' + template.Name + '" class="" />';
+                  tempString += '</label>';
+                  tempString += '</div>';
+              });
+              _$('#dynamic-templates').append(tempString);
+              _$('#dynamic-templates .template-selection').first().prop('checked', true);
+            })
+            .fail(function(){
+                alert('Failed to load template list: ' + app.templateDatURL);
             });
         },
         loadExistingTemp: function () {
             var x2js = new X2JS(),
                 ajaxUrl,
-                $selectedInput = $('input[name=template-url]:checked');
+                _$selectedInput = _$('input[name=template-url]:checked');
 
-            app.templateId = $selectedInput.val();
+            // Update UI to show additional input field to name the template
+            app._$tempNameFromTemp.removeClass('hidden');
+            app.templateId = parseInt(_$selectedInput.val());
+
             if (app.isLocalEnv) {
                 ajaxUrl = 'assets/xml/' + app.templateId + '.xml';
+                // Set the doc dimensions here
+                _$.get('assets/data/data.templates.txt', function(data){
+                  var localData = JSON.parse(app.utils.filterResponse(data));
+                  app.docDimensions = localData[app.templateId - 1].Dimensions.replace(' ', '').split(',');
+                }, 'text');
             } else {
                 ajaxUrl = '/be/api/PDF/Template.ashx?id=' + app.templateId + '&incXml=true'
             }
 
-            $.ajax({
+            _$.ajax({
                 type: 'GET',
                 url: ajaxUrl
             })
@@ -101,23 +109,40 @@ $(document).ready(function () {
                     tempJSON;
 
                 if (app.isLocalEnv) {
-                    templateData = data;
-                    tempJSON = x2js.xml2json(templateData);
+                  templateData = data;
+                  tempJSON = x2js.xml2json(templateData);
                 } else {
-                    templateData = JSON.parse(app.utils.filterResponse(data));
-                    tempJSON = x2js.xml_str2json(templateData[0].XML);
-                    app.docDimesions = templateData[0].Dimensions.replace(' ', '').split(',');
+                  templateData = JSON.parse(app.utils.filterResponse(data));
+                  console.log(templateData, templateData[0].Dimensions, templateData[0].Dimensions === '');
+                  tempJSON = x2js.xml_str2json(templateData[0].XML);
+                  if(templateData[0].Dimensions === ''){
+                    var docWidth  = parseInt(tempJSON.doc.page._width),
+                        docHeight = parseInt(tempJSON.doc.page._height);
+                    // Set the doc dimensions manually
+                    app.docDimensions = app.utils.dimensionlessDocSettings(docWidth, docHeight);
+                    console.log(app.docDimensions);
+                  } else{
+                    app.docDimensions = templateData[0].Dimensions.replace(' ', '').split(',');
+                  }                  
+                  console.log(tempJSON)
+                  console.log(app.docDimensions)
                 }
-                // Set the dimensions of the template
-                $('#template-size-options').text(app.docDimesions.join(','));
-                // Set the name of the template so the user can see once in the edit modes
-                // *** NEED TO ADD A TEXT FIELD TO SET THE NAME OF A TEMPLATE **///
-                app.templateName = $selectedInput.next().find('.template-name').text();
-                $('#template-name').text(app.templateName);
-                $('#template-tools-navigation').addClass('col-md-4');
 
+                // Set the dimensions of the template
+                app._$tempDimensionsName.text(app.docDimensions.join(','));
+                // Set the name of the template so the user can see once in the edit modes
+                app.templateName = _$selectedInput.next().find('.template-name').text();
+
+                // Prompt the user to update the template name
+                alert('Please update the template name');
+                app._$tempNameFromTemp.val(app.templateName + ' - Copy');
+                app._$templateName.text(app.templateName + ' - Copy');
+                
+                // Add class, to format the controls/canvas 
+                _$('#template-tools-navigation').addClass('col-md-4');
                 app.ct.loadTempFromJSON(tempJSON);
-            }).fail(function () {
+            })
+            .fail(function () {
                 alert('Load template request failed');
             });
         },
@@ -132,6 +157,7 @@ $(document).ready(function () {
             canvasEl.setAttribute('id', 'ct_canvas');
 
             var canvasSettings = app.utils.setCanvasSettings(docWidth, docHeight);
+
             canvasEl.width = canvasSettings.width;
             canvasEl.height = canvasSettings.height;
 
@@ -140,8 +166,13 @@ $(document).ready(function () {
             app.utils.drawGrid(396, app._ct_canvas); // Pass in the width dynamically so the whole grid is covered
             // Add all of the elements to the page.
             app.ct.createTempBlockFromXML(canvasData.doc.page, canvasSettings.canvasScale);
-            app.ct.bindCreateTemplateCanvasEvents();
+            // Change the position of the document size controls within the DOM
+            app.ct.repositionTempSizesControls(true);
+            // Set the relevant dimensions checkboxs and disabled invalid ones.
+            app.utils.setProductDimensions();
+            // Bind Global and Craete Template specific - Canvas events
             app.utils.bindGlobalCanvasEvents();
+            app.ct.bindCreateTemplateCanvasEvents();            
         },
         createTempBlockFromXML: function (templateJSON, scale) {
             // console.log(templateJSON);
@@ -203,24 +234,29 @@ $(document).ready(function () {
             if (app._ct_canvas) {
                 app._ct_canvas.clear();
             }
-            app.docDimesions = [];
+            app.docDimensions = [];
             app.gEditActive = false;
             app.tbgEditActive = false;
             app.tempGroupCnt = 0;
             app.tempGBlockCnt = 0;
 
-            // Reset the create template tool back to its default
+            // Reset the create template tool back to its default            
             app.ct.resetCreateTempBlock();
-            $('.empty-on-reset').empty();
-            $('.clear-on-reset').val('');
-            $('.stepped-option-2').addClass('hidden');
-            $('.new-template-container').removeClass('load-template-state');
+            _$('.empty-on-reset').empty();
+            _$('.clear-on-reset').val('');
+            _$('.stepped-option-2').addClass('hidden');
+            _$('.new-template-container').removeClass('load-template-state');
 
-            $('input[name=doc-size], input[name=doc-orientation]').not('default-setting').prop('checked', false);
-            $('.default-setting').prop('checked', true);
-            $('.active-option').fadeOut(100, function () {
-                $('.stepped-option').removeClass('active-option');
-                $('.stepped-option[data-step=0]').addClass('active-option').fadeIn(100);
+            // Reposition the document size controls.
+            app.ct.repositionTempSizesControls(false);
+            // Show all document size options again
+            app._$documentSizeBtns.parent().removeClass('hidden');
+
+            _$('[name=doc-size], [name=doc-orientation]').not('default-setting').prop('checked', false);
+            _$('.default-setting').prop('checked', true);
+            _$('.active-option').fadeOut(100, function () {
+                _$('.stepped-option').removeClass('active-option');
+                _$('.stepped-option[data-step=0]').addClass('active-option').fadeIn(100);
             });
         },
         resetCreateTempBlock: function () {
@@ -231,57 +267,68 @@ $(document).ready(function () {
             // Reset the text block group editing settings
             app.ct.handleTbgState(false);
             // Empty the the text block group list
-            $('#at-text-block-group-list').empty();
+            _$('#at-text-block-group-list').empty();
             // Resets all checkboxes and radio buttons to the default setting.
-            $('input[type="radio"].reset-to-default, input[type="checkbox"].reset-to-default').prop('checked', true);
+            _$('input[type="radio"].reset-to-default, input[type="checkbox"].reset-to-default').prop('checked', true);
             // Resets all text and number fields to the default setting.
-            $('input[type="text"].reset-to-default, input[type="number"].reset-to-default').each(function () {
-                var $this = $(this);
-                if ($this.attr('value') > 0) {
-                    var textVal = $this.attr('value');
-                    $this.val(textVal);
+            _$('input[type="text"].reset-to-default, input[type="number"].reset-to-default').each(function () {
+                var _$this = _$(this);
+                if (_$this.attr('value') > 0) {
+                    var textVal = _$this.attr('value');
+                    _$this.val(textVal);
                 } else {
-                    $this.val('');
+                    _$this.val('');
                 }
             });
             // Enable all block type selections
-            $('input[name=template-block-type]').removeAttr('disabled');
+            _$('input[name=template-block-type]').removeAttr('disabled');
             // Resets all buttons back to the default settings
-            $('button.reset-to-default').siblings().removeClass('option-selected').end()
+            _$('button.reset-to-default').siblings().removeClass('option-selected').end()
                                         .addClass('option-selected');
             // Resets the tempale block options back to default
-            $('.template-options').not('reset-to-default').addClass('hidden');
-            $('div.reset-to-default').removeClass('hidden');
+            _$('.template-options').not('reset-to-default').addClass('hidden');
+            _$('div.reset-to-default').removeClass('hidden');
         },
         resetGroupTextBlock: function () {
             // Reset Maxlength
-            var $groupMaxLength = $('#at-maxlength-g'),
-                textVal = $groupMaxLength.attr('value');
-            $groupMaxLength.val(textVal);
+            var _$groupMaxLength = _$('#at-maxlength-g'),
+                textVal = _$groupMaxLength.attr('value');
+            _$groupMaxLength.val(textVal);
 
             // Reset Block name
-            $('#at-text-block-title').val('');
+            _$('#at-text-block-title').val('');
 
             // Reset Manditory and Editable
-            $('#at-text-block-group-el-options input[type="checkbox"].reset-to-default').prop('checked', true);
+            _$('#at-text-block-group-el-options input[type="checkbox"].reset-to-default').prop('checked', true);
 
             // Reset Block Colour, Font, Size
-            $('#at-text-block-group-el-options button.reset-to-default').siblings().removeClass('option-selected').end()
+            _$('#at-text-block-group-el-options button.reset-to-default').siblings().removeClass('option-selected').end()
                                                                         .addClass('option-selected');
         },
+        repositionTempSizesControls: function (isFromExistingTemplate){
+            // Get the size Controls, then append it to the relevant container
+            var _$sizeControls = _$('#template-doc-size-controls');
+            if(isFromExistingTemplate === true){                 
+               _$("#from-template-doc-size-container").append(_$sizeControls)
+            } else{
+                _$("#new-template-doc-size-container").append(_$sizeControls)
+            }            
+        },
         createNewTemp: function () {
+            // Update UI to hide additional text field
+            app._$tempNameFromTemp.addClass('hidden');
             // The canvas needs to be created this way: For more details:
-            // (http://stackoverflow.com/questions/5034529/size-of-html5-canvas-via-css-versus-element-attributes)
+            // (http://stackoverflow.com/questions/5034529/size-of-html5-canvas-via-css-versus-element-attributes)           
             var canvasEl = document.createElement('canvas'),
                 size;
             canvasEl.setAttribute('id', 'ct_canvas');
 
             // Check if the document size desired template should be a regular paper size or business card.
             // All regular paper sizes use the same bases size (A4), but business cards are different.
-            if ($('input[name=doc-size]:checked').val() !== 'Business Card') {
+            if (_$('[name=doc-size]:checked').val() !== 'Business Card') {
                 // Check if the template should be portrait or landscape
                 // The canvas needs to be set to a specific size based on the 2 checks above.
-                if ($('input[name=doc-orientation]:checked').val() === 'p') {
+                if (_$('[name=doc-orientation]:checked').val() === 'p') {
                     app.orientation = 'p'; // Potrait
                     canvasEl.width = 396;
                     canvasEl.height = 561;
@@ -305,29 +352,28 @@ $(document).ready(function () {
             app.utils.drawGrid(396, app._ct_canvas); // Pass in the width dynamically so the whole grid is covered
         },
         setTemplateDetails: function () {
-            var $orientationDetail = $('#template-orientation');
+            var _$orientationDetail = _$('#template-orientation');
             // Set the template name
-            console.log(app.templateName);
             // When validation is enabled, the below line can be uncommented.
-            // $('#template-name').text(app.templateName);
-            $('#template-name').text($('#new-template-name').val());
+            // app._$templateName.text(app.templateName);
+            app._$templateName.text(app.templateName);
 
             // Store the set document varaitions sizes to an array
-            $('input[name=doc-size]').each(function () {
-                var $this = $(this);
-                if ($this.prop('checked') === true) {
-                    app.docDimesions.push($this.val());
+            app._$documentSizeBtns.each(function () {
+                var _$this = _$(this);
+                if (_$this.prop('checked') === true) {
+                    app.docDimensions.push(_$this.val());
                 }
             });
 
             // Set the text for available sizes
-            $('#template-size-options').text(app.docDimesions.join(','));
+            app._$tempDimensionsName.text(app.docDimensions.join(','));
 
             // Set the text to show orientation selected
             if (app.orientation === 'p') {
-                $orientationDetail.text('Portrait');
+                _$orientationDetail.text('Portrait');
             } else {
-                $orientationDetail.text('Landscape');
+                _$orientationDetail.text('Landscape');
             }
         },
         constrainGridMovement: function (e) {
@@ -357,7 +403,7 @@ $(document).ready(function () {
         },
         deactiveCanvasControls: function () {
             // If the edit state is active, hide the edit options
-            if (!$('.disabled-in-edit-state').hasClass('hidden')) {
+            if (!_$('.disabled-in-edit-state').hasClass('hidden')) {
                 // Hide the edit options
                 app.ct.toggleTempState(false);
             }
@@ -498,48 +544,73 @@ $(document).ready(function () {
                 // console.log(blockSettings);
 
                 if (data.block === 'tbg') {
-                    var listItems = '';
-                    data['text-block'].forEach(function (block) {
+                    var listItems = '',
+                        blockSettings;
+                    // Check if there is more than 1 text block inside the text block group
+                    if(typeof(data['text-block'].length) !== 'undefined'){
+                        data['text-block'].forEach(function (block) {
+                            // console.log(block);
+                            blockSettings = {};
+                            // console.log(block);
+                            blockSettings.isEditable = typeof (block._editable) !== 'undefined' ? block._editable : 'false';
+                            blockSettings.isManditory = typeof (block._mandatory) !== 'undefined' ? block._mandatory : 'false';
+                            blockSettings.fface = typeof (block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
+                            blockSettings.fontColor = app.utils.cmykToRGB(block._colour);
+                            blockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
+                            blockSettings.lineheight = typeof (block._leading) !== 'undefined' ? String(block._leading).replace('%', '') : '100';
+                            blockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
+                            blockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
+                            blockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : '';
+                            if (typeof (block._source) !== 'undefined') {
+                                blockSettings.stringSrc = block._source;
+                            }
+                            if (typeof (block.__text) !== 'undefined') {
+                                blockSettings.textVal = block.__text;
+                            }
+                            listItems+= app.ct.textBlockHtmlSnippet(blockSettings);
+                        });
+                    } else{
                         // console.log(block);
-                        var blockSettings = {};
+                        var singleBlock = data['text-block'];
+                        blockSettings = {};
                         // console.log(block);
-                        blockSettings.isEditable = typeof (block._editable) !== 'undefined' ? block._editable : 'false';
-                        blockSettings.isManditory = typeof (block._mandatory) !== 'undefined' ? block._mandatory : 'false';
-                        blockSettings.fface = typeof (block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
-                        blockSettings.fontColor = app.utils.cmykToRGB(block._colour);
-                        blockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
-                        blockSettings.lineheight = typeof (block._leading) !== 'undefined' ? String(block._leading).replace('%', '') : '100';
-                        blockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
-                        blockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
-                        blockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : '';
-                        if (typeof (block._source) !== 'undefined') {
-                            blockSettings.stringSrc = block._source;
+                        blockSettings.isEditable = typeof (singleBlock._editable) !== 'undefined' ? singleBlock._editable : 'false';
+                        blockSettings.isManditory = typeof (singleBlock._mandatory) !== 'undefined' ? singleBlock._mandatory : 'false';
+                        blockSettings.fface = typeof (singleBlock['_font-family']) !== 'undefined' ? singleBlock['_font-family'] : 'FuturaBT-Book';
+                        blockSettings.fontColor = app.utils.cmykToRGB(singleBlock._colour);
+                        blockSettings.fontSize = typeof (singleBlock['_font-size']) !== 'undefined' ? singleBlock['_font-size'] : 12;
+                        blockSettings.lineheight = typeof (singleBlock._leading) !== 'undefined' ? String(singleBlock._leading).replace('%', '') : '100';
+                        blockSettings.id = typeof (singleBlock._id) !== 'undefined' ? singleBlock._id : 'false';
+                        blockSettings.label = typeof (singleBlock._title) !== 'undefined' ? singleBlock._title : 'false';
+                        blockSettings.maxLength = typeof (singleBlock._maxlen) !== 'undefined' ? singleBlock._maxlen : '';
+                        if (typeof (singleBlock._source) !== 'undefined') {
+                            blockSettings.stringSrc = singleBlock._source;
                         }
-                        if (typeof (block.__text) !== 'undefined') {
-                            blockSettings.textVal = block.__text;
+                        if (typeof (singleBlock.__text) !== 'undefined') {
+                            blockSettings.textVal = singleBlock.__text;
                         }
-                        listItems += app.ct.textBlockHtmlSnippet(blockSettings);
-                    });
-                    $('#at-text-block-group-list').append(listItems);
+                        listItems+= app.ct.textBlockHtmlSnippet(blockSettings);
+                    }                    
+                    _$('#at-text-block-group-list').append(listItems);
                     app.ct.createTempBlockGroup(blockSettings);
                 } else {
                     app.ct.createTempBlockRegular(blockSettings)
                 }
                 // console.log(blockSettings);
             } else {
-                blockType = app.ct.setBlockType($('input[name=template-block-type]:checked').val());
-                blockSize = app.ct.setAspectRatio($('input[name=block-ratio]:checked').val()); // This returns and array
+                blockType = app.ct.setBlockType(_$('input[name=template-block-type]:checked').val());
+                blockSize = app.ct.setAspectRatio(_$('input[name=block-ratio]:checked').val()); // This returns and array
 
                 // console.log(blockType);
 
-                blockSettings.blockTitle = app.$tempBlockName.val() || 'Block';
-                blockSettings.halign = $('input[name=h-pos]:checked').val();
+                blockSettings.blockTitle = app._$tempBlockName.val() || 'Block';
+                blockSettings.halign = _$('input[name=h-pos]:checked').val();
                 blockSettings.height = blockSize[1];
-                blockSettings.isEditable = $('#at-editable').is(':checked') ? true : false;
-                blockSettings.isManditory = $('#at-manditory').is(':checked') ? true : false;
+                blockSettings.isEditable = _$('#at-editable').is(':checked') ? true : false;
+                blockSettings.isManditory = _$('#at-manditory').is(':checked') ? true : false;
                 blockSettings.left = 0;
                 blockSettings.top = 0;
-                blockSettings.valign = $('input[name=v-pos]:checked').val();
+                blockSettings.valign = _$('input[name=v-pos]:checked').val();
                 blockSettings.width = blockSize[0];
 
                 if (blockType === 'ib') {
@@ -550,20 +621,23 @@ $(document).ready(function () {
                 } else if (blockType === 'tb') {
                     // If this is a text block;
                     blockSettings.blocktype = 'new-text-block';
-                    blockSettings.fontColor = 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')';
-                    blockSettings.fontFamily = $('#at-font-face .option-selected').data('fface');
-                    blockSettings.fontSize = $('#at-font-size .option-selected').data('size');
-                    blockSettings.lineheight = $('#at-lineheight .option-selected').data('lineheight');
-                    blockSettings.maxLength = $('#at-maxlength').val();
-                    if ($('#at-source-yes').is(':checked')) {
-                        blockSettings.stringSrc = $('#at-src').val();
-                        $.ajax({
+                    blockSettings.fontColor = 'rgb(' + _$('#at-font-color .option-selected').attr('data-rgb') + ')';
+                    blockSettings.fontFamily = _$('#at-font-face .option-selected').data('fface');
+                    blockSettings.fontSize = _$('#at-font-size .option-selected').data('size');
+                    blockSettings.lineheight = _$('#at-lineheight .option-selected').data('lineheight');
+                    blockSettings.maxLength = _$('#at-maxlength').val();
+                    if (_$('#at-source-yes').is(':checked')) {
+                        blockSettings.stringSrc = _$('#at-src').val();
+                        _$.ajax({
                             url: 'assets/' + blockSettings.stringSrc,
                             dataType: 'text'
                         })
                         .done(function (data) {
                             //console.log(data);
                             blockSettings.textVal = data;
+                        })
+                        .fail(function(){
+                            alert('Failed to load source: ' + 'assets/' + blockSettings.stringSrc);
                         });
                     } else {
                         blockSettings.textVal = app.dummyText.responseText.substr(0, blockSettings.maxLength);
@@ -574,7 +648,7 @@ $(document).ready(function () {
 
                     blockSettings.blocktype = 'new-text-block-group';
                     blockSettings.height = 200;
-                    blockSettings.spacing = parseInt($('#at-spacing-g').val());
+                    blockSettings.spacing = parseInt(_$('#at-spacing-g').val());
                     blockSettings.width = 200;
                     //console.log(blockSettings);
                     app.ct.createTempBlockGroup(blockSettings);
@@ -590,14 +664,14 @@ $(document).ready(function () {
             // Only increment the counter if it is a new object
             // console.log(blockSettings);
             app.tempGroupCnt = typeof (_block) !== 'undefined' ? app.tempGroupCnt : app.tempGroupCnt++;
-            var $textBlockList = $('#at-text-block-group-list'),
+            var _$textBlockList = _$('#at-text-block-group-list'),
                 _blockId = typeof (_block) !== 'undefined' ? _block.blockId : 'tbg_' + app.tempGroupCnt;
 
             // console.log(_block);
             // Check if this is creating a group from an exisitng group. (Performing an update)
             if (typeof (_block) !== 'undefined') {
                 // Create indiviual text block for the text block group   
-                var _tblocks = app.ct.createTempBlockGroupItem($textBlockList.find('li'), $('#at-spacing-g'));
+                var _tblocks = app.ct.createTempBlockGroupItem(_$textBlockList.find('li'), _$('#at-spacing-g'));
                 // Add each block to the exiting group
                 console.log(_block);
                 _tblocks.forEach(function (block) {
@@ -607,9 +681,9 @@ $(document).ready(function () {
                 });
                 // Add the group to the canvas
                 app._ct_canvas.add(_block);
-            } else if ($textBlockList.find('li').length > 0) {
+            } else if (_$textBlockList.find('li').length > 0) {
                 // Use the settings from 'blockSettings' object if this is a new group
-                var _tblocks = app.ct.createTempBlockGroupItem($textBlockList.find('li'), blockSettings.spacing);
+                var _tblocks = app.ct.createTempBlockGroupItem(_$textBlockList.find('li'), blockSettings.spacing);
                 // Add the group elements to the group container
 
                 var _tblockg = new fabric.Group(_tblocks, {
@@ -643,7 +717,7 @@ $(document).ready(function () {
             }
 
             // Empty the list when complete
-            $textBlockList.empty();
+            _$textBlockList.empty();
             // Add the group to the canvas
             app._ct_canvas.renderAll();
 
@@ -691,7 +765,7 @@ $(document).ready(function () {
             app._ct_canvas.add(_block);
 
             // Set the relevant background image for block, based on blocktype
-            app.ct.setTempBlockBackgroundImg(_block, app.ct.setBlockType($('input[name=template-block-type]:checked').val()));
+            app.ct.setTempBlockBackgroundImg(_block, app.ct.setBlockType(_$('input[name=template-block-type]:checked').val()));
             // Empty the input field with the previous component name.
             app.ct.resetCreateTempBlock();
         },
@@ -699,7 +773,7 @@ $(document).ready(function () {
             var _blocksCollection = [];
             // console.log(blockSettings.spacing, blockSettings.spacing * parseInt(i + 1) );
             $els.each(function (i) {
-                var $template = $(this),
+                var $template = _$(this),
                     _innerblock = new fabric.Rect({
                         fill: 'rgb(255,255,255)',
                         hasBorders: true,
@@ -771,21 +845,21 @@ $(document).ready(function () {
         },
         editTempBlock: function () {
             var _block = app._ct_canvas.getActiveObject(),
-                blockType = app.ct.setBlockType($('input[name=template-block-type]:checked').val());
+                blockType = app.ct.setBlockType(_$('input[name=template-block-type]:checked').val());
             // console.log(blockType);
             // console.log(_block);
             if (blockType === 'tb') {
                 _block.blocktype = 'new-text-block';
-                _block.fontColor = 'rgb(' + $('#at-font-color .option-selected').attr('data-rgb') + ')';
-                _block.fontFamily = $('#at-font-face .option-selected').data('fface');
-                _block.fontSize = $('#at-font-size .option-selected').data('size');
-                _block.lineheight = $('#at-lineheight .option-selected').data('lineheight');
-                _block.maxLength = $('#at-maxlength').val();
+                _block.fontColor = 'rgb(' + _$('#at-font-color .option-selected').attr('data-rgb') + ')';
+                _block.fontFamily = _$('#at-font-face .option-selected').data('fface');
+                _block.fontSize = _$('#at-font-size .option-selected').data('size');
+                _block.lineheight = _$('#at-lineheight .option-selected').data('lineheight');
+                _block.maxLength = _$('#at-maxlength').val();
                 if (typeof (_block.stringSrc) !== 'undefined') {
-                    _block.stringSrc = $('#at-src').val();
+                    _block.stringSrc = _$('#at-src').val();
                 }
             } else if (blockType === 'ib') {
-                $('#new-template-image-block').siblings().addClass('hidden').end()
+                _$('#new-template-image-block').siblings().addClass('hidden').end()
                                               .removeClass('hidden');
                 _block.blocktype = 'new-image-block';
             } else if (blockType === 'tbg') {
@@ -799,19 +873,19 @@ $(document).ready(function () {
                 // Add new items...
                 console.log('Should be empty', _block);
 
-                if ($('#at-text-block-group-list').find('li').length > 0) {
-                    app.ct.createTempBlockGroup($('#at-text-block-group-list').find('li'), _block);
+                if (_$('#at-text-block-group-list').find('li').length > 0) {
+                    app.ct.createTempBlockGroup(_$('#at-text-block-group-list').find('li'), _block);
                 } else {
                     alert('The text block does not contain any text blocks, so it will be removed.');
                     app._ct_canvas.remove(_block);
                 }
             }
             // Set non-specific block settings
-            _block.blockTitle = app.$tempBlockName.val();
-            _block.halign = $('input[name=h-pos]:checked').val();
-            _block.isEditable = $('#at-editable').is(':checked') ? true : false;
-            _block.isManditory = $('#at-manditory').is(':checked') ? true : false;
-            _block.valign = $('input[name=v-pos]:checked').val();
+            _block.blockTitle = app._$tempBlockName.val();
+            _block.halign = _$('input[name=h-pos]:checked').val();
+            _block.isEditable = _$('#at-editable').is(':checked') ? true : false;
+            _block.isManditory = _$('#at-manditory').is(':checked') ? true : false;
+            _block.valign = _$('input[name=v-pos]:checked').val();
 
             // Set the relevant background image for block, based on blocktype
             if (blockType !== 'tbg') {
@@ -827,46 +901,46 @@ $(document).ready(function () {
         editBlockFromGroup: function ($el) {
             // Set the active mode
             app.tbgEditActive = true;
-            $('.divider').removeClass('hidden');
+            _$('.divider').removeClass('hidden');
 
             // Update the the settings on the list Item 
             var $blockEl = $el.parent(),
                 rgbAttr = 'data-rgb="' + $blockEl.data('rgb') + '"',
                 ffaceAttr = 'data-fface="' + $blockEl.data('fface') + '"';
-            $('#at-text-block-group-el-options').data('tbgid', $blockEl.data('id'));
+            _$('#at-text-block-group-el-options').data('tbgid', $blockEl.data('id'));
 
-            $('#at-text-block-title').val($blockEl.data('label'));
-            $('#at-font-face-g button[' + ffaceAttr + ']').siblings().removeClass('option-selected').end()
+            _$('#at-text-block-title').val($blockEl.data('label'));
+            _$('#at-font-face-g button[' + ffaceAttr + ']').siblings().removeClass('option-selected').end()
                                                           .addClass('option-selected');
 
-            $('#at-font-size-g button[data-size=' + $blockEl.data('size') + ']').siblings().removeClass('option-selected').end()
+            _$('#at-font-size-g button[data-size=' + $blockEl.data('size') + ']').siblings().removeClass('option-selected').end()
                                                                                 .addClass('option-selected');
 
-            $('#at-font-color-g button[' + rgbAttr + ']').siblings().removeClass('option-selected').end()
+            _$('#at-font-color-g button[' + rgbAttr + ']').siblings().removeClass('option-selected').end()
                                                          .addClass('option-selected');
 
-            $('#at-lineheight-g button[data-lineheight=' + $blockEl.data('lineheight') + ']').siblings().removeClass('option-selected').end()
+            _$('#at-lineheight-g button[data-lineheight=' + $blockEl.data('lineheight') + ']').siblings().removeClass('option-selected').end()
                                                                                              .addClass('option-selected');
-            $('#at-maxlength-g').val($blockEl.data('maxlength'));
-            $('#at-manditory-g').prop('checked', $blockEl.data('manditory'));
-            $('#at-editable-g').prop('checked', $blockEl.data('editable'));
+            _$('#at-maxlength-g').val($blockEl.data('maxlength'));
+            _$('#at-manditory-g').prop('checked', $blockEl.data('manditory'));
+            _$('#at-editable-g').prop('checked', $blockEl.data('editable'));
         },
         updateBlockFromGroup: function () {
             app.ct.handleTbgState(false);
-            var blockInEditIndex = $('#at-text-block-group-el-options').data('tbgid'),
-                $blockItem = $('#at-text-block-group-list li[data-id=' + blockInEditIndex + ']');
+            var blockInEditIndex = _$('#at-text-block-group-el-options').data('tbgid'),
+                $blockItem = _$('#at-text-block-group-list li[data-id=' + blockInEditIndex + ']');
 
             // Update the name of the element
-            $blockItem.find('.badge').text($('#at-text-block-title').val());
+            $blockItem.find('.badge').text(_$('#at-text-block-title').val());
             // Update the attributes of the element
-            $blockItem.data('label', $('#at-text-block-title').val());
-            $blockItem.data('fface', $('#at-font-face-g .option-selected').data('fface'));
-            $blockItem.data('size', $('#at-font-size-g .option-selected').data('size'));
-            $blockItem.data('rgb', $('#at-font-color-g .option-selected').data('rgb'));
-            $blockItem.data('maxlength', $('#at-maxlength-g').val());
-            $blockItem.data('lineheight', $('#at-lineheight-g .option-selected').data('lineheight'));
-            $blockItem.data('manditory', $('#at-manditory-g').is(':checked'));
-            $blockItem.data('editable', $('#at-editable-g').is(':checked'));
+            $blockItem.data('label', _$('#at-text-block-title').val());
+            $blockItem.data('fface', _$('#at-font-face-g .option-selected').data('fface'));
+            $blockItem.data('size', _$('#at-font-size-g .option-selected').data('size'));
+            $blockItem.data('rgb', _$('#at-font-color-g .option-selected').data('rgb'));
+            $blockItem.data('maxlength', _$('#at-maxlength-g').val());
+            $blockItem.data('lineheight', _$('#at-lineheight-g .option-selected').data('lineheight'));
+            $blockItem.data('manditory', _$('#at-manditory-g').is(':checked'));
+            $blockItem.data('editable', _$('#at-editable-g').is(':checked'));
             app.ct.stopBlockFromGroup();
             // Update the Edit active state
             app.tbgEditActive = false;
@@ -875,9 +949,9 @@ $(document).ready(function () {
             app.ct.handleTbgState(false);
             // Hide or show the relevant controls
             if (app.gEditActive === true) {
-                $('[data-state=disable-in-tgb-edit-state]').addClass('hidden');
+                _$('[data-state=disable-in-tgb-edit-state]').addClass('hidden');
             } else {
-                $('[data-state=disable-in-tgb-edit-state]').removeClass('hidden');
+                _$('[data-state=disable-in-tgb-edit-state]').removeClass('hidden');
             }
             app.tbgEditActive = false;
         },
@@ -891,35 +965,35 @@ $(document).ready(function () {
             //console.log(blockTypeName);
 
             // Set the title
-            app.$tempBlockName.val(_selectedEl.blockTitle);
+            app._$tempBlockName.val(_selectedEl.blockTitle);
 
             // Set H Align      
-            $('input[value=' + _selectedEl.halign + ']').prop('checked', true);
+            _$('input[value=' + _selectedEl.halign + ']').prop('checked', true);
             // Set V Align
-            $('input[value=' + _selectedEl.valign + ']').prop('checked', true);
+            _$('input[value=' + _selectedEl.valign + ']').prop('checked', true);
 
             // Set Editable
             if (_selectedEl.isEditable === true) {
-                $('#at-editable').prop('checked', true);
+                _$('#at-editable').prop('checked', true);
             } else {
-                $('#at-editable').prop('checked', false);
+                _$('#at-editable').prop('checked', false);
             }
 
             // Set Manditory
             if (_selectedEl.isManditory === true) {
-                $('#at-manditory').prop('checked', true);
+                _$('#at-manditory').prop('checked', true);
             } else {
-                $('#at-manditory').prop('checked', false);
+                _$('#at-manditory').prop('checked', false);
             }
 
             // Set Block Type
             // console.log(typeof(blockTypeName), blockTypeName);
-            $('#' + blockTypeName).prop('checked', true);
+            _$('#' + blockTypeName).prop('checked', true);
 
             // Set Block specific values
             if (blockTypeName === 'template-text-block') {
-                $('#template-text-block-group').attr('disabled', 'disabled');
-                $('#template-text-block, #template-image-block').removeAttr('disabled', 'disabled');
+                _$('#template-text-block-group').attr('disabled', 'disabled');
+                _$('#template-text-block, #template-image-block').removeAttr('disabled', 'disabled');
                 // Set the text block specific settings.
                 var rgb = _selectedEl.fontColor.replace('rgb(', '').replace(')', ''),
                     rgbAttr = 'data-rgb="' + rgb + '"',
@@ -927,49 +1001,49 @@ $(document).ready(function () {
                     linehAttr = 'data-lineheight="' + _selectedEl.lineheight + '"';
 
                 // Color
-                $('button[' + rgbAttr + ']').siblings().removeClass('option-selected').end()
+                _$('button[' + rgbAttr + ']').siblings().removeClass('option-selected').end()
                                                       .addClass('option-selected');
                 // Font size
-                $('button[data-size=' + _selectedEl.fontSize + ']').siblings().removeClass('option-selected').end()
+                _$('button[data-size=' + _selectedEl.fontSize + ']').siblings().removeClass('option-selected').end()
                                                                  .addClass('option-selected');
                 // Font Family
-                $('button[' + ffaceAttr + ']').siblings().removeClass('option-selected').end()
+                _$('button[' + ffaceAttr + ']').siblings().removeClass('option-selected').end()
                                             .addClass('option-selected');
 
                 // Line Height
-                $('button[' + linehAttr + ']').siblings().removeClass('option-selected').end()
+                _$('button[' + linehAttr + ']').siblings().removeClass('option-selected').end()
                                                       .addClass('option-selected');
 
                 //  MaxLength
-                $('#at-maxlength').val(_selectedEl.maxLength);
+                _$('#at-maxlength').val(_selectedEl.maxLength);
 
                 // From Source
                 if (typeof (_selectedEl.stringSrc) !== 'undefined') {
-                    $('#at-src').val(_selectedEl.stringSrc);
-                    $('#at-source-yes').prop('checked', true);
+                    _$('#at-src').val(_selectedEl.stringSrc);
+                    _$('#at-source-yes').prop('checked', true);
                 } else {
-                    $('#at-source-no').prop('checked', true)
+                    _$('#at-source-no').prop('checked', true)
                 }
 
                 // Show the TEXT editing options only                              
-                $('#new-template-text-block').removeClass('hidden');
-                $('#new-template-image-block, #new-template-text-block-group').addClass('hidden');
+                _$('#new-template-text-block').removeClass('hidden');
+                _$('#new-template-image-block, #new-template-text-block-group').addClass('hidden');
             } else if (blockTypeName === 'template-image-block') {
-                $('#template-text-block-group').attr('disabled', 'disabled');
-                $('#template-text-block, #template-image-block').removeAttr('disabled', 'disabled');
+                _$('#template-text-block-group').attr('disabled', 'disabled');
+                _$('#template-text-block, #template-image-block').removeAttr('disabled', 'disabled');
                 // Show the IMAGE editing options only
-                $('#new-template-image-block').removeClass('hidden');
-                $('#new-template-text-block, #new-template-text-block-group').addClass('hidden');
+                _$('#new-template-image-block').removeClass('hidden');
+                _$('#new-template-text-block, #new-template-text-block-group').addClass('hidden');
             } else if (blockTypeName === 'template-text-block-group') {
-                $('#template-text-block, #template-image-block').attr('disabled', 'disabled');
+                _$('#template-text-block, #template-image-block').attr('disabled', 'disabled');
                 // Show the TEXT BLOCK GROUP editing options only
-                $('#new-template-text-block-group').removeClass('hidden');
-                $('#new-template-text-block, #new-template-image-block').addClass('hidden');
+                _$('#new-template-text-block-group').removeClass('hidden');
+                _$('#new-template-text-block, #new-template-image-block').addClass('hidden');
                 // Set Spacing
-                $('#at-spacing-g').val(_selectedEl.spacing);
+                _$('#at-spacing-g').val(_selectedEl.spacing);
 
                 // Set text blocks inside text block group
-                var $textBlockList = $('#at-text-block-group-list'),
+                var $textBlockList = _$('#at-text-block-group-list'),
                     blockHTML = '',
                     blockDetails = {};
                 // Empty the list of text blocks from the list and then show the element
@@ -1046,11 +1120,11 @@ $(document).ready(function () {
         toggleTempState: function (isEditing) {
             // console.log(isEditing);
             if (isEditing === true) {
-                $('.disabled-in-edit-state').addClass('hidden');
-                $('.enabled-in-edit-state').removeClass('hidden');
+                _$('.disabled-in-edit-state').addClass('hidden');
+                _$('.enabled-in-edit-state').removeClass('hidden');
             } else {
-                $('.disabled-in-edit-state').removeClass('hidden');
-                $('.enabled-in-edit-state').addClass('hidden');
+                _$('.disabled-in-edit-state').removeClass('hidden');
+                _$('.enabled-in-edit-state').addClass('hidden');
             }
         },
         bindCreateTemplateCanvasEvents: function () {
@@ -1076,7 +1150,7 @@ $(document).ready(function () {
                     app.ct.toggleTempState(false);
                 }
             });
-            $('.template-container').on('click', app.ct.deactiveCanvasControls);
+            _$('.template-container').on('click', app.ct.deactiveCanvasControls);
         },
 
 
@@ -1084,14 +1158,14 @@ $(document).ready(function () {
           UI Specific Functions
         **/
         setSelectedOption: function () {
-            var $this = $(this);
+            var $this = _$(this);
             $this.siblings().removeClass('option-selected').end()
                  .addClass('option-selected');
         },
         showTemplates: function ($el) {
             console.log($el);
-            var $templateControlsContainer = $('#template-tools-navigation'),
-                $templateCanvasContainer = $('.new-template-container');
+            var $templateControlsContainer = _$('#template-tools-navigation'),
+                $templateCanvasContainer = _$('.new-template-container');
             if ($el.attr('id') === 'at-show-templates') {
                 $templateControlsContainer.removeClass('col-md-4');
             } else {
@@ -1105,17 +1179,17 @@ $(document).ready(function () {
             }
         },
         toggleTempGroupOpts: function (isClose) {
-            var $blockControls = $('.new-block-controls'),
-                $groupControls = $('.new-group-controls');
+            var $blockControls = _$('.new-block-controls'),
+                $groupControls = _$('.new-group-controls');
 
-            if ($(this).attr('id') === 'at-save-block-to-group') {
+            if (_$(this).attr('id') === 'at-save-block-to-group') {
                 $blockControls.removeClass('hidden');
                 $groupControls.addClass('hidden');
                 app.ct.addBlockToGroup(app.tempGBlockCnt);
                 app.ct.resetGroupTextBlock();
                 app.tempGBlockCnt++;
             } else {
-                $('#at-text-block-group-el-options').attr('data-tbgid', app.tempGBlockCnt);
+                _$('#at-text-block-group-el-options').attr('data-tbgid', app.tempGBlockCnt);
                 $blockControls.addClass('hidden');
                 $groupControls.removeClass('hidden');
             }
@@ -1126,21 +1200,21 @@ $(document).ready(function () {
             }
         },
         addBlockToGroup: function (blockId) {
-            var $textBlockList = $('#at-text-block-group-list'),
+            var $textBlockList = _$('#at-text-block-group-list'),
                 blockHTML,
                 blockDetails = {};
             if ($textBlockList.find('li').length === 0) {
                 $textBlockList.show();
             }
-            blockDetails.fontSize = $('#at-font-size-g .option-selected').data('size');
-            blockDetails.fface = $('#at-font-face-g .option-selected').data('fface');
-            blockDetails.fontColor = $('#at-font-color-g .option-selected').data('rgb');
+            blockDetails.fontSize = _$('#at-font-size-g .option-selected').data('size');
+            blockDetails.fface = _$('#at-font-face-g .option-selected').data('fface');
+            blockDetails.fontColor = _$('#at-font-color-g .option-selected').data('rgb');
             blockDetails.id = blockId;
-            blockDetails.isEditable = $('#at-editable-g').is(':checked') ? true : false;
-            blockDetails.isManditory = $('#at-manditory-g').is(':checked') ? true : false;
-            blockDetails.label = $('#at-text-block-title').val().length > 0 ? $('#at-text-block-title').val() : 'Text Block ' + blockId;
-            blockDetails.lineheight = $('#at-lineheight-g .option-selected').data('lineheight');
-            blockDetails.maxLength = $('#at-maxlength-g').val();
+            blockDetails.isEditable = _$('#at-editable-g').is(':checked') ? true : false;
+            blockDetails.isManditory = _$('#at-manditory-g').is(':checked') ? true : false;
+            blockDetails.label = _$('#at-text-block-title').val().length > 0 ? _$('#at-text-block-title').val() : 'Text Block ' + blockId;
+            blockDetails.lineheight = _$('#at-lineheight-g .option-selected').data('lineheight');
+            blockDetails.maxLength = _$('#at-maxlength-g').val();
 
             blockHTML = app.ct.textBlockHtmlSnippet(blockDetails);
             $textBlockList.append(blockHTML);
@@ -1149,30 +1223,30 @@ $(document).ready(function () {
             // Update the UI
             //console.log('handleTbgState ' + state)
             if (state === true) {
-                $('[data-state=disable-text-block-controls]').addClass('hidden');
-                $('[data-state=enable-text-block-controls]').removeClass('hidden');
+                _$('[data-state=disable-text-block-controls]').addClass('hidden');
+                _$('[data-state=enable-text-block-controls]').removeClass('hidden');
             } else {
-                $('[data-state=disable-text-block-controls]').removeClass('hidden');
-                $('[data-state=enable-text-block-controls]').addClass('hidden');
+                _$('[data-state=disable-text-block-controls]').removeClass('hidden');
+                _$('[data-state=enable-text-block-controls]').addClass('hidden');
             }
         },
         textBlockHtmlSnippet: function (settings) {
             // console.log(settings)
             var htmlString = '';
             htmlString += '<li class="list-group-item" ';
-            htmlString += 'data-editable="' + settings.isEditable + '" ';
-            htmlString += 'data-fface="' + settings.fface + '" ';
-            htmlString += 'data-rgb="' + settings.fontColor + '" ';
-            htmlString += 'data-size="' + settings.fontSize + '" ';
-            htmlString += 'data-id="' + settings.id + '" ';
-            htmlString += 'data-label="' + settings.label + '" ';
-            htmlString += 'data-lineheight="' + settings.lineheight + '" ';
-            htmlString += 'data-manditory="' + settings.isManditory + '" ';
-            htmlString += 'data-maxlength="' + settings.maxLength + '">';
-            htmlString += '<span class="badge">' + settings.label + '</span>';
-            htmlString += '<span class="hidden text-value">' + settings.textVal + '</span>';
-            htmlString += '<button type="button" data-action="remove-tb-from-tbg" class="btn btn-danger pull-right">X</button>';
-            htmlString += '<button type="button" data-action="edit-tb-from-tbg" class="btn btn-info pull-right">Edit</button>';
+                htmlString += 'data-editable="' + settings.isEditable + '" ';
+                htmlString += 'data-fface="' + settings.fface + '" ';
+                htmlString += 'data-rgb="' + settings.fontColor + '" ';
+                htmlString += 'data-size="' + settings.fontSize + '" ';
+                htmlString += 'data-id="' + settings.id + '" ';
+                htmlString += 'data-label="' + settings.label + '" ';
+                htmlString += 'data-lineheight="' + settings.lineheight + '" ';
+                htmlString += 'data-manditory="' + settings.isManditory + '" ';
+                htmlString += 'data-maxlength="' + settings.maxLength + '">';
+                htmlString += '<span class="badge">' + settings.label + '</span>';
+                htmlString += '<span class="hidden text-value">' + settings.textVal + '</span>';
+                htmlString += '<button type="button" data-action="remove-tb-from-tbg" class="btn btn-danger pull-right">X</button>';
+                htmlString += '<button type="button" data-action="edit-tb-from-tbg" class="btn btn-info pull-right">Edit</button>';
             htmlString += '</li>';
             return htmlString
         },
@@ -1182,23 +1256,23 @@ $(document).ready(function () {
           Validation
         **/
         validateTemplateName: function () {
-            app.$newTempBtn.removeAttr('disabled');
-            app.templateName = $.trim($(this).val());
-            // var $this = $(this);
+            app._$newTempBtn.removeAttr('disabled');
+            app.templateName = _$.trim(_$(this).val());
+            // var $this = _$(this);
             // if($this.val().length > 2){
-            //   app.$newTempBtn.removeAttr('disabled');
+            //   app._$newTempBtn.removeAttr('disabled');
             //   );
             // }else{
-            //   app.$newTempBtn.attr('disabled', 'disabled');
+            //   app._$newTempBtn.attr('disabled', 'disabled');
             // }
         },
         validateDocSize: function () {
-            var $this = $(this),
-                $businessCardOpt = $('.doc-size-business'),
-                $docOrientationOpts = $('input[name=doc-orientation]');
+            var $this               = _$(this),
+                $businessCardOpt    = _$('.doc-size-business'),
+                $docOrientationOpts = _$('input[name=doc-orientation]');
 
             if ($this.val() === 'Business Card') {
-                app.$documentSizeBtns.not('.doc-size-business').prop('checked', false);
+                app._$documentSizeBtns.not('.doc-size-business').prop('checked', false);
                 $businessCardOpt.prop('checked', true);
                 $docOrientationOpts.eq(1).prop('checked', true);
                 $docOrientationOpts.first().removeAttr('checked').attr('disabled', 'disabled').addClass('default-disabled');
@@ -1218,77 +1292,82 @@ $(document).ready(function () {
           Click elements
         **/
         bindCreateTemplateClickEvents: function () {
-            app.$tempActionBtn = $('.create-template, .update-template');
+            app._$tempActionBtn    = _$('.create-template, .update-template');
 
-            app.$reserCreateTemp = $('.reset-create-template');
-            app.$addTempArea = $('#add-template-block');
-            app.$addBlockToGroup = $('#at-add-block-to-group');
-            app.$saveBlockToGroup = $('#at-save-block-to-group');
-            app.$exitBlockToGroup = $('#at-close-block-to-group');
-            app.$stepBtns = $('.step-option-btn:not(.at-from-template)');
-            app.$newTempBtn = $('#at-new-template');
-            app.$fromTempBtn = $('.at-from-template');
-            app.$documentSizeBtns = $('input[name=doc-size]');
-            app.$textComponentOpt = $('.text-editor-option button');
-            app.$templateName = $('#new-template-name');
-            app.$toggleElTriggers = $('.js-toggle-target-el');
-            app.$updateTbBtn = $('[data-action=update-tb-from-tbg]');
-            app.$stopTbBtn = $('[data-action=stop-tb-from-tbg');
+            app._$reserCreateTemp  = _$('.reset-create-template');
+            app._$addTempArea      = _$('#add-template-block');
+            app._$addBlockToGroup  = _$('#at-add-block-to-group');
+            app._$saveBlockToGroup = _$('#at-save-block-to-group');
+            app._$exitBlockToGroup = _$('#at-close-block-to-group');
+            app._$stepBtns         = _$('.step-option-btn:not(.at-from-template)');
+            app._$newTempBtn       = _$('#at-new-template');
+            app._$fromTempBtn      = _$('.at-from-template');            
+            app._$textComponentOpt = _$('.text-editor-option button');            
+            app._$toggleElTriggers = _$('.js-toggle-target-el');
+            app._$updateTbBtn      = _$('[data-action=update-tb-from-tbg]');
+            app._$stopTbBtn        = _$('[data-action=stop-tb-from-tbg');
+
+            // Updates the template name above the canvas when typing into input field
+            app._$tempNameFromTemp.on('keyup', function(){
+              _$.debounce(app._$templateName.text(_$(this).val()), 500);              
+            });
+                
 
             // Edit Canvas Component Triggers
-            app.$delComponentBtn = $('#at-remove-component');
-            app.$editComponentBtn = $('#at-update-component');
-            app.$stopComponentBtn = $('#at-stop-update-component');
+            app._$delComponentBtn  = _$('#at-remove-component');
+            app._$editComponentBtn = _$('#at-update-component');
+            app._$stopComponentBtn = _$('#at-stop-update-component');
 
             // Bind to dom elements to functions
-            app.$reserCreateTemp.on('click', app.ct.resetTemplate);
-            app.$tempActionBtn.on('click', app.ct.createTempInit);
-            app.$tmplToggleBtn = $('.template-container [data-action=toggle-grid]');
-            app.$tmplToggleBtn.on('click', function () {
-                app.utils.toggleCanvasGrid($(this), false, app._ct_canvas);
+            app._$reserCreateTemp.on('click', app.ct.resetTemplate);
+            app._$tempActionBtn.on('click', app.ct.createTempInit);
+
+            app._$tmplToggleBtn = _$('.template-container [data-action=toggle-grid]');
+            app._$tmplToggleBtn.on('click', function () {
+                app.utils.toggleCanvasGrid(_$(this), false, app._ct_canvas);
             });
-            $('.template-container [data-action=download-thumbnail]').on('click', function () {
+            _$('.template-container [data-action=download-thumbnail]').on('click', function () {
                 console.log(app._ct_canvas);
-                app.utils.covertCanvasToImgDownload($(this), app._ct_canvas);
+                app.utils.covertCanvasToImgDownload(_$(this), app._ct_canvas);
             });
-            app.$documentSizeBtns.on('click', app.ct.validateDocSize);
-            app.$newTempBtn.on('click', app.ct.createNewTemp);
-            app.$stepBtns.on('click', function () {
-                app.utils.steppedOptionHandler($(this));
+            app._$documentSizeBtns.on('click', app.ct.validateDocSize);
+            app._$newTempBtn.on('click', app.ct.createNewTemp);
+            app._$stepBtns.on('click', function () {
+                app.utils.steppedOptionHandler(_$(this));
             });
-            app.$fromTempBtn.on('click', function () {
-                var $this = $(this);
+            app._$fromTempBtn.on('click', function () {
+                var $this = _$(this);
                 app.utils.steppedOptionHandler($this);
                 app.ct.toggleTempState(false);
                 app.ct.loadExistingTemp();
             });
-            app.$addTempArea.on('click', app.ct.createTempBlockData);
-            app.$addBlockToGroup.on('click', function () {
+            app._$addTempArea.on('click', app.ct.createTempBlockData);
+            app._$addBlockToGroup.on('click', function () {
                 app.ct.toggleTempGroupOpts();
                 app.ct.resetGroupTextBlock();
             });
-            app.$saveBlockToGroup.on('click', app.ct.toggleTempGroupOpts);
-            app.$updateTbBtn.on('click', app.ct.updateBlockFromGroup);
-            app.$stopTbBtn.on('click', app.ct.stopBlockFromGroup);
-            app.$exitBlockToGroup.on('click', function () {
+            app._$saveBlockToGroup.on('click', app.ct.toggleTempGroupOpts);
+            app._$updateTbBtn.on('click', app.ct.updateBlockFromGroup);
+            app._$stopTbBtn.on('click', app.ct.stopBlockFromGroup);
+            app._$exitBlockToGroup.on('click', function () {
                 app.ct.toggleTempGroupOpts(false);
                 app.ct.resetGroupTextBlock();
             });
-            app.$textComponentOpt.on('click', app.ct.setSelectedOption);
-            app.$templateName.on('keyup blur', app.ct.validateTemplateName);
-            app.$toggleElTriggers.on('click', app.ct.toggleElements);
-            app.$delComponentBtn.on('click', app.ct.delTempBlock);
-            app.$editComponentBtn.on('click', app.ct.editTempBlock);
-            app.$stopComponentBtn.on('click', app.ct.stopTempBlock);
-            $('body').on('click', 'button[data-action=remove-tb-from-tbg]', function () {
-                $(this).parent().remove();
-                if ($('#at-text-block-group-list li').length > 0) {
-                    $('#at-text-block-group-list li').removeAttr('style');
+            app._$textComponentOpt.on('click', app.ct.setSelectedOption);
+            app._$templateName.on('keyup blur', app.ct.validateTemplateName);
+            app._$toggleElTriggers.on('click', app.ct.toggleElements);
+            app._$delComponentBtn.on('click', app.ct.delTempBlock);
+            app._$editComponentBtn.on('click', app.ct.editTempBlock);
+            app._$stopComponentBtn.on('click', app.ct.stopTempBlock);
+            app._$body.on('click', 'button[data-action=remove-tb-from-tbg]', function () {
+                _$(this).parent().remove();
+                if (_$('#at-text-block-group-list li').length > 0) {
+                    _$('#at-text-block-group-list li').removeAttr('style');
                 }
             });
-            $('body').on('click', 'button[data-action=edit-tb-from-tbg]', function () {
+            app._$body.on('click', 'button[data-action=edit-tb-from-tbg]', function () {
                 app.ct.handleTbgState(true);
-                app.ct.editBlockFromGroup($(this));
+                app.ct.editBlockFromGroup(_$(this));
             });
         },
 
@@ -1299,17 +1378,17 @@ $(document).ready(function () {
         createTempInit: function () {
             var confrimation;
             // Check if a user is trying to make and update or create a new template
-            if ($(this).hasClass('update-template')) {
+            if (_$(this).hasClass('update-template')) {
                 confrimation = confirm("Are you sure you want to update this template? This will effect any products that have been created using this template.");
                 // Confrim to the user that they are making an update.
                 if (confrimation == true) {
                     // Set the templateId so this can be passed through to the POST request and update the correct template
-                    app.templateId = $('input[name=template-url]:checked').val();
+                    app.templateId = _$('input[name=template-url]:checked').val();
                 }
             }
 
             // Check that if is is an update, they have confirmed they are happy to make it. Otherwise this request is to create a new template
-            if (!$(this).hasClass('update-template') || confrimation === true) {
+            if (!_$(this).hasClass('update-template') || confrimation === true) {
                 // Set what type of request this is. Required by the utils.generateXML 
                 app.isCreateTemplate = true;
                 app.isCreateProduct = false;
@@ -1319,14 +1398,14 @@ $(document).ready(function () {
                     app.templateId = null;
                 }
                 // Create a preview image on the page of what is on the canvas
-                app.utils.generateCanvasPreviewImg(app.$tmplToggleBtn, app._ct_canvas, 'ct');
+                app.utils.generateCanvasPreviewImg(app._$tmplToggleBtn, app._ct_canvas, 'ct');
                 // Begin creating the templates' cooridnates/XML
                 app.utils.generateCords(app.utils.generateJSON(app._ct_canvas));
             }
         },
     };
 
-    if ($('[data-template=build-template]').length > 0) {
+    if (_$('[data-template=build-template]').length > 0) {
         app.ct.initCreateTemp();
     }
 });

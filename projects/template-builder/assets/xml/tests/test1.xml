@@ -1,0 +1,13 @@
+<doc assetspath="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\" scalex="1" scaley="1">
+	<page height="297" width="420">
+		<pdf align="left" editable="false" id="bglayer" lowerleftx="0" lowerlefty="0" orientate="north" title="background" upperrightx="420" upperrighty="297" verticalalign="top"/>
+		<text-block-group align="left" editable="True" id="Group0" lowerleftx="238.9998" lowerlefty="56.58600000000001" mandatory="False" orientate="north" spacing="10" upperrightx="397.3902" upperrighty="226.29000000000002" verticalalign="top">
+			<text-block editable="True" font-family="FuturaBT-Heavy" font-size="16" id="TextBlockG_0" leading="100%" mandatory="False" textmode="multiline" title="Title">Name of Event</text-block>
+			<text-block editable="True" font-family="FuturaBT-Heavy" font-size="15" id="TextBlockG_1" leading="125%" mandatory="False" textmode="multiline" title="Medium Text">20 Month 2013 11am to 4pm Name of venue/location Street address, town, county</text-block>
+			<text-block editable="True" font-family="FuturaBT-Heavy" font-size="10" id="TextBlockG_2" leading="125%" mandatory="False" textmode="multiline" title="Small Text">Please bring this ticket with you.</text-block>
+		</text-block-group>
+		<text-block align="left" editable="true" font-family="FuturaBT-Medium" font-size="7" id="TextBlock_1" leading="100%" lowerleftx="21.212999999999997" lowerlefty="14.160000000000025" mandatory="true" orientate="north" source="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\C:\Projects\bemac_discovery\BeMacDiscovery\Assets\Terms.txt" textmode="multiline" title="Terms and Conditions" upperrightx="384.6624" upperrighty="26.887800000000027" verticalalign="bottom"/>
+		<image align="right" editable="true" fitmethod="auto" highresfilename="assets/img/demo-thumbs/4.jpg" id="Logo 22" lowerleftx="25.455599999999997" lowerlefty="203.6628" lowresfilename="assets/img/demo-thumbs/4.jpg" mandatory="true" orientate="north" title="Logo 2" upperrightx="398.8044" upperrighty="261.645" verticalalign="bottom"/>
+		<image align="right" editable="true" fitmethod="auto" highresfilename="demo-800.jpg" id="Logo 13" lowerleftx="31.112399999999997" lowerlefty="87.69840000000002" lowresfilename="demo-800.jpg" mandatory="true" orientate="north" title="Logo 1" upperrightx="404.46119999999996" upperrighty="135.7812" verticalalign="bottom"/>
+	</page>
+</doc>
