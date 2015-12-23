@@ -873,8 +873,11 @@ _$(document).ready(function () {
         },
         setImageBlockDefaultImg: function(){
         	_$('[data-block-type=block-item]').each(function(){
-        		var blockId = _$(this).data('prodblockid'),
-        			imgUrl  = _$('[name=asset-default-block_' + blockId + ']:checked').val();       		
+        		var blockId 	 = _$(this).data('prodblockid'),
+        			_$defaultImg = _$('[name=asset-default-block_' + blockId + ']:checked'),        			
+        			imgUrl  	 = _$defaultImg.val();  
+        		// Only request an image, if a default has been set.
+        		if(_$defaultImg.length > 0)     		
         		setTimeout(function(){
 	        		// console.log(blockId, imgUrl);
 	        		// Load each blocks default image into the to the relevant block.
@@ -1106,10 +1109,9 @@ _$(document).ready(function () {
                 var _$this  = _$(this),
 					assetId = _$this.val(),
 					imgUrl  = _$this.next().find('img').attr('src'),
-					blockId = _$this.attr('id').replace('block_', '').replace('/_asset_[0-9][0-9]?/g', ''),
 					isChecked;
 					
-				console.log(_$this.attr('id'), blockId);
+				console.log(app.activeImageBlockId, app.activeImageBlockId);
 
                 // Check if this is the first asset to be added. If it is, then show the list
                 if (i === 0 && _$blockAssetTable.find('tr').length <= 0) {
@@ -1117,8 +1119,8 @@ _$(document).ready(function () {
                     isChecked = 'checked';
 
                     // Set the canvas image to the new default
-                    app.cp.setActiveCanvasObj(blockId);
-	            	console.log(app._activeEditEl, blockId);
+                    app.cp.setActiveCanvasObj(app.activeImageBlockId);
+	            	console.log(app._activeEditEl, app.activeImageBlockId);
 	            	app.cp.setCanvasObjImage(imgUrl, app._activeEditEl.width, app._activeEditEl.height);
                 } else {
                     isChecked = '';
@@ -1158,11 +1160,12 @@ _$(document).ready(function () {
             app._$saveBlockAssetBtn.data('boundblockid', app.activeImageBlockId);
         },
         removeAssetFromBlock: function (_$el) {
+        	alert('Made it..')
             var _$blockAssetList = _$el.parents('.block-asset-item-list'),
 	    		canvasObjId 	 = _$el.data('blockid'),
 	    		isAssetDefault	 = _$el.parent().siblings().find('[data-action=update-canvas-control]').is(':checked');
 
-	    	console.log('canvasObjId: ' + canvasObjId)
+	    	// console.log('canvasObjId: ' + canvasObjId)
 
             // Check if this is the last item to be deleted from the blocks' list.
             if (_$blockAssetList.find('tr').length <= 1) {
@@ -1579,6 +1582,12 @@ _$(document).ready(function () {
         },
         createBlockImgAssetItem: function (assetId, blockId, isChecked, imgUrl) {
             // This function creates a unordered list, that contains the block's image options
+            // Change img path based on enviornment
+            if (app.isLocalEnv) {
+                imgUrl = 'assets/img/demo-thumbs/' + assetId + '.jpg';
+            } else {
+                imgUrl = globalUrls.smallThumbFolder + assetId + '.jpg';
+            }
             var assetItemString = '';
             // console.log(imgUrl)
 
@@ -1592,7 +1601,7 @@ _$(document).ready(function () {
             assetItemString += '<td>';
             assetItemString += '<input type="radio" ' + isChecked + ' data-action="update-canvas-control" ';
             assetItemString += 'data-canvas-setting-type="bi" data-assetid="' + assetId + '" ';
-            assetItemString += 'value="assets/img/demo-thumbs/' + assetId + '.jpg" name="asset-default-block_' + blockId + '" ';
+            assetItemString += 'value="' + imgUrl + '" name="asset-default-block_' + blockId + '" ';
             assetItemString += 'id="block_' + blockId + '_asset_' + assetId + '">';
             assetItemString += '<label for="block_' + blockId + '_asset_' + assetId + '">image name</label>';
             assetItemString += '</td>';
@@ -1727,9 +1736,7 @@ _$(document).ready(function () {
                 app.cp.setActiveBlockImage(_$(this));
             });
             // Remove an asset from a block
-            app._$body.on('click', '[data-action=remove-block-img]', function(e){
-            	alert('Clicked');
-            	e.preventDefault();
+            app._$body.on('click', '[data-action=remove-block-img]', function(){
             	app.cp.removeAssetFromBlock(_$(this));
             });
 

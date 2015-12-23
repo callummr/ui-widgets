@@ -30,7 +30,8 @@ _$(document).ready(function () {
         **/
         bindAssetLibraryDOMEvents: function () {
             _$('[data-action=toggle-asset-lib-functions]').on('click', app.al.toggleAssetLibFeatures);
-            _$('[data-action=search-asset-lib]').on('click', app.al.searchAssets);
+            _$('[data-action=search-asset-lib]').on('click', function (event) { app.al.searchAssets("lib"); });
+            _$('[data-action=search-asset-prod]').on('click', function (event) { app.al.searchAssets("prod"); });
             _$('[data-action=init-add-new-asset]').on('click', app.al.LoadPopup);
         },
         SetThemes: function () {
@@ -84,7 +85,6 @@ _$(document).ready(function () {
                     _$(this).colorbox.resize();
                     app.al.SetupSave();
                 }
-
             });
             //_$(".ajax").colorbox();
         },
@@ -100,7 +100,81 @@ _$(document).ready(function () {
             }
             return "Headline";
         },
-        AssetsSearchResults: function (results) {
+        LoadUsage: function (id) {
+
+            _$.ajax({
+                url: BaseUrl + "Asset.ashx",
+                type: "get", //send it through get method
+                data: { cmd: "assetUsage", assetId: id },
+                success: function (response) {
+
+                    console.log("asset usage: " + response);
+
+                    var results = app.al.ExtractJSON(response);
+
+                    var htmlList = app.al.BuildAssetUsage(results);
+
+                    _$.colorbox({
+                        html: htmlList,
+                        scrolling: false,
+                        onOpen: function () {
+                            // make the overlay visible and re-add all it's original properties!
+                            _$('#cboxOverlay').css({
+                                'visibility': 'visible',
+                                'opacity': 1,
+                                'cursor': 'pointer'
+                            });
+                            _$('#colorbox').css({ 'visibility': 'visible' }).fadeIn(1000);
+                        },
+                        onComplete: function () {
+                            _$(this).colorbox.resize();
+                            app.al.SetupSave();
+                        }
+                    });
+                }
+            });
+
+            console.log("loading usage: " + id);
+        },
+        BuildAssetUsage: function (data) {
+
+            //    var thumbPath = '/be/SharedAssets/th1/';
+            var resultsString = '<ul id="asset-lib-item-list" class="clearfix list-group">';
+
+            // For each result, create a list item that can be used by the user to select the image asset
+            _$.each(data, function (key, value) {
+                resultsString += '<li class="list-group-item">';
+                resultsString += '<label for="item_' + value.ItemId + '" class="asset-lib-label"></label>';
+                resultsString += '<span class="asset-lib-item-name">Product Item ' + value.Description + '</span>';
+                resultsString += '<span class="asset-lib-item-name">Product Id ' + value.ProductId + '</span>';
+                resultsString += '<span class="asset-lib-item-name">CreatedOn ' + value.CreatedOn + '</span>';
+                resultsString += '<span class="asset-lib-item-name">Job Usage ' + value.JobUsage + '</span>';
+                resultsString += '';
+                resultsString += '</li>';
+            });
+
+            return resultsString += "</ul>";
+        },
+        BuildAssetQuickGrid: function (results) {
+
+            var thumbPath = '/be/SharedAssets/th1/';
+            var resultsString = "";
+
+            // For each result, create a list item that can be used by the user to select the image asset
+            _$.each(results, function (key, value) {
+                resultsString += '<li class="list-group-item">';
+                resultsString += '<input type="checkbox" name="block-asset-item" id="asset_' + value.AssetId + '" ';
+                resultsString += 'class="hidden asset-lib-selection-checkbox" value="' + value.AssetId + '">';
+                resultsString += '<label for="asset_' + value.AssetId + '" class="asset-lib-label">';
+                resultsString += '<img src="' + thumbPath + value.AssetId + '.jpg" alt="Asset ' + value.AssetId + '" class="asset-lib-thumb">';
+                resultsString += '<span class="asset-lib-item-name">Asset ' + value.AssetId + '</span>';
+                resultsString += '</label>';
+                resultsString += '</li>';
+            });
+
+            return resultsString;
+        },
+        BuildAssetGrid: function (results) {
 
             console.log('in table build');
 
@@ -129,7 +203,7 @@ _$(document).ready(function () {
                         '   <td>{1}</td>' +
                         '   <td>{2}</td>' +
                         '   <td>{3}</td>' +
-                        '   <td>{4}</td>' +
+                        '   <td><a href="#" onclick="app.al.LoadUsage({1})">{4}</a></td>' +
                         '   <td>{5}</td>' +
                         '   <td>' +
                         '       <button type="button" class="btn btn-default" data-action="asset-functions" data-assetid="1">Replace</button>' +
@@ -141,7 +215,7 @@ _$(document).ready(function () {
                 var NewRow = RowTemplate.toString();
 
                 NewRow = NewRow.replace("{0}", results[i].Name);
-                NewRow = NewRow.replace("{1}", results[i].AssetId);
+                NewRow = NewRow.replace("{1}", results[i].AssetId).replace("{1}", results[i].AssetId);
                 NewRow = NewRow.replace("{2}", results[i].Type);
                 NewRow = NewRow.replace("{3}", results[i].Category);
                 NewRow = NewRow.replace("{4}", results[i].Usage);
@@ -175,19 +249,19 @@ _$(document).ready(function () {
                 },
                 error: function (e) {
                     console.log(e);
-                    if(e.status === 200){
+                    if (e.status === 200) {
                         alert('Asset Saved');
                         /*
-                            Add a form reset function
+                        Add a form reset function
                         */
-                    } else{
+                    } else {
                         alert('Asset upload failed');
                     }
                 },
                 success: function () {
                     alert('Asset Saved');
                     /*
-                        Add a form reset function
+                    Add a form reset function
                     */
                 }
             }).bind('fileuploadsubmit', function (e, data) {
@@ -204,11 +278,14 @@ _$(document).ready(function () {
                 app.assetTheme = _$(this).find('option:selected').val();
             });
         },
-        searchAssets: function () {
+        searchAssets: function (Populate) {
 
             var SearchTitleTagID = _$('#search-text').val();
             var SearchType = _$('#search-type').val();
-            var SearchCategory = _$('#search-category').val();
+            var SearchCategory = _$('#searchCategory').val();
+
+            if (SearchCategory === undefined)
+                SearchCategory = _$('#pdfItemAdmin1_searchCategory option:selected').val();
 
             _$.ajax({
                 url: BaseUrl + "Asset.ashx",
@@ -216,103 +293,29 @@ _$(document).ready(function () {
                 data: { ttid: SearchTitleTagID, t: SearchType, c: SearchCategory },
                 success: function (response) {
 
-                    console.log(response);
-
                     var results = app.al.ExtractJSON(response);
-                    console.log('res: ' + results);
 
-                    var vals = app.al.AssetsSearchResults(results);
+                    if (Populate == "lib") {
 
-                    _$("#grid").empty().append(vals);
+                        var GridData = app.al.BuildAssetGrid(results);
+                        _$("#grid").empty().append(GridData);
+                    }
+                    else {
 
-                    if (response.substr(0, 1) == "[") {
-                        var data = response.substr(0, response.lastIndexOf("]") + 1);
-                        dataObj = JSON.parse(data),
-                    _$searchResults = _$('#assetsFound #asset-lib-item-list'),
-                    resultsString = '';
-
-                        // Empty the Search results
-                        _$searchResults.empty();
-
-                        var thumbPath = '/be/SharedAssets/th1/';
-
-                        // For each result, create a list item that can be used by the user to select the image asset
-                        _$.each(dataObj, function (key, value) {
-                            resultsString += '<li class="list-group-item">';
-                            resultsString += '<input type="checkbox" name="block-asset-item" id="asset_' + value.AssetId + '" ';
-                            resultsString += 'class="hidden asset-lib-selection-checkbox" value="' + value.AssetId + '">';
-                            resultsString += '<label for="asset_' + value.AssetId + '" class="asset-lib-label">';
-                            resultsString += '<img src="' + thumbPath + value.AssetId + '.jpg" alt="Asset ' + value.AssetId + '" class="asset-lib-thumb">';
-                            resultsString += '<span class="asset-lib-item-name">Asset ' + value.AssetId + '</span>';
-                            resultsString += '</label>';
-                            resultsString += '</li>';
-                        });
-                        // Append results to the list
-                        _$searchResults.append(resultsString);
-                    } else {
-                        alert('no data returned...');
+                        console.log('populate prod grid');
+                        var QuickGridData = app.al.BuildAssetQuickGrid(results);
+                        _$('#assetsFound #asset-lib-item-list').empty().append(QuickGridData);
                     }
                 }
             });
         }
-
     };
-
-    // Refactor the code below and add it to the app.ap object.
 
     app.al.initAssetLibrary();
 
     var BaseUrl;
 
-    // 
     if (!app.isLocalEnv) {
         BaseUrl = globalUrls.assetBaseUrl;
     }
-
-
-    //***************     ASSET SEARCH  ***************************
-    _$('#btnSearchAssets').on('click', function () {
-        var fileName = _$('#txtSearchFilename').val(),
-            tags = _$('#txtSearchTags').val();
-
-        if (app.isLocalEnv) {
-            // Show the 'Save assets' button on click of 'Search' locally
-            app._$saveBlockAssetBtn.removeClass('hidden');
-        }
-
-        _$.ajax({
-            url: BaseUrl + "Asset.ashx",
-            type: "get", //send it through get method
-            data: { fn: fileName, tg: tags },
-            success: function (response) {
-                if (response.substr(0, 1) == "[") {
-                    var data = response.substr(0, response.lastIndexOf("]") + 1);
-                    dataObj = JSON.parse(data),
-                    _$searchResults = _$('#assetsFound #asset-lib-item-list'),
-                    resultsString = '';
-
-                    // Empty the Search results
-                    _$searchResults.empty();
-
-                    // For each result, create a list item that can be used by the user to select the image asset
-                    _$.each(dataObj, function (key, value) {
-                        resultsString += '<li class="list-group-item">';
-                        resultsString += '<input type="checkbox" name="block-asset-item" id="asset_' + value.AssetId + '" ';
-                        resultsString += 'class="hidden asset-lib-selection-checkbox" value="' + value.AssetId + '">';
-                        resultsString += '<label for="asset_' + value.AssetId + '" class="asset-lib-label">';
-                        resultsString += '<img src="' + globalUrls.smallThumbFolder + value.AssetId + '.jpg" alt="Asset ' + value.AssetId + '" class="asset-lib-thumb">';
-                        resultsString += '<span class="asset-lib-item-name">Asset ' + value.AssetId + '</span>';
-                        resultsString += '</label>';
-                        resultsString += '</li>';
-                    });
-                    // Append results to the list
-                    _$searchResults.append(resultsString);
-                    // Show the 'Save assets' button if there are some results.
-                    app._$saveBlockAssetBtn.removeClass('hidden');
-                } else {
-                    alert('No search results found. Please try again.');
-                }
-            }
-        });
-    });
 });

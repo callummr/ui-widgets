@@ -1192,10 +1192,10 @@ _$(document).ready(function(){
 		      		app.utils.createTemplate(xmlOutput);
 		      	} else if(app.isCreateProduct || app.isUpdateProduct){
 		      		// Make sure a hidden checkbox is checked as the BE needs to know this.
-		      		$('#pdfItemAdmin1_chkIsPDF').prop('checked', true);		
+		      		_$('#pdfItemAdmin1_chkIsPDF').prop('checked', true);		
 
 		      		// Mimic a click on the storefront button that updates/creates a product
-		      		$('#btnSubmit').click();	       
+		      		_$('#btnSubmit').click();	       
 		        }  
 	      	}    
 	    },
