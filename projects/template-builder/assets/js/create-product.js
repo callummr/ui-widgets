@@ -1727,10 +1727,13 @@ _$(document).ready(function () {
 
             // Initiate the usage of the asset Library
             app._$body.on('click', '[data-action=add-images-to-block]', app.cp.initAssetLibrary);
+
             // Save Assets to block
-            app._$saveBlockAssetBtn.on('click', app.cp.saveAssetsToBlock);
+            app._$saveBlockAssetBtn.unbind()..on('click', app.cp.saveAssetsToBlock);
+
             // Close Asset Library Without Saving      		
             _$('[data-action=close-asset-library]').on('click', app.cp.closeAssetLibrary);
+            
             // Updates the canvas with the relevant image selected with the image block
             app._$body.on('click', '[data-action=update-block-img-on-canvas]', function () {
                 app.cp.setActiveBlockImage(_$(this));
