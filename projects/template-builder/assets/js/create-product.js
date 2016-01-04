@@ -1160,7 +1160,6 @@ _$(document).ready(function () {
             app._$saveBlockAssetBtn.data('boundblockid', app.activeImageBlockId);
         },
         removeAssetFromBlock: function (_$el) {
-        	alert('Made it..')
             var _$blockAssetList = _$el.parents('.block-asset-item-list'),
 	    		canvasObjId 	 = _$el.data('blockid'),
 	    		isAssetDefault	 = _$el.parent().siblings().find('[data-action=update-canvas-control]').is(':checked');
@@ -1173,7 +1172,7 @@ _$(document).ready(function () {
                 _$blockAssetList.addClass('hidden');
             }
             // Then remove the item from the DOM
-            _$el.parents('tr').remove();
+            _$el.closest('tr').remove();
 
             // Check the clicked element is the default and if there is another img to set as the default
             if (isAssetDefault === false) {
