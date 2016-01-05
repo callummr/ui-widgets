@@ -13,14 +13,14 @@ _$(document).ready(function () {
     app._activeEditEl = null;
     app.activeImageBlockId;
 
-    app._$productBlockList = _$('#product-blocks-list');
-    app._$blockAssetLibrary = _$('#block-asset-lib');
-    app._$saveBlockAssetBtn = _$('[data-action=save-block-assets]');
-    app._$blockAssetsJSONel = _$('#pdfItemAdmin1_hdnBlockAssets');
-    app._$hiddenAssetId = _$('#pdfItemAdmin1_hdnTemplateId');
-    app._$hiddenDimensions = _$('#pdfItemAdmin1_hdnTemplateDimensions');
-    app._$hiddenTemplateName = _$('#pdfItemAdmin1_hdnTemplateName');
-    app._$fromTempName = _$('#from-template-name');
+    app._$productBlockList 	  = _$('#product-blocks-list');
+    app._$blockAssetLibrary	  = _$('#block-asset-lib');
+    app._$saveBlockAssetBtn   = _$('[data-action=save-block-assets]');
+    app._$blockAssetsJSONel   = _$('#pdfItemAdmin1_hdnBlockAssets');
+    app._$hiddenAssetId	   	  = _$('#pdfItemAdmin1_hdnTemplateId');    
+    app._$hiddenDimensions    = _$('#pdfItemAdmin1_hdnTemplateDimensions');
+    app._$hiddenTemplateName  = _$('#pdfItemAdmin1_hdnTemplateName');
+    app._$fromTempName		  = _$('#from-template-name');
 
     app._$saveNewTempCheckbox = _$('#save-as-new-template');
 
@@ -38,12 +38,12 @@ _$(document).ready(function () {
 
             // Set the name of the h1 so the user knows what product they are editing
             var productName = _$('#txtName').val() || 'Product';
-            _$('#product-name').text('Editing Product :: ' + productName);
+            _$('#product-name').text('Editing Product :: ' + productName );
 
             // Set the template name
             var fromtemplateName = app._$hiddenTemplateName.val();
             app._$fromTempName.text(fromtemplateName + ' (id: ' + app.templateId + ') ');
-
+            
             if (_$hiddenXmlEl.val() === '' || typeof (_$hiddenXmlEl) === 'undefined') {
                 // console.log('Empty XML');
                 // Set the type of operation that is taking place
@@ -51,7 +51,7 @@ _$(document).ready(function () {
                 app.isUpdateProduct = false;
                 // Show a user a list of templates to select from.
                 app.cp.loadProductList();
-            } else {
+            } else{
                 // console.log('XML is not empty');                
 
                 // Set the type of operation that is taking place
@@ -72,14 +72,14 @@ _$(document).ready(function () {
                 app.docDimensions = app._$hiddenDimensions.val().split(',');
 
                 // Set the products available dimensions
-                app.utils.setProductDimensions();
+			    app.utils.setProductDimensions();
 
                 // Create the Canvas Element based of JSON created from the XML				
                 app.cp.loadProductFromJSON(productJSON);
             }
 
-            if (!app.isLocalEnv) {
-                app.cp.loadAssetLibUploadForm();
+            if(!app.isLocalEnv){
+            	app.cp.loadAssetLibUploadForm();
             }
 
             app.cp.bindCreateProductDomEvents();
@@ -116,20 +116,20 @@ _$(document).ready(function () {
         closeEditTbFromTbg: function () {
             _$(this).parents('.edit-tb-defaults-container').addClass('hidden');
         },
-        loadAssetLibUploadForm: function () {
-            // This functions loads the asset libraray upload form into the page.
-            _$.ajax({
-                url: 'PDF/AddAsset.html'
-            })
-        	.success(function (data) {
-        	    // Append the form to the targeted div
-        	    _$('[data-id=asset-upload-container]').append(_$(data));
-        	    // Sets up the functionality to save an asset
-        	    app.al.SetupSave();
+        loadAssetLibUploadForm: function(){
+        	// This functions loads the asset libraray upload form into the page.
+        	_$.ajax({
+        		url: 'PDF/AddAsset.html'
         	})
-        	.fail(function () {
-        	    alert('Failed to load Asset Library upload form.');
-        	});
+        	.success(function(data){
+        		// Append the form to the targeted div
+        		_$('[data-id=asset-upload-container]').append(_$(data));
+        		// Sets up the functionality to save an asset
+        		app.al.SetupSave(); 
+        	})
+        	.fail(function(){
+        		alert('Failed to load Asset Library upload form.');
+        	});	        	   	
         },
 
 
@@ -157,14 +157,14 @@ _$(document).ready(function () {
 			    _$('#dynamic-product-templates').append(prodString).removeClass('hidden');
 			    _$('#dynamic-product-templates .template-selection').first().prop('checked', true);
 			})
-			.fail(function () {
-			    alert('Failed to load template list');
+			.fail(function(){
+				alert('Failed to load template list');
 			});
         },
         loadExistingProduct: function () {
             var x2js = new X2JS(),
 	         	ajaxUrl,
-	          	_$this = _$(this),
+	          	_$this 			 = _$(this),
 	          	existingTempName = _$this.siblings('.template-name').text();
 
             app.utils.steppedOptionHandler(_$this);
@@ -195,7 +195,7 @@ _$(document).ready(function () {
 			    } else {
 			        productData = JSON.parse(app.utils.filterResponse(data));
 			        productJSON = x2js.xml_str2json(productData[0].XML);
-			        app.docDimensions = productData[0].Dimensions.replace(' ', '').split(',');
+			        app.docDimensions = productData[0].Dimensions.replace(' ', '').split(',');			        
 			    }
 
 			    // Update template name hidden field
@@ -213,7 +213,7 @@ _$(document).ready(function () {
 			    _$('#template-name').text(_$this.next().find('.template-name').text());
 
 			    // Create the Canvas Element based of JSON created from the XML
-			    app.cp.loadProductFromJSON(productJSON);
+			    app.cp.loadProductFromJSON(productJSON);			    
 
 			})
 			.fail(function () {
@@ -223,9 +223,9 @@ _$(document).ready(function () {
         loadProductFromJSON: function (canvasData) {
             // console.log(canvasData);
             // console.log(canvasData.doc);
-            var canvasEl = document.createElement('canvas'),
-			  	docWidth = parseInt(canvasData.doc.page._width),
-			  	docHeight = parseInt(canvasData.doc.page._height),
+            var canvasEl 	   = document.createElement('canvas'),
+			  	docWidth 	   = parseInt(canvasData.doc.page._width),
+			  	docHeight 	   = parseInt(canvasData.doc.page._height),
 			  	canvasSettings = app.utils.setCanvasSettings(docWidth, docHeight);
 
             // Set the ID of the Canvas      
@@ -238,7 +238,7 @@ _$(document).ready(function () {
 
             // console.log(document.getElementById('c'));
             app._cp_canvas = new fabric.Canvas('cp_canvas', { selection: false, backgroundColor: '#FFF' });
-            app.utils.drawGrid(396, app._cp_canvas); // Pass in the width dynamically so the whole grid is covered
+            app.utils.drawGrid(app._cp_canvas);
             // Add all of the elements to the page.
             app.cp.createProductBlocksSettings(canvasData.doc.page);
             app.cp.bindCreateProductCanvasEvents();
@@ -299,7 +299,7 @@ _$(document).ready(function () {
                         app.cp.createBlockDataFromXML(imgBlock);
                     });
                 }
-            }
+            }          
 
             app._$productBlockList.append(blockListingString);
 
@@ -311,9 +311,9 @@ _$(document).ready(function () {
             // Create a list of assets for each image block
             app.cp.createImageBlockAssetList();
             // Sets the defualt image for each canvas block
-            setTimeout(function () {
-                app.cp.setImageBlockDefaultImg();
-            }, 1000);
+            setTimeout(function(){
+            	app.cp.setImageBlockDefaultImg();
+            }, 1000);            
             // app.cp.setActiveBlock();
             // console.log(app._cp_canvas);
         },
@@ -325,25 +325,25 @@ _$(document).ready(function () {
             // console.log(blockId);
             // console.log(imgBlock);
             imgBlockString += '<li class="clearfix list-group-item" data-prodblockid="' + blockId + '" data-block-type="block-item">';
-            imgBlockString += '<button type="button" class="btn btn-info pull-top-right" data-action="toggle-product-block">X</button>';
-            imgBlockString += '<h2 class="block-item-heading">' + imgBlock._title + '</h2>';
-            imgBlockString += '<div class="cp-block-container hidden">';
-            imgBlockString += '<input type="text" class="form-control" value="' + imgBlock._title + '" />';
-            imgBlockString += '<div class="clearfix">';
-            // V Align & H Align Settings
-            imgBlockString += app.cp.createAlignmentSettings(blockId, imgBlock._align, imgBlock._verticalalign);
-            imgBlockString += '</div>';
-            imgBlockString += '<div class="clearfix">';
-            // Editable & Manditory Settings
-            imgBlockString += app.cp.createUserSettings(blockId, imgBlock._editable, imgBlock._mandatory);
-            imgBlockString += '</div>';
-            imgBlockString += '<hr>';
-            imgBlockString += '<button type="button" class="btn btn-info" data-action="add-images-to-block" data-id="' + blockId + '">Add Image</button>';
-            imgBlockString += '<div class="block-asset-item-list-wrapper">';
-            imgBlockString += '<table data-asset-block="' + blockId + '" class="table block-asset-item-list hidden"></table>';
-            imgBlockString += '</div>';
-            imgBlockString += '<button type="button" class="btn btn-danger" data-action="remove-product-block" data-id="' + blockId + '">Delete Block</button>';
-            imgBlockString += '</div>';
+	            imgBlockString += '<button type="button" class="btn btn-info pull-top-right" data-action="toggle-product-block">X</button>';
+	            imgBlockString += '<h2 class="block-item-heading">' + imgBlock._title + '</h2>';
+	            imgBlockString += '<div class="cp-block-container hidden">';
+		            imgBlockString += '<input type="text" class="form-control" value="' + imgBlock._title + '" />';
+		            imgBlockString += '<div class="clearfix">';
+		            // V Align & H Align Settings
+		            imgBlockString += app.cp.createAlignmentSettings(blockId, imgBlock._align, imgBlock._verticalalign);
+		            imgBlockString += '</div>';
+		            imgBlockString += '<div class="clearfix">';
+		            // Editable & Manditory Settings
+		            imgBlockString += app.cp.createUserSettings(blockId, imgBlock._editable, imgBlock._mandatory);
+		            imgBlockString += '</div>';
+		            imgBlockString += '<hr>';
+		            imgBlockString += '<button type="button" class="btn btn-info" data-action="add-images-to-block" data-id="' + blockId + '">Add Image</button>';
+		            imgBlockString += '<div class="block-asset-item-list-wrapper">';
+		            imgBlockString += '<table data-asset-block="' + blockId + '" class="table block-asset-item-list hidden"></table>';
+		            imgBlockString += '</div>';
+		            imgBlockString += '<button type="button" class="btn btn-danger" data-action="remove-product-block" data-id="' + blockId + '">Delete Block</button>';		            
+	            imgBlockString += '</div>';
             imgBlockString += '</li>';
             //console.log(imgBlockString); 
 
@@ -355,26 +355,26 @@ _$(document).ready(function () {
 	    		blockId = tbgBlock._id.replace(/ /g, '');
 
             tbgBlockString += '<li class="clearfix list-group-item" data-prodblockid="' + blockId + '" data-block-type="text-block-group-item">';
-            tbgBlockString += '<button type="button" class="btn btn-info pull-top-right" data-action="toggle-product-block">X</button>';
-            tbgBlockString += '<h2 class="block-item-heading">' + tbgBlock._id + '</h2>';
-            tbgBlockString += '<div class="cp-block-container hidden">';
-            // tbgBlockString+= '<input type="text" class="form-control" value="' + tbgBlock._title +'" />';
-            // Block Spacing Setting
-            tbgBlockString += app.cp.createSpacingSetting(blockId, tbgBlock._spacing);
-            tbgBlockString += '<div class="clearfix">';
-            // V Align & H Align Settings
-            tbgBlockString += app.cp.createAlignmentSettings(blockId, tbgBlock._align, tbgBlock.__verticalalign);
-            tbgBlockString += '</div>';
-            tbgBlockString += '<div class="clearfix">';
-            // Editable & Manditory Settings
-            tbgBlockString += app.cp.createUserSettings(blockId, tbgBlock._editable, tbgBlock._mandatory);
-            tbgBlockString += '</div>';
-            // Create the list of text blocks with text bloxk group
-            // console.log(tbgBlock);
-            tbgBlockString += app.cp.createTbBlockFromTbgList(blockId, tbgBlock['text-block']);
-            tbgBlockString += '<button type="button" class="btn btn-danger" data-action="remove-product-block" data-id="' + blockId + '">Delete Block</button>';
+	            tbgBlockString += '<button type="button" class="btn btn-info pull-top-right" data-action="toggle-product-block">X</button>';
+	            tbgBlockString += '<h2 class="block-item-heading">' + tbgBlock._id + '</h2>';
+	            tbgBlockString += '<div class="cp-block-container hidden">';
+	            // tbgBlockString+= '<input type="text" class="form-control" value="' + tbgBlock._title +'" />';
+	            // Block Spacing Setting
+	            tbgBlockString += app.cp.createSpacingSetting(blockId, tbgBlock._spacing);
+	            tbgBlockString += '<div class="clearfix">';
+		            // V Align & H Align Settings
+		            tbgBlockString += app.cp.createAlignmentSettings(blockId, tbgBlock._align, tbgBlock.__verticalalign);
+	            tbgBlockString += '</div>';
+	            tbgBlockString += '<div class="clearfix">';
+		            // Editable & Manditory Settings
+		            tbgBlockString += app.cp.createUserSettings(blockId, tbgBlock._editable, tbgBlock._mandatory);
+	            tbgBlockString += '</div>';
+	            // Create the list of text blocks with text bloxk group
+	            // console.log(tbgBlock);
+	            tbgBlockString += app.cp.createTbBlockFromTbgList(blockId, tbgBlock['text-block']);
+	            tbgBlockString += '<button type="button" class="btn btn-danger" data-action="remove-product-block" data-id="' + blockId + '">Delete Block</button>';		            
 
-            tbgBlockString += '</div>';
+	            tbgBlockString += '</div>';
             tbgBlockString += '</li>';
 
             // console.log(tbgBlockString); 
@@ -386,13 +386,13 @@ _$(document).ready(function () {
 
             if (fromTbg === false) {
                 tBlockString += '<li class="clearfix list-group-item" data-prodblockid="' + blockId + '" data-block-type="text-block-item">';
-                tBlockString += '<h2 class="block-item-heading">' + tBlock._title + '</h2>';
-                tBlockString += '<button type="button" class="btn btn-info pull-top-right" data-action="toggle-product-block">X</button>';
-                // Need to hidden active class to button conditionally;
-                tBlockString += '<div class="cp-block-container hidden">';
-            } else {
-                tBlockString += '<div class="clearfix text-block-defaults-container" data-prodblockid="' + blockId + '">';
-                tBlockString += '<h2 class="block-item-heading">' + tBlock._title + '</h2>';
+	                tBlockString += '<h2 class="block-item-heading">' + tBlock._title + '</h2>';
+	                tBlockString += '<button type="button" class="btn btn-info pull-top-right" data-action="toggle-product-block">X</button>';
+	                // Need to hidden active class to button conditionally;
+	                tBlockString += '<div class="cp-block-container hidden">';
+            } else{
+	                tBlockString += '<div class="clearfix text-block-defaults-container" data-prodblockid="' + blockId + '">';
+	                tBlockString += '<h2 class="block-item-heading">' + tBlock._title + '</h2>';
             }
             // Block Title
             tBlockString += '<input type="text" class="form-control" value="' + tBlock._title + '" />';
@@ -405,27 +405,27 @@ _$(document).ready(function () {
             // Color Settings
             tBlockString += app.cp.createFontColorSetting(blockId, tBlock._colour);
             tBlockString += '<div class="clearfix">';
-            // Maxlength Setting
-            tBlockString += app.cp.createMaxLengthSetting(blockId, tBlock._maxlen);
-            // Lineheight Setting
-            tBlockString += app.cp.createlineHeightSetting(blockId, tBlock._leading);
+	            // Maxlength Setting
+	            tBlockString += app.cp.createMaxLengthSetting(blockId, tBlock._maxlen);
+	            // Lineheight Setting
+	            tBlockString += app.cp.createlineHeightSetting(blockId, tBlock._leading);
             tBlockString += '</div>';
             // Only include these options if the the block being created is not in a text block group
-            if (fromTbg === false) {
-                tBlockString += '<div class="clearfix">';
-                // V Align & H Align Settings
-                tBlockString += app.cp.createAlignmentSettings(blockId, tBlock._align, tBlock.__verticalalign);
-                tBlockString += '</div>';
+            if(fromTbg === false){
+            	tBlockString += '<div class="clearfix">';
+		            // V Align & H Align Settings
+		            tBlockString += app.cp.createAlignmentSettings(blockId, tBlock._align, tBlock.__verticalalign);
+	            tBlockString += '</div>';
             }
-
+            
             tBlockString += '<div class="clearfix">';
-            // Editable & Manditory Settings
-            tBlockString += app.cp.createUserSettings(blockId, tBlock._editable, tBlock._mandatory);
+	            // Editable & Manditory Settings
+	            tBlockString += app.cp.createUserSettings(blockId, tBlock._editable, tBlock._mandatory);
             tBlockString += '</div>';
 
             if (fromTbg === false) {
-                tBlockString += '<button type="button" class="btn btn-danger" data-action="remove-product-block" data-id="' + blockId + '">Delete Block</button>';
-                tBlockString += '</div>';
+            		tBlockString += '<button type="button" class="btn btn-danger" data-action="remove-product-block" data-id="' + blockId + '">Delete Block</button>';		            
+                	tBlockString += '</div>';
                 tBlockString += '</li>';
             } else {
                 tBlockString += '</div>';
@@ -505,19 +505,22 @@ _$(document).ready(function () {
             // 2. Convert the MM to its Pixel equivelant                || Math.ceil(10.60670343657191 * 3.779527559055) = 41
             // 3. Convert the that unit to the relevant size based of the scale of the canvas || Math.ceil(41 / 2.0174)  = 21
 
-            // console.log(Math.ceil(app.utils.convertUnit(data._width, app.pxSize)));
-            // console.log(Math.ceil( Math.ceil(app.utils.convertUnit(data._width, app.pxSize)) / canvasScale));
-            blockDimensions.upperX = Math.ceil(Math.ceil(app.utils.coverUnitFromMM(data._upperrightx, app.pxSize)) / canvasScale);
-            blockDimensions.upperY = Math.ceil(Math.ceil(app.utils.coverUnitFromMM(data._upperrighty, app.pxSize)) / canvasScale);
-            blockDimensions.lowerX = Math.ceil(Math.ceil(app.utils.coverUnitFromMM(data._lowerleftx, app.pxSize)) / canvasScale);
-            blockDimensions.lowerY = Math.ceil(Math.ceil(app.utils.coverUnitFromMM(data._lowerlefty, app.pxSize)) / canvasScale);
-            // console.log(blockDimensions);
+            blockDimensions.upperX = app.utils.convertMMtoPX(data._upperrightx, canvasScale);
+            blockDimensions.upperY = app.utils.convertMMtoPX(data._upperrighty,canvasScale);
+            blockDimensions.lowerX = app.utils.convertMMtoPX(data._lowerleftx, canvasScale);
+            blockDimensions.lowerY = app.utils.convertMMtoPX(data._lowerlefty,canvasScale);
+
+            // blockDimensions.upperX = Math.ceil(Math.ceil(app.utils.convertMMtoPX(data._upperrightx, app.pxSize)) / canvasScale);
+            // blockDimensions.upperY = Math.ceil(Math.ceil(app.utils.convertMMtoPX(data._upperrighty, app.pxSize)) / canvasScale);
+            // blockDimensions.lowerX = Math.ceil(Math.ceil(app.utils.convertMMtoPX(data._lowerleftx, app.pxSize)) / canvasScale);
+            // blockDimensions.lowerY = Math.ceil(Math.ceil(app.utils.convertMMtoPX(data._lowerlefty, app.pxSize)) / canvasScale);
+            console.log(blockDimensions);
 
             // (el.width * scalex) * canvasScale, app.mmSize
             blockSettings.height = app.utils.calcHeight(blockDimensions);
-            blockSettings.left = blockDimensions.lowerX;
-            blockSettings.top = app._cp_canvas.height - blockDimensions.upperY;
-            blockSettings.width = app.utils.calcWidth(blockDimensions);
+            blockSettings.left 	 = blockDimensions.lowerX;
+            blockSettings.top 	 = app._cp_canvas.height - blockDimensions.upperY;
+            blockSettings.width  = app.utils.calcWidth(blockDimensions);
             // console.log(blockSettings);
             if (data.block === 'ib') {
                 app.cp.createProductImageBlock(blockSettings);
@@ -638,47 +641,47 @@ _$(document).ready(function () {
             //console.log(blockSettings);
 
             var placeholderURL
-            if (app.isLocalEnv) {
-                placeholderURL = 'assets/img/prod-img-placeholder.png';
-            } else {
-                placeholderURL = '../assets/img/prod-img-placeholder.png';
+            if(app.isLocalEnv){
+            	placeholderURL = 'assets/img/prod-img-placeholder.png';
+            } else{
+            	placeholderURL = '../assets/img/prod-img-placeholder.png';
             }
 
-            fabric.Image.fromURL(placeholderURL, function (_block) {
-                // console.log(_block);
-                _block.set({
-                    hasBorders: true,
-                    hasRotatingPoint: false,
-                    height: blockSettings.height,
-                    left: blockSettings.left,
-                    lockRotation: true,
-                    selectable: true,
-                    top: blockSettings.top,
-                    width: blockSettings.width
-                })
-                // Add additional non-block specific properties based on blocktype
-                _block['blocktype'] = blockSettings.blocktype;
-                _block['blockTitle'] = blockSettings.blockTitle;
-                _block['halign'] = blockSettings.halign;
-                _block['isEditable'] = blockSettings.isEditable;
-                _block['isManditory'] = blockSettings.isManditory;
-                _block['imgSrc'] = blockSettings.imgSrc;
-                // _block['parentId']      = blockSettings.parentId.replace(/ /g, '');
-                _block['id'] = blockSettings.id.replace(/ /g, '');
-                _block['valign'] = blockSettings.valign;
+            fabric.Image.fromURL(placeholderURL, function(_block) {
+            	// console.log(_block);
+            	_block.set({
+            		hasBorders: true,
+	                hasRotatingPoint: false,
+	                height: blockSettings.height,
+	                left: blockSettings.left,
+	                lockRotation: true,
+	                selectable: true,
+	                top: blockSettings.top,
+	                width: blockSettings.width
+            	})
+				// Add additional non-block specific properties based on blocktype
+	            _block['blocktype'] = blockSettings.blocktype;
+	            _block['blockTitle'] = blockSettings.blockTitle;
+	            _block['halign'] = blockSettings.halign;
+	            _block['isEditable'] = blockSettings.isEditable;
+	            _block['isManditory'] = blockSettings.isManditory;
+	            _block['imgSrc'] = blockSettings.imgSrc;
+	            // _block['parentId']      = blockSettings.parentId.replace(/ /g, '');
+	            _block['id'] = blockSettings.id.replace(/ /g, '');
+	            _block['valign'] = blockSettings.valign;
 
-                if (_block.imgSrc !== null) {
-                    // Set the background of the block to that image.
-                }
+	            if (_block.imgSrc !== null) {
+	                // Set the background of the block to that image.
+	            }
 
-                // console.log(_block);
+	            // console.log(_block);
 
-                // If a product... then will need to load image settings.
-                // If it has a default image, set it as the background image.
+	            // If a product... then will need to load image settings.
+	            // If it has a default image, set it as the background image.
 
-                // Add the new component to the canvas. This needs to be done, before we can update the background img of the object
-                app._cp_canvas.add(_block).renderAll();
-            });
+	            // Add the new component to the canvas. This needs to be done, before we can update the background img of the object
+	            app._cp_canvas.add(_block).renderAll();
+			});
         },
         createProductTextBlock: function (settings) {
             // Create the fabric js element on the canvas using the settings from 'settings' object
@@ -699,16 +702,16 @@ _$(document).ready(function () {
 
             var _ptblock,
 	      		_formattedBlock;
-
+            console.log(cTBSettings.lineheight, (cTBSettings.lineheight / 100).toString().replace(/%/g, ''));
             _ptblock = new fabric.Text(cTBSettings.textVal, {
-                fill: app.utils.cmykToRGB(cTBSettings.fontColor),
+                fill: cTBSettings.fontColor,
                 fontFamily: cTBSettings.fontFamily,
-                fontSize: parseInt(cTBSettings.fontSize), // Need to convert PT to Pixel here
+                fontSize: app.utils.convertPtToPx(parseInt(cTBSettings.fontSize)),
                 hasBorders: true,
                 hasRotatingPoint: false,
                 //  height: cTBSettings.height,
                 left: cTBSettings.left,
-                // lineHeight: String(cTBSettings.lineheight).replace('%', ''), TODO
+                lineHeight: (cTBSettings.lineheight / 100).toString().replace(/%/g, '') ,
                 lockRotation: true,
                 selectable: true,
                 textAlign: cTBSettings.halign,
@@ -800,22 +803,22 @@ _$(document).ready(function () {
                         var prevObjIndex = i - 1;
                         // console.log(i, prevObjIndex, obj)
                         // If it is the first item, then reference its parentTop property
-                        if (i === 0) {
-                            obj.set({
-                                width: block.width,
-                                top: obj.parentTop,
-                            });
-                        } else {
-                            obj.set({
-                                width: block.width,
-                                top: app.filteredCanvasObjs[prevObjIndex].top + app.filteredCanvasObjs[prevObjIndex].height + block.spacing,
-                            });
+                        if(i === 0){
+                        	obj.set({
+	                            width: block.width,
+	                            top: obj.parentTop,
+	                        });
+                        } else{
+                        	obj.set({
+	                            width: block.width,
+	                            top: app.filteredCanvasObjs[prevObjIndex].top + app.filteredCanvasObjs[prevObjIndex].height + block.spacing,
+	                        });
                         }
-
+                        
                         // Reset the obj's controls coordinates
                         obj.setCoords();
                         // Re-redner the canvas
-                        app._cp_canvas.renderAll();
+                        app._cp_canvas.renderAll();			    			
                     }
                 });
             });
@@ -841,12 +844,12 @@ _$(document).ready(function () {
         setActiveCanvasObj: function (id) {
             // This function sets the relevant canvas object to its active state
             if (app._activeEditEl === null) {
-                var _canvasObjs = app._cp_canvas._objects;
-                console.log(_canvasObjs, _canvasObjs.length);
+            	var _canvasObjs = app._cp_canvas._objects;
+            	console.log(_canvasObjs, _canvasObjs.length);           
                 _canvasObjs.forEach(function (obj, i) {
-                    // console.log(i);
-                    // console.log(obj);
-                    // console.log(id);
+                	// console.log(i);
+                	// console.log(obj);
+                	// console.log(id);
                     if (obj.id === id) {
                         app._activeEditEl = obj;
                         app._cp_canvas.setActiveObject(_canvasObjs[i]);
@@ -871,27 +874,27 @@ _$(document).ready(function () {
             });
             app._cp_canvas.renderAll();
         },
-        setImageBlockDefaultImg: function () {
-            _$('[data-block-type=block-item]').each(function () {
-                var blockId = _$(this).data('prodblockid'),
-        			_$defaultImg = _$('[name=asset-default-block_' + blockId + ']:checked'),
-        			imgUrl = _$defaultImg.val();
-                // Only request an image, if a default has been set.
-                if (_$defaultImg.length > 0)
-                    setTimeout(function () {
-                        // console.log(blockId, imgUrl);
-                        // Load each blocks default image into the to the relevant block.
-                        app.cp.setActiveCanvasObj(blockId);
-                        console.log(app._activeEditEl, blockId);
-                        // Create a callback, which will clear the activeEl
-                        app.cp.setCanvasObjImage(imgUrl, app._activeEditEl.width, app._activeEditEl.height);
-                    }, 250);
-            });
+        setImageBlockDefaultImg: function(){
+        	_$('[data-block-type=block-item]').each(function(){
+        		var blockId 	 = _$(this).data('prodblockid'),
+        			_$defaultImg = _$('[name=asset-default-block_' + blockId + ']:checked'),        			
+        			imgUrl  	 = _$defaultImg.val();  
+        		// Only request an image, if a default has been set.
+        		if(_$defaultImg.length > 0)     		
+        		setTimeout(function(){
+	        		// console.log(blockId, imgUrl);
+	        		// Load each blocks default image into the to the relevant block.
+	            	app.cp.setActiveCanvasObj(blockId);
+	            	console.log(app._activeEditEl, blockId);
+	            	// Create a callback, which will clear the activeEl
+	            	app.cp.setCanvasObjImage(imgUrl, app._activeEditEl.width, app._activeEditEl.height); 
+        		}, 250);        		           	
+        	});
         },
         setActiveBlockImage: function (_$el) {
             // Get the canvas object id from the relevant block
             var canvasObjId = _$el.data('blockid'),
-	    		imgURL = _$el.data('img-url'),
+	    		imgURL 		= _$el.data('img-url'),
 	    		blockWidth,
 	    		blockHeight;
 
@@ -899,23 +902,23 @@ _$(document).ready(function () {
             app.cp.setActiveCanvasObj(canvasObjId);
             console.log(imgURL, app._activeEditEl)
             app._activeEditEl['imgSrc'] = imgURL;
-            blockWidth = app._activeEditEl.width;
-            blockHeight = app._activeEditEl.height;
+            blockWidth  = app._activeEditEl.width;
+            blockHeight =  app._activeEditEl.height;
             console.log(canvasObjId, imgURL);
-
-            app.cp.setCanvasObjImage(imgURL, blockWidth, blockHeight);
+           
+            app.cp.setCanvasObjImage(imgURL, blockWidth, blockHeight);	
         },
-        setCanvasObjImage: function (imgURL, objWidth, objHeight) {
-            // This functions changes the image of the active object on the canvas
-            console.log(imgURL, app._activeEditEl)
-            app._activeEditEl.setSrc(imgURL, function () {
-                app._activeEditEl.set({
-                    height: objHeight,
-                    width: objWidth
-                });
-                app._activeEditEl = null;
-                app._cp_canvas.renderAll();
-            });
+        setCanvasObjImage: function(imgURL, objWidth, objHeight){
+        	// This functions changes the image of the active object on the canvas
+        	console.log(imgURL, app._activeEditEl)
+        	app._activeEditEl.setSrc(imgURL, function(){
+            	app._activeEditEl.set({
+            		height: objHeight,
+            		width: objWidth
+            	});
+            	app._activeEditEl = null;
+            	app._cp_canvas.renderAll();            	
+            });            
         },
         updateCanvasObjSetting: function () {
             var _$this = _$(this),
@@ -933,103 +936,103 @@ _$(document).ready(function () {
             // Re-Render the canvas to show the update
             app._cp_canvas.renderAll();
         },
-        removeProductBlock: function (_$el, isfromSingleBlock) {
-            // This functions removes a UI element and the relevant object from the canvas
-            var id = _$el.data('id'),
-        		_$blockContainer = _$('[data-prodblockid=' + id + ']'),
+        removeProductBlock: function(_$el, isfromSingleBlock){
+        	// This functions removes a UI element and the relevant object from the canvas
+        	var id 				= _$el.data('id'),
+        		_$blockContainer = _$('[data-prodblockid=' +  id + ']'),
         		confrimation;
 
-            // Checks if this function has been called from a regular block or a text block inside a text block group.        	
-            if (isfromSingleBlock === true) {
-                confrimation = true;
-            } else {
-                confrimation = confirm('Are you sure you want to delete this block?');
-            }
+        	// Checks if this function has been called from a regular block or a text block inside a text block group.        	
+        	if(isfromSingleBlock === true){
+        		confrimation = true;        		
+        	} else{        		
+        		confrimation = confirm('Are you sure you want to delete this block?');
+        	}
+        	
+        	// Confirm with the user they defintely want to delete this block
+        	if(confrimation === true){
+        		// Check if this is a textblock group.
+        		// Text block groups need to be handled in a different way regular text blocks and image blocks
+        		if(_$blockContainer.data('block-type') === 'text-block-group-item'){
+        			// Make a collection of all of the text block group's inner text blocks.
+        			var groupObjs = app._cp_canvas._objects.filter(function(block){
+        				return block.parentId === id
+        			});
 
-            // Confirm with the user they defintely want to delete this block
-            if (confrimation === true) {
-                // Check if this is a textblock group.
-                // Text block groups need to be handled in a different way regular text blocks and image blocks
-                if (_$blockContainer.data('block-type') === 'text-block-group-item') {
-                    // Make a collection of all of the text block group's inner text blocks.
-                    var groupObjs = app._cp_canvas._objects.filter(function (block) {
-                        return block.parentId === id
-                    });
+        			// Remove all objects in the collection from the canvas
+        			groupObjs.forEach(function(obj){
+        				app._cp_canvas.remove(obj).renderAll();
+        			});
+        			
+        		} else{
+        			// Remove the relevant canvas object
+	        		app.cp.setActiveCanvasObj(id);
+	        		app._cp_canvas.remove(app._activeEditEl).renderAll();
+        		}
+        		// Set the active canvas element to null, now the previously selected element has been removed
+        		app._activeEditEl = null;
 
-                    // Remove all objects in the collection from the canvas
-                    groupObjs.forEach(function (obj) {
-                        app._cp_canvas.remove(obj).renderAll();
-                    });
-
-                } else {
-                    // Remove the relevant canvas object
-                    app.cp.setActiveCanvasObj(id);
-                    app._cp_canvas.remove(app._activeEditEl).renderAll();
-                }
-                // Set the active canvas element to null, now the previously selected element has been removed
-                app._activeEditEl = null;
-
-                // Removes the block from the DOM
-                _$('[data-prodblockid=' + id + ']').remove();
-            }
+        		// Removes the block from the DOM
+        		_$('[data-prodblockid=' +  id + ']').remove();
+        	}        	
         },
-        removeProductTBGFromBlock: function () {
-            var _$this = _$(this),
-        		id = _$this.parent().attr('id').replace('tb-', ''),
+        removeProductTBGFromBlock: function(){
+        	var _$this 	 = _$(this),
+        		id    	 = _$this.parent().attr('id').replace('tb-', ''),
         		parentId = _$this.parent().data('tbg-parent');
 
-            // This functions removes a UI element and the relevant object from the canvas
-            var confrimation = confirm('Are you sure you want to delete this block?');
-            // Confirm with the user they defintely want to delete this block
-            if (confrimation === true) {
-                // Check if this is a textblock group.
-                // Remove the relevant canvas object
-                app.cp.setActiveCanvasObj(id);
-                app._cp_canvas.remove(app._activeEditEl);
-                // Reformat the text block group
-                app.cp.reformatTextBlockGroups();
-            }
-            // Set the active canvas element to null, now the previously selected element has been removed
-            app._activeEditEl = null;
+        	// This functions removes a UI element and the relevant object from the canvas
+        	var confrimation = confirm('Are you sure you want to delete this block?');
+        	// Confirm with the user they defintely want to delete this block
+        	if(confrimation === true){
+        		// Check if this is a textblock group.
+        			// Remove the relevant canvas object
+	        		app.cp.setActiveCanvasObj(id);
+	        		app._cp_canvas.remove(app._activeEditEl);
+	        		// Reformat the text block group
+	        		app.cp.reformatTextBlockGroups();
+        		}
+        		// Set the active canvas element to null, now the previously selected element has been removed
+        		app._activeEditEl = null;
 
-            // Check if this is the last text block within a text block group
-            if (_$this.parent().siblings('li').length === 0) {
-                // If it is, then remove the text block group
-                var _$deleteBtnEl = _$('#' + parentId).next('[data-action=remove-product-block]');
-                // By passing true, it will skip the confirmation of deleting the text block group when this is the last element
-                app.cp.removeProductBlock(_$deleteBtnEl, true);
-            }
+        		// Check if this is the last text block within a text block group
+        		if(_$this.parent().siblings('li').length === 0){
+        			// If it is, then remove the text block group
+        			var _$deleteBtnEl = _$('#' + parentId ).next('[data-action=remove-product-block]');
+        			// By passing true, it will skip the confirmation of deleting the text block group when this is the last element
+        			app.cp.removeProductBlock(_$deleteBtnEl, true);
+        		}
 
-            // Removes the block from the DOM
-            _$this.parent().remove();
+        		// Removes the block from the DOM
+        		_$this.parent().remove();
         },
-        isCreateNewTemplateRequired: function () {
-            // Check whether to create new template when creating a product
-            if (app._$saveNewTempCheckbox.is(':checked')) {
-                // Update the template name by getting the user to type in to a prompt
-                var tName = prompt("Please enter a name for the new template you are creating.");
-                // Set the template name
-                app.templateName = tName;
-                app._$hiddenTemplateName.val(tName);
+        isCreateNewTemplateRequired: function(){
+        	// Check whether to create new template when creating a product
+      		if(app._$saveNewTempCheckbox.is(':checked')){
+      			// Update the template name by getting the user to type in to a prompt
+      			var tName = prompt("Please enter a name for the new template you are creating.");
+      			// Set the template name
+      			app.templateName = tName;
+      			app._$hiddenTemplateName.val(tName);
 
-                // Clear the template ID and hidden field
-                app.templateId = '';
-                app._$hiddenAssetId.val('');
+      			// Clear the template ID and hidden field
+      			app.templateId = '';
+      			app._$hiddenAssetId.val('');
 
-                // Set the dimensions
-                var dimensionsString = '';
-                app._$documentSizeBtns.each(function () {
-                    var _$this = _$(this)
-                    if (_$this.is(':checked')) {
-                        dimensionsString += _$this.val() + ',';
-                    }
-                });
-                // Remove the last comma from the string
-                dimensionsString = dimensionsString.slice(0, -1);
+      			// Set the dimensions
+      			var dimensionsString = '';
+      			app._$documentSizeBtns.each(function(){
+      				var _$this = _$(this)
+      				if(_$this.is(':checked')){
+      					dimensionsString+= _$this.val() + ',';
+      				}      				
+      			});
+      			// Remove the last comma from the string
+      			dimensionsString = dimensionsString.slice(0, -1);
 
-                app._$hiddenDimensions.val(dimensionsString);
-                console.log(app._$hiddenTemplateName.val(), app._$hiddenAssetId.val(), app._$hiddenDimensions.val());
-            }
+      			app._$hiddenDimensions.val(dimensionsString);
+      			console.log(app._$hiddenTemplateName.val(), app._$hiddenAssetId.val(), app._$hiddenDimensions.val());
+      		}
         },
         bindCreateProductCanvasEvents: function () {
             // This event handles whether to enter edit mode or not
@@ -1106,12 +1109,12 @@ _$(document).ready(function () {
 
             _$checkedAssetsEls.each(function (i) {
                 // Get the ID of the Asset and IMG URL				
-                var _$this = _$(this),
+                var _$this  = _$(this),
 					assetId = _$this.val(),
-					imgUrl = _$this.next().find('img').attr('src'),
+					imgUrl  = _$this.next().find('img').attr('src'),
 					isChecked;
-
-                console.log(app.activeImageBlockId, app.activeImageBlockId);
+					
+				console.log(app.activeImageBlockId, app.activeImageBlockId);
 
                 // Check if this is the first asset to be added. If it is, then show the list
                 if (i === 0 && _$blockAssetTable.find('tr').length <= 0) {
@@ -1120,8 +1123,8 @@ _$(document).ready(function () {
 
                     // Set the canvas image to the new default
                     app.cp.setActiveCanvasObj(app.activeImageBlockId);
-                    console.log(app._activeEditEl, app.activeImageBlockId);
-                    app.cp.setCanvasObjImage(imgUrl, app._activeEditEl.width, app._activeEditEl.height);
+	            	console.log(app._activeEditEl, app.activeImageBlockId);
+	            	app.cp.setCanvasObjImage(imgUrl, app._activeEditEl.width, app._activeEditEl.height);
                 } else {
                     isChecked = '';
                 }
@@ -1139,7 +1142,7 @@ _$(document).ready(function () {
             app.cp.updateActiveAssetBlock();
         },
         updateActiveAssetBlock: function () {
-            console.log('Called')
+        	console.log('Called')
             // Change the UI to show the block being edited again.
             app._$productBlockList.removeClass('hidden');
             app._$blockAssetLibrary.addClass('hidden');
@@ -1156,15 +1159,15 @@ _$(document).ready(function () {
             _$('#txtSearchFilename, #txtSearchTags').val('');
 
             // Remove the id on the save asset button
-            app.activeImageBlockId = '';
+            app.activeImageBlockId = '';            
             app._$saveBlockAssetBtn.data('boundblockid', app.activeImageBlockId);
         },
         removeAssetFromBlock: function (_$el) {
             var _$blockAssetList = _$el.parents('.block-asset-item-list'),
-	    		canvasObjId = _$el.data('blockid'),
-	    		isAssetDefault = _$el.parent().siblings().find('[data-action=update-canvas-control]').is(':checked');
+	    		canvasObjId 	 = _$el.data('blockid'),
+	    		isAssetDefault	 = _$el.parent().siblings().find('[data-action=update-canvas-control]').is(':checked');
 
-            // console.log('canvasObjId: ' + canvasObjId)
+	    	// console.log('canvasObjId: ' + canvasObjId)
 
             // Check if this is the last item to be deleted from the blocks' list.
             if (_$blockAssetList.find('tr').length <= 1) {
@@ -1176,44 +1179,44 @@ _$(document).ready(function () {
 
             // Check the clicked element is the default and if there is another img to set as the default
             if (isAssetDefault === false) {
-                alert('Asset removed from block!');
-            } else if (isAssetDefault === true && _$blockAssetList.find('[name^=asset-default-block]').length > 0) {
-                // Find the img element in the blocks' list of assets.
+            	alert('Asset removed from block!');                               
+            } else if(isAssetDefault === true && _$blockAssetList.find('[name^=asset-default-block]').length > 0){
+            	// Find the img element in the blocks' list of assets.
                 var _$firstImgAsset = _$blockAssetList.find('[name^=asset-default-block]').first();
                 // Set is a the new default
                 _$firstImgAsset.prop('checked', true);
                 // Set the blocks background image and updates the objects properties
-                // Need to pass through the new default img's button instead of the originally clicked element
-                app.cp.setActiveBlockImage(_$blockAssetList.find('[data-action=remove-block-img]').first());
+            	// Need to pass through the new default img's button instead of the originally clicked element
+            	app.cp.setActiveBlockImage(_$blockAssetList.find('[data-action=remove-block-img]').first());
             } else {
                 // Make the user aware of their action.
                 alert('All images removed. Please select another image.');
 
                 // Sets the relevant canvas object to active state
-                app.cp.setActiveCanvasObj(canvasObjId);
+                app.cp.setActiveCanvasObj(canvasObjId);                
 
                 var objHeight = app._activeEditEl.height,
-                	objWidth = app._activeEditEl.width,
+                	objWidth  = app._activeEditEl.width,
                 	placeholderURL;
 
-                if (app.isLocalEnv) {
-                    placeholderURL = 'assets/img/prod-img-placeholder.png';
-                } else {
-                    placeholderURL = '../assets/img/prod-img-placeholder.png';
-                }
+	            if(app.isLocalEnv){
+	            	placeholderURL = 'assets/img/prod-img-placeholder.png';
+	            } else{
+	            	placeholderURL = '../assets/img/prod-img-placeholder.png';
+	            }
 
-                console.log(app._activeEditEl);
-                app._activeEditEl.setSrc(placeholderURL, function () {
-                    app._activeEditEl.set({
-                        height: objHeight,
-                        width: objWidth,
-                        fill: 'rgb(0,0,0)'
-                    });
-                    // Remove the relevant canvas obj 'imgSrc' property
-                    app._activeEditEl['imgSrc'] = null;
-                    app._activeEditEl = null;
-                    app._cp_canvas.renderAll();
-                });
+	            console.log(app._activeEditEl);
+                app._activeEditEl.setSrc(placeholderURL, function(){
+	            	app._activeEditEl.set({
+	            		height: objHeight,
+	            		width: objWidth,
+	            		fill: 'rgb(0,0,0)'
+	            	});
+	            	// Remove the relevant canvas obj 'imgSrc' property
+                	app._activeEditEl['imgSrc'] = null;
+	            	app._activeEditEl = null;
+	            	app._cp_canvas.renderAll();            	
+	            });
             }
         },
 
@@ -1276,7 +1279,7 @@ _$(document).ready(function () {
                             }
 
                             // Create an asset list item and append to the assetListItem string.
-                            assetListItem += app.cp.createBlockImgAssetItem(assetId, blockId, isChecked, imgUrl);
+                            assetListItem += app.cp.createBlockImgAssetItem(assetId, blockId, isChecked, imgUrl);                            
                         });
                     } else {
                         console.log('Other Scenerio to do...');
@@ -1287,7 +1290,7 @@ _$(document).ready(function () {
 
                     // After the HTML has been appended, show the list. By default it is hidden
                     _$this.find('.block-asset-item-list').removeClass('hidden').append(assetListItem);
-                });
+                });			
             }
         },
 
@@ -1299,19 +1302,19 @@ _$(document).ready(function () {
             var productString = '',
             	imgUrl;
 
-            if (app.isLocalEnv) {
-                imgUrl = '../templates/';
-            } else {
-                imgUrl = globalUrls.templateFolder;
+            if(app.isLocalEnv){
+            	imgUrl = '../templates/';
+            } else{
+            	imgUrl = globalUrls.templateFolder;
             }
 
             productString += '<div class="col-xs-6 col-md-3">';
-            productString += '<input type="radio" id="template' + product.ID + '" name="template-url" value="' + product.ID + '" class="template-selection hidden">';
-            productString += '<label for="template' + product.ID + '" class="thumbnail">';
-            productString += '<span class="template-name">' + product.Name + '</span>';
-            productString += '<img src="' + imgUrl + product.ID + '.jpg" alt="' + product.Name + '" class="" />';
-            productString += '<button type="button" class="btn btn-primary step-option-btn" data-tempid="' + product.ID + '" data-action="load-from-product" data-step-action="forward">Select</button>';
-            productString += '</label>';
+	            productString += '<input type="radio" id="template' + product.ID + '" name="template-url" value="' + product.ID + '" class="template-selection hidden">';
+	            productString += '<label for="template' + product.ID + '" class="thumbnail">';
+	            productString += '<span class="template-name">' + product.Name + '</span>';
+	            productString += '<img src="' + imgUrl + product.ID + '.jpg" alt="' + product.Name + '" class="" />';
+	            productString += '<button type="button" class="btn btn-primary step-option-btn" data-tempid="' + product.ID + '" data-action="load-from-product" data-step-action="forward">Select</button>';
+	            productString += '</label>';
             productString += '</div>';
 
             return productString;
@@ -1366,8 +1369,9 @@ _$(document).ready(function () {
             return tbBlockList;
         },
         createFontColorSetting: function (id, colour) {
+            console.log(colour);
             var fontColorString = '',
-	    		blockColour = typeof (colour) !== 'undefined' ? colour : '0,0,0'; // NEED to convert CMYK to RGB
+	    		blockColour = typeof (colour) !== 'undefined' ? colour : '75,68,97,90'; // CYMK BLACK
             // console.log(blockColour);
             fontColorString += '<h3 class="block-item-heading">Font Colour</h3>';
             app.fontColours.forEach(function (fontColour) {
@@ -1616,35 +1620,35 @@ _$(document).ready(function () {
         /**
         	VALIDATION
         **/
-        validateDocSizeChanges: function () {
-            // This function is required as a product needs to have a corresponding template, with regards to the available
-            // document sizes e.g. A4,A5. It is not an issue if a product has a layout variation, as this is stored in the XML,
-            // however a prodcucts available sizes, must match a template.
+        validateDocSizeChanges: function(){
+        	// This function is required as a product needs to have a corresponding template, with regards to the available
+        	// document sizes e.g. A4,A5. It is not an issue if a product has a layout variation, as this is stored in the XML,
+        	// however a prodcucts available sizes, must match a template.
 
-            // Check if any checkboxes are checked. If they aren't check the previously clicked one, and show user a message
-            if (app._$documentSizeBtns.is(':checked') === false) {
-                _$(this).prop('checked', true);
-                alert('You must have atleast 1 document size selected');
-            } else {
-                // If a products size options change, then a new template needs to be saved.
-                var allDefaultsChecked = true;
-                _$('input[type=checkbox].template-default-size').each(function () {
-                    if (!_$(this).is(':checked')) {
-                        allDefaultsChecked = false;
-                    }
-                });
+        	// Check if any checkboxes are checked. If they aren't check the previously clicked one, and show user a message
+        	if(app._$documentSizeBtns.is(':checked') === false){
+        		_$(this).prop('checked', true);
+        		alert('You must have atleast 1 document size selected');
+        	} else{
+        		// If a products size options change, then a new template needs to be saved.
+	        	var allDefaultsChecked = true;
+	        	_$('input[type=checkbox].template-default-size').each(function(){
+	        		if(!_$(this).is(':checked')){
+	        			allDefaultsChecked = false;
+	        		}
+	        	});
 
-                console.log(allDefaultsChecked, app._$documentSizeBtns.not('.template-default-size').is(':checked'));
+	        	console.log(allDefaultsChecked, app._$documentSizeBtns.not('.template-default-size').is(':checked'));
 
-                // This checks if all the default options are checked, or no others non-defaults are checked.
-                // I.e the template options have not changed, then we dont need to force saving a new template
-                if (allDefaultsChecked === false || app._$documentSizeBtns.not('.template-default-size').is(':checked')) {
-                    // Something has changed from the defaults, so a new template must be saved.
-                    app._$saveNewTempCheckbox.attr('disabled', 'disabled').prop('checked', true);
-                } else {
-                    app._$saveNewTempCheckbox.removeAttr('disabled').prop('checked', false);
-                }
-            }
+	        	// This checks if all the default options are checked, or no others non-defaults are checked.
+	        	// I.e the template options have not changed, then we dont need to force saving a new template
+	        	if(allDefaultsChecked === false || app._$documentSizeBtns.not('.template-default-size').is(':checked')){
+	        		// Something has changed from the defaults, so a new template must be saved.
+	        		app._$saveNewTempCheckbox.attr('disabled', 'disabled').prop('checked', true);
+	        	} else{
+	        		app._$saveNewTempCheckbox.removeAttr('disabled').prop('checked', false);        		
+	        	}
+        	}        	
         },
 
 
@@ -1666,10 +1670,10 @@ _$(document).ready(function () {
                 app.cp.toggleOptions(_$(this), '.cp-block-container');
             });
             // Removes a block from the product
-            app._$body.on('click', '[data-action=remove-product-block]', function () {
-                // Pass through the clicked element, and false
-                // This click has not come from a single text block within a text block group
-                app.cp.removeProductBlock(_$(this), false);
+            app._$body.on('click', '[data-action=remove-product-block]', function(){
+            	// Pass through the clicked element, and false
+            	// This click has not come from a single text block within a text block group
+            	app.cp.removeProductBlock(_$(this), false);
             });
             // Remove a single text block from a text block group
             app._$body.on('click', '[data-action=remove-text-block-from-group]', app.cp.removeProductTBGFromBlock);
@@ -1694,20 +1698,20 @@ _$(document).ready(function () {
             });
             // Downloads an image of what is on the canvas 
             _$downloadProductBtn.on('click', function () {
-                app.utils.covertCanvasToImgDownload(_$(this), app._cp_canvas);
+                app.utils.convertCanvasToImgDownload(_$(this), app._cp_canvas);
             });
 
             // PRODUCT CREATION TOOLS
             // Saves a new product's XML
             _$('[data-action=save-product]').on('click', function () {
-                // // Download and image of the product
-                var confirmDownloadImg = confirm('Would you like to save the product image?');
-                if (confirmDownloadImg === true) {
-                    app.utils.covertCanvasToImgDownload(_$(this), app._cp_canvas);
-                }
-                // Slight bug with this.. if you click 'cancel' on the prompt it doesnt download a thumbnail
-                // If you then click the button again and chose to download the image it works
-                // If you were then to click save again and select 'cancel', it still downloads an image.
+            	// // Download and image of the product
+            	var confirmDownloadImg = confirm('Would you like to save the product image?');
+            	if(confirmDownloadImg === true){
+            		app.utils.convertCanvasToImgDownload(_$(this), app._cp_canvas);	
+            	}
+            	// Slight bug with this.. if you click 'cancel' on the prompt it doesnt download a thumbnail
+            	// If you then click the button again and chose to download the image it works
+            	// If you were then to click save again and select 'cancel', it still downloads an image.
 
                 // Set what type of request this is. Required by the utils.generateXML
                 app.isCreateTemplate = false;
@@ -1738,8 +1742,8 @@ _$(document).ready(function () {
                 app.cp.setActiveBlockImage(_$(this));
             });
             // Remove an asset from a block
-            app._$body.on('click', '[data-action=remove-block-img]', function () {
-                app.cp.removeAssetFromBlock(_$(this));
+            app._$body.on('click', '[data-action=remove-block-img]', function(){
+            	app.cp.removeAssetFromBlock(_$(this));
             });
 
             // VALIDATION
