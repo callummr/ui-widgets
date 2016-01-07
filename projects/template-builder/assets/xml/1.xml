@@ -1,7 +1,7 @@
 <doc>
    <page width="297" height="420">
       <pdf id="back" title="Background Silhouette" lowerleftx="0" lowerlefty="0" upperrightx="297" upperrighty="420" editable="false" />
-      <text-block-group id="Group1" title="Group 1" lowerleftx="15" lowerlefty="311.25" upperrightx="173.2" upperrighty="405" editable="true" align="left" verticalalign="top" spacing="10">
+      <text-block-group id="Group1" title="Group 1" lowerleftx="280" lowerlefty="311.25" upperrightx="297" upperrighty="415" editable="true" align="left" verticalalign="top" spacing="10">
          <text-block id="Title" title="Title" font-family="FuturaBT-Heavy" font-size="36" editable="true" maxlen="30" />
          <text-block id="Medium" title="Medium Text" font-family="FuturaBT-Heavy" font-size="24" editable="true" maxlen="200" textmode="multiline" leading="125%">20 Month 2006 11am to 4pm Name of venue/location Street address, town, county</text-block>
          <text-block id="Small" title="Small Text" font-family="FuturaBT-Heavy" font-size="20" editable="true" maxlen="150" textmode="multiline" leading="125%">call Contact Name on 01234 567890 or email cname@macmillan.org.uk</text-block>

@@ -82,7 +82,6 @@
                         }
                     }
                 }
-
             },
             "Walking for health":{
                 "SubCategory" : {
@@ -167,4 +166,3 @@
         }
     }
 }]
-

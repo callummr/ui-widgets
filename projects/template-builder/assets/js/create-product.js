@@ -13,6 +13,8 @@ _$(document).ready(function () {
     app._activeEditEl = null;
     app.activeImageBlockId;
 
+    app.defaultMaxCharLength = 2500;
+
     app._$productBlockList 	  = _$('#product-blocks-list');
     app._$blockAssetLibrary	  = _$('#block-asset-lib');
     app._$saveBlockAssetBtn   = _$('[data-action=save-block-assets]');
@@ -226,7 +228,7 @@ _$(document).ready(function () {
             var canvasEl 	   = document.createElement('canvas'),
 			  	docWidth 	   = parseInt(canvasData.doc.page._width),
 			  	docHeight 	   = parseInt(canvasData.doc.page._height),
-			  	canvasSettings = app.utils.setCanvasSettings(docWidth, docHeight);
+			  	canvasSettings = app.utils.setCanvasSettings(docWidth, docHeight); // Returns and object with the canvas's settings
 
             // Set the ID of the Canvas      
             canvasEl.setAttribute('id', 'cp_canvas');
@@ -238,9 +240,13 @@ _$(document).ready(function () {
 
             // console.log(document.getElementById('c'));
             app._cp_canvas = new fabric.Canvas('cp_canvas', { selection: false, backgroundColor: '#FFF' });
+            // This functions sets the max/min coordinatations an element can move to.
+            app.utils.setCanvasMaxMargins(app._cp_canvas);
+            // Draw the grid onto the canvas
             app.utils.drawGrid(app._cp_canvas);
             // Add all of the elements to the page.
             app.cp.createProductBlocksSettings(canvasData.doc.page);
+            // Initate all of the canvas event handlers.
             app.cp.bindCreateProductCanvasEvents();
             app.utils.bindGlobalCanvasEvents();
         },
@@ -250,6 +256,7 @@ _$(document).ready(function () {
             if (typeof (productData['text-block-group']) !== 'undefined') {
                 if (typeof (productData['text-block-group'].length) === 'undefined') {
                     // Only a single text block group
+                    // console.log(productData['text-block-group']);
                     productData['text-block-group']['block'] = 'tbg';
                     productData['text-block-group']['scale'] = app.blockScale;
                     blockListingString += app.cp.createTextBlockGroupBlockSettings(productData['text-block-group']);
@@ -257,6 +264,7 @@ _$(document).ready(function () {
                 } else {
                     // Multiple text block groups
                     productData['text-block-group'].forEach(function (textBlockGroup) {
+                        // console.log(textBlockGroup);
                         textBlockGroup['block'] = 'tbg';
                         textBlockGroup['scale'] = app.blockScale;
                         blockListingString += app.cp.createTextBlockGroupBlockSettings(textBlockGroup);
@@ -381,6 +389,7 @@ _$(document).ready(function () {
             return tbgBlockString;
         },
         createTextBlockBlockSettings: function (tBlock, fromTbg) {
+            // console.log(tBlock);
             var tBlockString = '',
 	    		blockId = tBlock._id.replace(/ /g, '');
 
@@ -458,13 +467,13 @@ _$(document).ready(function () {
                 blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : 'left';
                 blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
                 blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
-                blockSettings.lineheight = typeof (data._leading) !== 'undefined' ? String(data._leading).replace('%', '') : '100';
+                blockSettings.lineheight = typeof (data._leading) !== 'undefined' ? data._leading.toString().replace('%', '') : '100';
                 blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
                 // Text Block Specific
                 blockSettings.fontColor = app.utils.cmykToRGB(data._colour);
                 blockSettings.fontFamily = typeof (data['_font-family']) !== 'undefined' ? data['_font-family'] : 'FuturaBT-Book';
                 blockSettings.fontSize = typeof (data['_font-size']) !== 'undefined' ? data['_font-size'] : '12';
-                blockSettings.maxLength = typeof (data._maxlen) !== 'undefined' ? data._maxlen : '';
+                blockSettings.maxLength = typeof (data._maxlen) !== 'undefined' ? data._maxlen : 5000;
                 blockSettings['text-block-type'] = 'text';
                 if (typeof (data._source) !== 'undefined') {
                     blockSettings.stringSrc = data._source;
@@ -477,6 +486,7 @@ _$(document).ready(function () {
                 blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : 'left';
                 blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
                 blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
+                // console.log(data._spacing);
                 blockSettings.spacing = typeof (data._spacing) !== 'undefined' ? data._spacing : 'false';
                 blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
             }
@@ -497,8 +507,10 @@ _$(document).ready(function () {
             data._lowerlefty = data._lowerlefty / data.scale;
             // console.log('After Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
             // Generic block settings
-            var canvasScale = app.templateType === 'default' ? 2.0174 : 1,
-	            blockDimensions = {};
+            var canvasScale     = app.templateType === 'default' ? 2.0174 : 1,
+	            blockDimensions = {},
+                canvasWidth     = app._cp_canvas.width,
+                canvasHeight    = app._cp_canvas.height;
 
             // Base of 15 at a3...
             // 1. Convert a unit into its equivelant it would be in a4. || 15 / 1.4142 (10.60670343657191)
@@ -508,19 +520,13 @@ _$(document).ready(function () {
             blockDimensions.upperX = app.utils.convertMMtoPX(data._upperrightx, canvasScale);
             blockDimensions.upperY = app.utils.convertMMtoPX(data._upperrighty,canvasScale);
             blockDimensions.lowerX = app.utils.convertMMtoPX(data._lowerleftx, canvasScale);
-            blockDimensions.lowerY = app.utils.convertMMtoPX(data._lowerlefty,canvasScale);
+            blockDimensions.lowerY = app.utils.convertMMtoPX(data._lowerlefty,canvasScale);            
 
-            // blockDimensions.upperX = Math.ceil(Math.ceil(app.utils.convertMMtoPX(data._upperrightx, app.pxSize)) / canvasScale);
-            // blockDimensions.upperY = Math.ceil(Math.ceil(app.utils.convertMMtoPX(data._upperrighty, app.pxSize)) / canvasScale);
-            // blockDimensions.lowerX = Math.ceil(Math.ceil(app.utils.convertMMtoPX(data._lowerleftx, app.pxSize)) / canvasScale);
-            // blockDimensions.lowerY = Math.ceil(Math.ceil(app.utils.convertMMtoPX(data._lowerlefty, app.pxSize)) / canvasScale);
-            console.log(blockDimensions);
-
-            // (el.width * scalex) * canvasScale, app.mmSize
             blockSettings.height = app.utils.calcHeight(blockDimensions);
-            blockSettings.left 	 = blockDimensions.lowerX;
-            blockSettings.top 	 = app._cp_canvas.height - blockDimensions.upperY;
             blockSettings.width  = app.utils.calcWidth(blockDimensions);
+            blockSettings.left 	 = app.utils.validateLeftPos(canvasWidth, blockDimensions.lowerX, blockSettings.width);
+            blockSettings.top 	 = app.utils.validateTopPos(canvasHeight, blockDimensions.upperY, blockSettings.height);
+            // console.log(blockDimensions);
             // console.log(blockSettings);
             if (data.block === 'ib') {
                 app.cp.createProductImageBlock(blockSettings);
@@ -542,10 +548,10 @@ _$(document).ready(function () {
                 });
                 // These needs reformatting so it does not get repeated.
                 // This check is required if a textblock group only has 1 text block inside it.
+                var innerBlockSettings = {};
                 if (typeof (data['text-block']).length !== 'undefined') {
+
                     data['text-block'].forEach(function (block, i) {
-                        // console.log(block);
-                        var innerBlockSettings = {};
                         // console.log(block);
                         innerBlockSettings.blocktype = 'new-text-block';
                         innerBlockSettings.blockTitle = typeof (block._title) !== 'undefined' ? block._title : '';
@@ -555,10 +561,10 @@ _$(document).ready(function () {
                         innerBlockSettings.fontFamily = typeof (block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
                         innerBlockSettings.fontColor = app.utils.cmykToRGB(block._colour);
                         innerBlockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
-                        innerBlockSettings.lineheight = typeof (block._leading) !== 'undefined' ? String(block._leading).replace('%', '') : '100';
+                        innerBlockSettings.lineheight = typeof (block._leading) !== 'undefined' ? block._leading.toString().replace('%', '') : '100';
                         innerBlockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
                         innerBlockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
-                        innerBlockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : '';
+                        innerBlockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : 5000;
                         innerBlockSettings.valign = blockSettings.valign;  // Take from the parent element
                         innerBlockSettings.top = blockSettings.top;     // Take from the parent element
                         innerBlockSettings.width = blockSettings.width;   // Take from the parent element
@@ -590,8 +596,6 @@ _$(document).ready(function () {
                 } else {
                     var block = data['text-block'];
                     // console.log(block);
-                    var innerBlockSettings = {};
-                    // console.log(block);
                     innerBlockSettings.blocktype = 'new-text-block';
                     innerBlockSettings.blockTitle = typeof (block._title) !== 'undefined' ? block._title : '';
                     innerBlockSettings.halign = blockSettings.halign;  // Take from the parent element
@@ -600,7 +604,7 @@ _$(document).ready(function () {
                     innerBlockSettings.fontFamily = typeof (block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
                     innerBlockSettings.fontColor = app.utils.cmykToRGB(block._colour);
                     innerBlockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
-                    innerBlockSettings.lineheight = typeof (block._leading) !== 'undefined' ? String(block._leading).replace('%', '') : '100';
+                    innerBlockSettings.lineheight = typeof (block._leading) !== 'undefined' ? block._leading.toString().replace('%', '') : '100';
                     innerBlockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
                     innerBlockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
                     innerBlockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : '';
@@ -702,7 +706,7 @@ _$(document).ready(function () {
 
             var _ptblock,
 	      		_formattedBlock;
-            console.log(cTBSettings.lineheight, (cTBSettings.lineheight / 100).toString().replace(/%/g, ''));
+            // console.log(cTBSettings.lineheight, (cTBSettings.lineheight / 100).toString().replace(/%/g, ''));
             _ptblock = new fabric.Text(cTBSettings.textVal, {
                 fill: cTBSettings.fontColor,
                 fontFamily: cTBSettings.fontFamily,
@@ -753,7 +757,7 @@ _$(document).ready(function () {
 			_formattedBlock['fontColor'] = cTBSettings.fontColor;
             _formattedBlock['fontFamily'] = cTBSettings.fontFamily;
             _formattedBlock['fontSize'] = parseInt(cTBSettings.fontSize);
-            _formattedBlock['lineheight'] = String(cTBSettings.lineheight).replace('%', '');
+            _formattedBlock['lineheight'] = cTBSettings.lineheight.toString().replace('%', '');
             _formattedBlock['maxLength'] = parseInt(cTBSettings.maxLength);
             _formattedBlock['textVal'] = cTBSettings.textVal;
             _formattedBlock['textblocktype'] = cTBSettings.textblocktype;
@@ -769,7 +773,7 @@ _$(document).ready(function () {
                 _formattedBlock['parentHeight'] = cTBSettings.parentHeight;
                 _formattedBlock['parentTop'] = cTBSettings.parentTop;
                 _formattedBlock['parentWidth'] = cTBSettings.parentWidth;
-                _formattedBlock['spacing'] = cTBSettings.spacing;
+                _formattedBlock['spacing'] = app.utils.convertMMtoPX(cTBSettings.spacing);
             }
 
             if (typeof (cTBSettings.stringSrc) !== 'undefined') {
@@ -803,6 +807,7 @@ _$(document).ready(function () {
                         var prevObjIndex = i - 1;
                         // console.log(i, prevObjIndex, obj)
                         // If it is the first item, then reference its parentTop property
+                        // console.log(obj);
                         if(i === 0){
                         	obj.set({
 	                            width: block.width,
@@ -845,7 +850,7 @@ _$(document).ready(function () {
             // This function sets the relevant canvas object to its active state
             if (app._activeEditEl === null) {
             	var _canvasObjs = app._cp_canvas._objects;
-            	console.log(_canvasObjs, _canvasObjs.length);           
+            	// console.log(_canvasObjs, _canvasObjs.length);           
                 _canvasObjs.forEach(function (obj, i) {
                 	// console.log(i);
                 	// console.log(obj);
@@ -860,9 +865,12 @@ _$(document).ready(function () {
             // console.log(app._activeEditEl);
         },
         setBlockControlTextarea: function (activeObj) {
-            var _$targetTextarea = _$('[data-prodblockid=' + activeObj.target.parentId + '] textarea');
+            var _activeObj = activeObj.target,
+                _$targetTextarea = _$('[data-prodblockid=' + _activeObj.parentId + '] textarea');
             // Debounce the textarea being updated.
-            _$.debounce(_$targetTextarea.val(activeObj.target.text), 500);
+            _$.debounce(_$targetTextarea.val(_activeObj.text), 500);
+            // Update the UI to show amount of characters left
+            _$targetTextarea.next().find('.badge').html(_activeObj.maxLength - _activeObj.text.length);
         },
         setModifedBlockScale: function (obj) {
             //console.log(obj);
@@ -910,18 +918,19 @@ _$(document).ready(function () {
         },
         setCanvasObjImage: function(imgURL, objWidth, objHeight){
         	// This functions changes the image of the active object on the canvas
-        	console.log(imgURL, app._activeEditEl)
+        	// console.log(imgURL, app._activeEditEl)
         	app._activeEditEl.setSrc(imgURL, function(){
             	app._activeEditEl.set({
             		height: objHeight,
             		width: objWidth
             	});
             	app._activeEditEl = null;
-            	app._cp_canvas.renderAll();            	
+                app._cp_canvas.deactivateAll();  
+            	app._cp_canvas.renderAll();
             });            
         },
-        updateCanvasObjSetting: function () {
-            var _$this = _$(this),
+        updateCanvasObjSetting: function (_$el) {
+            var _$this = _$el,
 	    		canvasBlockId = _$this.parent().data('prodblockid') || _$this.parents('[data-prodblockid]').data('prodblockid');
 
             // Set the relevant object to its active state
@@ -930,8 +939,9 @@ _$(document).ready(function () {
             // Returns an object to that sets the correct property with the new value
             var objSetting = app.utils.selectCanvasPropertyToEdit(_$this);
             // Updated the selected objects relevant properties
+            console.log(objSetting)
             //console.log(app._activeEditEl);
-            app._activeEditEl.set(objSetting);
+            app._activeEditEl.set(objSetting).setCoords();
             //console.log(app._activeEditEl);
             // Re-Render the canvas to show the update
             app._cp_canvas.renderAll();
@@ -1037,17 +1047,35 @@ _$(document).ready(function () {
         bindCreateProductCanvasEvents: function () {
             // This event handles whether to enter edit mode or not
             app._cp_canvas.on('object:selected', function (e) {
-                console.log('Clicked');
                 // Get the id of the selected element 
                 var _activeObj = app._cp_canvas.getActiveObject();
+
+                /**
+                    FIX BUG, MULTIPLE OBJECTS ARE MOVING
+                **/
+                console.log(_activeObj);
+                // Allow a user to move elements on the canvas with keyboard arrows
+                app.utils.activeKeyboardMovements(_activeObj, app._cp_canvas);
                 // Show the relevant blocks' settings that has been selected
                 // _$('[data-prodblockid=' + _activeObj.parentId + ']').find('[data-action=toggle-product-block]').click();
             });
             // This event handles when an IText Field has beem edited
             app._cp_canvas.on('text:changed', function (e) {
-                //console.log(e);
-                app.cp.setBlockControlTextarea(e);
-                e.target['textVal'] = e.target.text;
+                var obj     = e.target,
+                    textVal = obj.text;
+                // Validate whether the text value is below the maxmimum value allowed
+                if(textVal.length > obj.maxLength){         
+                    // Remove the previous character that has been typed
+                    obj.set({
+                        text: textVal.substring(0, obj.maxLength)
+                    });
+                    // Actually removes the character from teh canvas
+                    app._cp_canvas.renderAll();
+                    alert('Max character limit has been reached.');
+                } else{
+                    app.cp.setBlockControlTextarea(e);
+                    e.target['textVal'] = e.target.text; 
+                }                
             });// This event handles when an IText Field has beem edited
             app._cp_canvas.on('text:editing:entered', function (e) {
                 // Set 2 new properties to store the elements original width and height
@@ -1229,14 +1257,14 @@ _$(document).ready(function () {
             // Iterate over all image blocks
             _$('[data-block-type=block-item]').each(function () {
                 var blockAssetData = {
-                    BlockId: String(_$(this).data('prodblockid')).replace(/\D/g, ''), // Replace all non-digits
+                    BlockId: _$(this).data('prodblockid').toString().replace(/\D/g, ''), // Replace all non-digits
                     Assets: []
                 };
                 // Within each image block, find the blocks' list of assets
                 _$(this).find('.block-asset-item-list-wrapper input[name^=asset-default-block]').each(function () {
                     var _$this = _$(this),
 	    				assetData = {
-	    				    AssetId: String(_$this.data('assetid')).replace(/\D/g, ''), // Replace all non-digits,
+	    				    AssetId: _$this.data('assetid').toString().replace(/\D/g, ''), // Replace all non-digits,
 	    				    Def: _$this.is(':checked') ? 1 : 0 // Return 1 if the image has been selected as a default
 	    				};
                     // console.log(assetData);
@@ -1320,13 +1348,15 @@ _$(document).ready(function () {
             return productString;
         },
         createSpacingSetting: function (id, spacing) {
+            // This shows visually what unit (in MM) the spacing is set to.
+            // A keyup event will need to be added to the spacing field, which will update the canvas in PX's to show an increase
+            // in space between text blocks within a text block group.
             var spacingString = '',
-
-	    		blockSpacing = typeof (spacing) !== 'undefined' ? spacing : 10;
+	    		blockSpacing  = typeof (spacing) !== 'undefined' ? spacing : 10;
 
             spacingString += '<h3 class="block-item-heading">Text block Spacing</h3>';
             spacingString += '<input type="number" value="' + blockSpacing + '" id="at-spacing-' + id + '" class="form-control" ';
-            spacingString += 'data-action="update-canvas-control" data-canvas-setting-type="sp">';
+            spacingString += 'data-action="update-canvas-control" data-canvas-setting-type="sp" value="' + blockSpacing +  '">';
             spacingString += '<hr>';
 
             return spacingString;
@@ -1369,7 +1399,7 @@ _$(document).ready(function () {
             return tbBlockList;
         },
         createFontColorSetting: function (id, colour) {
-            console.log(colour);
+            
             var fontColorString = '',
 	    		blockColour = typeof (colour) !== 'undefined' ? colour : '75,68,97,90'; // CYMK BLACK
             // console.log(blockColour);
@@ -1409,17 +1439,17 @@ _$(document).ready(function () {
         },
         createFontSizeSetting: function (id, size) {
             var fontSizeString = '',
-	    		blockFSize = typeof (size) !== 'undefined' ? size : '24';
+	    		blockFSize = typeof (size) !== 'undefined' ? size : '20'; // Default fontsize
 
             fontSizeString += '<h3 class="block-item-heading">Font Size</h3>';
             app.fontSizes.forEach(function (fsize) {
-                var isChecked = blockFSize === fsize.size ? 'checked' : '';
+                var isChecked = blockFSize === fsize.ptSize ? 'checked' : '';
                 // console.log(fsize.size);
                 // console.log(blockFSize);
-                fontSizeString += '<input type="radio" id="block-' + fsize.size + '-fsize" ';
-                fontSizeString += 'name="fsize-default" data-action="update-canvas-control" data-canvas-setting-type="fs" ';
-                fontSizeString += 'value="' + fsize.size + '" ' + isChecked + '>';
-                fontSizeString += '<label for="block-' + fsize.size + '-fsize">' + fsize.sizeName + '</label>';
+                fontSizeString += '<input type="radio" id="block-' + fsize.ptSize + '-fsize" ';
+                    fontSizeString += 'name="fsize-default" data-action="update-canvas-control" data-canvas-setting-type="fs" ';
+                    fontSizeString += 'value="' + fsize.ptSize + '" ' + isChecked + '>';
+                fontSizeString += '<label for="block-' + fsize.ptSize + '-fsize">' + fsize.sizeName + '(' + fsize.ptSize + ')</label>';
             });
 
             return fontSizeString;
@@ -1438,7 +1468,7 @@ _$(document).ready(function () {
         },
         createMaxLengthSetting: function (id, maxLength) {
             var spacingString = '',
-	    		blockMaxlength = typeof (maxLength) !== 'undefined' ? maxLength : '';
+	    		blockMaxlength = typeof (maxLength) !== 'undefined' ? maxLength : app.defaultMaxCharLength;
 
             spacingString += '<div class="col-md-5">';
             spacingString += '<h3 class="block-item-heading">Max length</h3>';
@@ -1482,7 +1512,7 @@ _$(document).ready(function () {
             alignmentString += '<h3 class="block-item-heading">Horizontal &amp; Vertical positioning</h3>';
             alignmentString += '<div class="col-md-6">';
             alignmentString += '<span>';
-            alignmentString += '<input type="radio"  data-action="update-canvas-control" data-canvas-setting-type="ah" ';
+            alignmentString += '<input type="radio" data-action="update-canvas-control" data-canvas-setting-type="ah" ';
             alignmentString += 'id="' + id + '-h-left" class="hidden show-border-when-selected" name="ap-h-pos" ' + halignLeft + ' value="left">';
             alignmentString += '<label class="align-icon align-left" for="' + id + '-h-left"></label>';
             alignmentString += '</span>';
@@ -1550,12 +1580,10 @@ _$(document).ready(function () {
         },
         createTextSettings: function (id, block, maxLength) {
             var blockTextSettings = '',
-	    		fromSource = typeof (block._source) !== 'undefined' && block._source !== '' ? true : false,
-	    		disabledAttr = '',
-	    		hasMaxLength = typeof (maxLength) !== 'undefined' && maxLength > 0,
-	    		maxLengthAttr = hasMaxLength === true ? 'maxlength="' + maxLength + '"' : '',
+	    		fromSource    = typeof(block._source) !== 'undefined' && block._source !== '' ? true : false,
+	    		disabledAttr  = '',
+	    		maxLengthVal = typeof(maxLength) !== 'undefined' ? maxLength : app.defaultMaxCharLength,
 	    		blockText;
-            // console.log(block);
 
             // If the blocks text value is from an external source, retreive the text
             if (fromSource === true) {
@@ -1568,19 +1596,18 @@ _$(document).ready(function () {
             }
 
             blockTextSettings += '<label for="text-block-' + id + '" class="block-item-heading">Block Text</label>';
-            blockTextSettings += '<textarea id="text-block-' + id + '" class="form-control" data-action="update-block-text" ' + disabledAttr + ' ' + maxLengthAttr + '>';
+            blockTextSettings += '<textarea id="text-block-' + id + '" class="form-control" data-action="update-block-text" maxlength="' + maxLengthVal + '" ' + disabledAttr + '>';
             blockTextSettings += blockText
             blockTextSettings += '</textarea>';
 
             // Only apply a maxlength if there is one.
-            if (hasMaxLength) {
-                var charsRemaining = parseInt(maxLength) - blockText.length;
-                if (charsRemaining < 0) {
-                    charsRemaining = 0;
-                }
-                blockTextSettings += '<p>Characters remaining: <span class="badge">' + charsRemaining + '</span></p>';
+            
+            var charsRemaining = parseInt(maxLengthVal) - blockText.length;
+            if (charsRemaining < 0) {
+                charsRemaining = 0;
             }
-
+            blockTextSettings += '<p>Characters remaining: <span class="badge">' + charsRemaining + '</span></p>';
+           
             return blockTextSettings;
         },
         createBlockImgAssetItem: function (assetId, blockId, isChecked, imgUrl) {
@@ -1682,13 +1709,39 @@ _$(document).ready(function () {
             // https://code.google.com/p/jquery-debounce/
             // When focusing or typing on these textareasm update the relevant canvas object with the new text value
             app._$body.on('keyup focus', '[data-action=update-block-text]', function () {
-                _$.debounce(app.cp.updateCanvasBlockText(_$(this)), 500);
+                // Need to add Debounce
+                var _$this    = _$(this),
+                    _$counter = _$this.next().find('.badge'), 
+                    blockId   = _$this.attr('id').substr(_$this.attr('id').indexOf('_') + 1),
+                    textVal   = _$this.val(),                    
+                    _$maxLengthTextarea = _$('#at-maxlengthTextBlockG_' + blockId),                                       
+                    maxLength = _$maxLengthTextarea.val(),
+                    isValidInput = true;
+
+                // Check if the maxlength has been set
+                if(maxLength !== ''){
+                    // Make it an integar
+                    maxLength = parseInt(maxLength);
+                }
+
+                // Check if the new inputted value is valid
+                isValidInput = app.utils.validateMaxLengthTextArea(textVal, maxLength, _$counter);
+
+                // If it is valid... then update the canvas
+                if(isValidInput === true){
+                    // Need to add Debounce
+                    app.cp.updateCanvasBlockText(_$(this));
+                } else{
+                    console.log('Max character limit reached');
+                }
             });
             // After finishing editing a canvas objects's text, handle that event
             app._$body.on('blur', '[data-action=update-block-text]', app.cp.textareaBlurHandler);
 
             // Listens for change and click events, and then updates the active canvas object with the new value
-            app._$body.on('change keyup', '[data-action=update-canvas-control]', app.cp.updateCanvasObjSetting);
+            app._$body.on('change keyup', '[data-action=update-canvas-control]', function(){
+                _$.debounce(app.cp.updateCanvasObjSetting(_$(this)), 750);
+            });
 
             // CANVAS CONTROLS
             app._$productToggleBtn = _$('.product-container [data-action=toggle-grid]');

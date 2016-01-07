@@ -60,7 +60,7 @@
 				<button type="button" id="at-show-templates" class="btn btn-lg btn-info step-option-btn" data-step-action="forward" data-step-secondaction="2">Load from existing template?</button>			
 			</div>
 			
-			<div class="col-md-4" id="template-tools-navigation">
+			<div class="col-md-5" id="template-tools-navigation">
 				<div class="stepped-option" data-step="1">
 					<div class="stepped-option-2 hidden" data-step-target="1">
 						<h3>Name template</h3>
@@ -207,27 +207,17 @@
 
 									<h3>Font Face</h3>
 									<div id="at-font-face" class="text-editor-option">
-										<!-- Need to add more weights -->
-										<button type="button" class="at-control reset-to-default btn btn-default option-selected" data-fface="FuturaBT-Book">Regular</button>
-										<button type="button" class="btn btn-default" data-fface="FuturaBT-Medium">Medium</button>
-										<button type="button" class="at-control btn btn-default" data-fface="FuturaBT-Heavy">Headline</button>
+										<!-- Loaded via JS -->										
 									</div>
 
 									<h3>Select Font Size</h3>
 									<div id="at-font-size" class="text-editor-option">
-										<button type="button" class="at-control reset-to-default btn btn-default option-selected" data-size="12">Small</button>
-										<button type="button" class="at-control btn btn-default" data-size="24">Medium</button>
-										<button type="button" class="at-control btn btn-default" data-size="36">Large</button>
+										<!-- Loaded via JS -->
 									</div>														
 
 									<h3>Colour</h3>
 									<div id="at-font-color" class="text-editor-option">
-										<!-- <button type="button" class="at-control  btn btn-default color-option color-light-green" data-rgb="140,198,63">Light Green</button>
-										<button type="button" class="at-control btn btn-default color-option color-mid-green" data-rgb="0,162,70">Mid Green</button>
-										<button type="button" class="at-control btn btn-default color-option color-dark-green" data-rgb="0,92,70">Dark Green</button>
-										<button type="button" class="at-control btn btn-default color-option color-purple" data-rgb="104,44,136">Purple</button>
-										<button type="button" class="at-control btn btn-default color-option color-orange" data-rgb="241,131,21">Orange</button>
-										<button type="button" class="at-control btn btn-default color-option color-red" data-rgb="227,35,51">Red</button> -->
+										<!-- Loaded via JS -->
 									</div>
 									<div class="row text-editor-option">
 										<div class="col-md-5">
@@ -236,9 +226,7 @@
 										</div>
 										<div class="col-md-7" id="at-lineheight">
 											<h3>Line height</h3>
-											<button type="button" class="at-control btn btn-default" data-lineheight="75">75%</button>
-											<button type="button" class="at-control btn btn-default reset-to-default option-selected" data-lineheight="100">100%</button>
-											<button type="button" class="at-control btn btn-default" data-lineheight="125">125%</button>
+											<!-- Loaded via JS -->
 										</div>										
 									</div>
 								</div>
@@ -497,12 +485,12 @@
 				</div>
 			</div>
 
-			<div class="col-md-7 col-md-offset-1 stepped-option new-template-container" data-step="2">
+			<div class="col-md-6 col-md-offset-1 stepped-option new-template-container" data-step="2">
 
 				<button type="button" class="btn btn-danger reset-create-template" data-step-action="back">Reset</button>
 				<button type="button" class="btn btn-default" data-action="toggle-grid" style="margin-right: 20px">Toggle Grid</button>
 				<button type="button" class="btn btn-info create-template">Create Template</button>				
-				<a class="btn btn-warning" data-action="download-thumbnail" download="template-thumbnail.png">Download Thumbnail</a>
+				<!-- <a class="btn btn-warning" data-action="download-thumbnail" download="template-thumbnail.png">Download Thumbnail</a> -->
 				<button type="button" class="btn btn-info update-template hidden-el">Update Template</button>
 				
 				<hr>

@@ -12,7 +12,7 @@ _$(document).ready(function(){
 	// Canvas Elements/Settings
 	app._ct_canvas;
 	app._cp_canvas;
-	app.canvasFixedMargin;
+	app.canvasMargins = {}
 
 	// Grid Squares
 	app.gridSquare      = 8;
@@ -88,7 +88,8 @@ _$(document).ready(function(){
 	app.fontFaces		=   [
 								{
 									ffname: 'FuturaBT-Book',
-									fftitle: 'Regular'
+									fftitle: 'Regular',
+									isDefault: true // This setting is required for when creating a template we can set a default
 								},
 								{
 									ffname: 'FuturaBT-Medium',
@@ -103,29 +104,19 @@ _$(document).ready(function(){
 									fftitle: 'Headline'
 								}
 							];
-	app.fontSizes		= 	[
+	app.lineHeights		=   [
 								{
-									sizeName: 'X Small',
-									size:  	  '9'
+									lineheight: 75									
 								},
 								{
-									sizeName: 'Small',
-									size:  	  '16'
+									lineheight: 100,
+									isDefault: true // This setting is required for when creating a template we can set a default
 								},
 								{
-									sizeName: 'Medium',
-									size:  	  '20'
-								},
-								{
-									sizeName: 'Large',
-									size:  	  '36'
-								},
-								{
-									sizeName: 'X-Large',
-									size:  	  '44'
+									lineheight: 125
 								}
-							]
-
+							];
+	
 	// DOM elements
 	app._$tempBlockName  	= _$('#at-block-title');
 	app._$documentSizeBtns  = _$('input[name=doc-size]');
@@ -147,7 +138,40 @@ _$(document).ready(function(){
 	app.utils = {
 		/**
 			UTIL FUNCTION
-		**/ 
+		**/
+		initUtils: function(){
+			app.utils.setFontSize();
+		},
+		setFontSize: function(){
+			app.fontSizes		= 	[
+									{
+										sizeName: 'X Small',
+										ptSize: 9,
+										pxSize: app.utils.convertPtToPx(9)
+									},
+									{
+										sizeName: 'Small',
+										ptSize: 16,
+										pxSize: app.utils.convertPtToPx(16)
+									},
+									{
+										sizeName: 'Medium',
+										ptSize: 20,
+										pxSize: app.utils.convertPtToPx(20),
+										isDefault: true // This setting is required for when creating a template we can set a default
+									},
+									{
+										sizeName: 'Large',
+										ptSize: 36,
+										pxSize: app.utils.convertPtToPx(36)
+									},
+									{
+										sizeName: 'X-Large',
+										ptSize: 44,
+										pxSize: app.utils.convertPtToPx(44)
+									}
+								];
+		},
 		filterResponse: function(data){
 	      // Ugly way of dealing with store front response which contains extra junk in the request.
 	      // This cleans up the reponse so it can be parsed as JSON.
@@ -211,24 +235,24 @@ _$(document).ready(function(){
 	    //   // return unit * targetUnit;    
 	    // },
 	    convertPtToPx: function(size){
-	    	console.log( 'convertPtToPx: ' +  Math.round(parseInt(size) * app.ptToPxSize) )
-	    	return  Math.round(parseInt(size) * app.ptToPxSize)
+	    	// console.log( 'convertPtToPx: ' +  Math.round(parseInt(size) * app.ptToPxSize) )
+	    	return Math.round(parseInt(size) * app.ptToPxSize)
 	    },
 	    convertMMtoPX: function(unit, canvasScale){
 	    	// console.log(unit, canvasScale);
 	    	var pxUnit,
 	    		scale     = typeof(canvasScale) !== 'undefined' ? canvasScale : 1;
 	    	// Multiple the MM unit by it's the MMtoPxSize to get the pixel and then round it up
-	    	pxUnit = Math.ceil(unit * app.MMtoPxSize);
+	    	pxUnit = Math.ceil(parseInt(unit) * app.MMtoPxSize);
 	    	// console.log( pxUnit );
-	    	// Divide the MM pixel by the canvasScale and then round up.
-	    	pxUnit = Math.ceil(pxUnit / canvasScale);
+	    	// Divide the MM pixel by the scale and then round up.
+	    	pxUnit = Math.ceil(pxUnit / scale);
 
-	    	console.log(pxUnit, app.canvasFixedMargin);
-	    	console.log(pxUnit < app.canvasFixedMargin);
+	    	// console.log(pxUnit, app.canvasMargins.bleed);
+	    	// console.log(pxUnit < app.canvasMargins.bleed);
 
-		    if(pxUnit < app.canvasFixedMargin){
-		        return app.canvasFixedMargin
+		    if(pxUnit < 0){
+		        return 0
 		    } else{
 		    	return pxUnit
 		    }
@@ -312,12 +336,12 @@ _$(document).ready(function(){
 								      		fill: 'rgba(255,255,255,0)',
 							                hasBorders: false,
 							                hasRotatingPoint: false,
-							                height: _canvas.height - app.canvasFixedMargin,
+							                height: _canvas.height - app.canvasMargins.bleed,
 							                left: 0,
 							                lockRotation: true,
 							                top: 0,
-							                width: _canvas.width - app.canvasFixedMargin,
-							                strokeWidth: app.canvasFixedMargin,
+							                width: _canvas.width - app.canvasMargins.bleed,
+							                strokeWidth: app.canvasMargins.bleed,
 							                stroke: 'rgba(205,205,205,0.5)'
 							            });
 		  gridLines.push(_bleedarea);
@@ -366,9 +390,9 @@ _$(document).ready(function(){
 				settings.width    = 332;
 				settings.height   = 207;
 				// Set the canvas margin (5mm for Business Cards)
-                app.canvasFixedMargin = Math.ceil(Math.ceil(5 * app.MMtoPxSize) / 2);
+                app.canvasMargins.bleed = Math.ceil(Math.ceil(5 * app.MMtoPxSize) / 2);
                 // Make the number a multiple of 8, so its fits to the grid properly
-                app.canvasFixedMargin = Math.ceil(app.canvasFixedMargin / 8) * 8;
+                app.canvasMargins.bleed = Math.ceil(app.canvasMargins.bleed / 8) * 8;
 			} else{
 				if(docWidth < docHeight){
 				 	settings.width  = 396;
@@ -378,9 +402,9 @@ _$(document).ready(function(){
 				 	settings.height = 396;
 				}
 				// Set the canvas margin (15mm for standard A4 Documents) / Divided by the canvas scale
-                app.canvasFixedMargin = Math.ceil(Math.ceil(15 * app.MMtoPxSize) / 2.0174);
+                app.canvasMargins.bleed = Math.ceil(Math.ceil(15 * app.MMtoPxSize) / 2.0174);
                 // Make the number a multiple of 8, so its fits to the grid properly
-                app.canvasFixedMargin = Math.ceil(app.canvasFixedMargin / 8) * 8;
+                app.canvasMargins.bleed = Math.ceil(app.canvasMargins.bleed / 8) * 8;
 			}
 
 			// Set the level of scaling so the when converting the cooridinates to pixels that are accurate      
@@ -407,6 +431,15 @@ _$(document).ready(function(){
 				settings.canvasScale = 1;
 			}
 			return settings;
+	    },
+	    setCanvasMaxMargins: function(_canvas){
+	    	var canvasWidth  = _canvas.width,
+	    		canvasHeight = _canvas.height;
+
+	    	app.canvasMargins.maxLeft   = app.canvasMargins.bleed;
+	    	app.canvasMargins.maxRight  = canvasWidth - app.canvasMargins.bleed;
+	    	app.canvasMargins.maxTop    = app.canvasMargins.bleed;
+	    	app.canvasMargins.maxBottom = canvasHeight - app.canvasMargins.bleed; 
 	    },
 
 	    // Need to refactor the above and below functions so there is only 1 that does both as they are very similar.
@@ -541,7 +574,6 @@ _$(document).ready(function(){
 		    // get rid of empy newline at the end
 		    formatted = formatted.substr(0, formatted.length - 1);
 		    // console.log(formatted);
-		    console.log(t.fill);
 		    var _canvasobj,
 		    	_objSettings = {
 			        fill: t.fill,	
@@ -572,11 +604,17 @@ _$(document).ready(function(){
 		    
 		    return _canvasobj;
 		},
-		selectCanvasPropertyToEdit: function($el){
-			var updatedVal = $el.val(),
-				elType	   = $el.data('canvas-setting-type'),
-				elChecked  = $el.is(':checked');
+		selectCanvasPropertyToEdit: function(_$el){
+			var updatedVal = _$el.val(),
+				elType	   = _$el.data('canvas-setting-type'),
+				elChecked  = _$el.is(':checked');
+
 			console.log(elType, updatedVal, elChecked);
+
+			app.utils.setDomPropertiesOnEdit(_$el);
+			// Futher dom manipulation is needed when updating the max length value
+		   
+			
 			switch(elType) {
 		        case 'bt': // Block Title
 		            return {
@@ -589,8 +627,10 @@ _$(document).ready(function(){
 		            }
 		            break;
 		        case 'fs':
+		        	// console.log(app.utils.convertPtToPx(updatedVal))
 		            return {
-		            	fontSize: updatedVal
+		            	// Need to convert the equvielant of Xpt to Xpx
+		            	fontSize: app.utils.convertPtToPx(updatedVal)
 		            }
 		            break;
 		        case 'fc':
@@ -641,10 +681,108 @@ _$(document).ready(function(){
 		        	break;
 		    }
 		},
+		setDomPropertiesOnEdit: function(_$el){
+			var elType 	   = _$el.data('canvas-setting-type'),
+				updatedVal = _$el.val();
+
+		    if(elType === 'ml'){
+		    	var blockId 		= _$el.attr('id').substr(_$el.attr('id').indexOf('_') + 1),
+		    		_$blockTextArea = _$('#text-block-TextBlockG_' + blockId),
+		    		textAreaValue   = _$blockTextArea.val(),
+		    		charsRemaining	= parseInt(updatedVal) - textAreaValue.length;
+
+		    	if(charsRemaining < 0 || isNaN(charsRemaining) ){
+		    		charsRemaining = 0;
+		    	}
+
+		    	// Update the UI to show how many characters are left
+		    	_$blockTextArea.next().find('.badge').html(charsRemaining);
+
+		    	// Update the text string so it has the correct number of characters
+		    	textAreaValue = textAreaValue.substr(0, parseInt(updatedVal));
+
+		    	// Update the textarea's attribute and value
+		    	_$blockTextArea.attr('maxlength', updatedVal).val(textAreaValue);
+
+		    	// Update the canvas obj with the new text value
+		    	app.utils.setActiveTextBlockText(textAreaValue);
+		    }
+		},
+		setActiveTextBlockText: function(objText){
+			// This function updates the relevant canvas obj, after the maxlength control has been changed
+			var _activeObj = app._cp_canvas.getActiveObject();
+			_activeObj.set({
+				text: objText
+			});
+			_activeObj.setCoords();
+			app._cp_canvas.renderAll();
+		},
 
 		/**
 			CANVAS EVENTS
 		**/
+		activeKeyboardMovements: function(_currentActiveObj, _canvas){
+			var _activeObj = _currentActiveObj;
+
+			// MULTIPLE OBJECTS ARE MOVING...
+
+			app._$body.on('keydown', function(e){
+				if(e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40){
+					// Prevent the page scrolling
+					e.preventDefault();
+					if(e.keyCode === 37){
+						// Left Arrow	
+						if((_activeObj.left - app.gridSquare) > app.canvasMargins.maxLeft){					
+							_activeObj.set({
+								left: _activeObj.left - app.gridSquare
+							});	
+						} else{
+							_activeObj.set({
+								left: app.canvasMargins.maxLeft
+							});
+						}
+					} else if(e.keyCode === 38){
+						// Up Arrow
+						if((_activeObj.top - app.gridSquare) > app.canvasMargins.maxTop){
+							_activeObj.set({
+								top: _activeObj.top - app.gridSquare
+							});
+						} else{
+							_activeObj.set({
+								top: app.canvasMargins.maxTop
+							});
+						}
+					} else if(e.keyCode === 39){
+						// Right Arrow
+						console.log((_activeObj.left + (_activeObj.width * _activeObj.scaleX) + app.gridSquare) , app.canvasMargins.maxRight)
+						if((_activeObj.left + (_activeObj.width * _activeObj.scaleX) + app.gridSquare) < app.canvasMargins.maxRight){
+							_activeObj.set({
+								left: _activeObj.left + app.gridSquare
+							});
+						} else{
+							_activeObj.set({
+								left: app.canvasMargins.maxRight - _activeObj.width
+							});
+						}
+					} else if(e.keyCode === 40){
+						// Down Arrow
+						if((_activeObj.top + (_activeObj.height * _activeObj.scaleY) + app.gridSquare) < app.canvasMargins.maxBottom){
+							_activeObj.set({
+								top: _activeObj.top + app.gridSquare
+							});
+						} else{
+							_activeObj.set({
+								top: app.canvasMargins.maxBottom - _activeObj.height
+							});
+						}
+					}
+					_activeObj.setCoords();
+					_canvas.renderAll();
+
+					// Add delete and backspace to delete canvas OBJ and relevant block..	
+				}
+			});
+		},
 		constrainGridMovement: function(e, _canvas){
 		  var obj = e.target;
 	      // Snap to grid
@@ -661,28 +799,28 @@ _$(document).ready(function(){
 	      // }        
 	      obj.setCoords();        
 	      // top-left  corner
-	      if(obj.getBoundingRect().top < app.canvasFixedMargin || obj.getBoundingRect().left < app.canvasFixedMargin){
-	          obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top + app.canvasFixedMargin);
-	          obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left + app.canvasFixedMargin);
+	      if(obj.getBoundingRect().top < app.canvasMargins.bleed || obj.getBoundingRect().left < app.canvasMargins.bleed){
+	          obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top + app.canvasMargins.bleed);
+	          obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left + app.canvasMargins.bleed);
 	      }
 	      // bot-right corner
-	      if(obj.getBoundingRect().top+obj.getBoundingRect().height + app.canvasFixedMargin > obj.canvas.height || obj.getBoundingRect().left+obj.getBoundingRect().width + app.canvasFixedMargin > obj.canvas.width){
-	          obj.top = Math.min(obj.top, obj.canvas.height-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top - app.canvasFixedMargin);
-	          obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left - app.canvasFixedMargin);
+	      if(obj.getBoundingRect().top+obj.getBoundingRect().height + app.canvasMargins.bleed > obj.canvas.height || obj.getBoundingRect().left+obj.getBoundingRect().width + app.canvasMargins.bleed > obj.canvas.width){
+	          obj.top = Math.min(obj.top, obj.canvas.height-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top - app.canvasMargins.bleed);
+	          obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left - app.canvasMargins.bleed);
 	      }
 
 	      // Sets the drawmax width and height of an element
-	      // console.log(_canvas.width, app.canvasFixedMargin * 2)
+	      // console.log(_canvas.width, app.canvasMargins.bleed * 2)
 	      var objWidth  = obj.width * obj.scaleX,
 	      	  objHeight = obj.height * obj.scaleY,
-	      	  maxWidth  = _canvas.width  - (app.canvasFixedMargin * 2),
-	      	  maxHeight = _canvas.height - (app.canvasFixedMargin * 2);
+	      	  maxWidth  = _canvas.width  - (app.canvasMargins.bleed * 2),
+	      	  maxHeight = _canvas.height - (app.canvasMargins.bleed * 2);
 
 	      // Handle width
 	      if(objWidth > maxWidth){
 	      	obj.set({
 	      		width: maxWidth,
-	      		left: app.canvasFixedMargin,
+	      		left: app.canvasMargins.bleed,
 	      		scaleX: 1
 	      	});
 	      }
@@ -691,7 +829,7 @@ _$(document).ready(function(){
 	      if(objHeight > maxHeight){
 	      	obj.set({
 	      		height: maxHeight,
-	      		top: app.canvasFixedMargin,
+	      		top: app.canvasMargins.bleed,
 	      		scaleY: 1
 	      	});
 	      }
@@ -1102,25 +1240,73 @@ _$(document).ready(function(){
 	    /**
 			Validation
 	    **/
-	    validateMaxLengthTextArea: function($el, $targetEl){
-	    	if($el.maxLength <= $el.val().length){
-	    		console.log('This is valid');
-	    	}else{
-	    		console.log('Invalid');
+	    validateLeftPos: function(canvasWidth, leftPos, elWidth){
+	    	// This function checks whether the top position is valid    	
+	    	if(leftPos < app.canvasMargins.bleed){
+	    		// console.log(app.canvasMargins.bleed)
+	    		// Check the element position is greater than the left margin
+	    		return app.canvasMargins.bleed
+	    	} else if(leftPos + elWidth > canvasWidth - app.canvasMargins.bleed){
+	    		// console.log(canvasWidth - app.canvasMargins.bleed - elWidth)
+	    		// Check the element position is less than the right margin
+	    		return canvasWidth - app.canvasMargins.bleed - elWidth
+	    	} else{
+	    		// console.log(leftPos)
+	    		// Otherwise the left position is ok and outside of both sides margins
+	    		return leftPos
 	    	}
 	    },
-	    validateTextBlock: function(_block){
+	    validateTopPos: function(canvasHeight, upperX, elHeight){
+	    	// This function checks whether the top position is valid
+	    	var maxTopPos   = canvasHeight - (app.canvasMargins.bleed * 2),
+	    		topPosition = canvasHeight - upperX;
+
+	    	if(topPosition + elHeight > maxTopPos){
+	    		// Check the elements position is outside the bottom margin
+	    		return canvasHeight - app.canvasMargins.bleed - elHeight
+	    	} else if(topPosition < app.canvasMargins.bleed){
+	    		// Check the elements position is outside the top margin
+	    		return app.canvasMargins.bleed
+	    	} else{
+	    		// Other wise the top position is ok and outside both margins
+	    		return topPosition
+	    	}
+	    },
+	    validateMaxLengthTextArea: function(textVal, maxLength, _$targetel){
+	    	console.log(textVal, typeof(maxLength));
+	    	// If a targetElement is set, then update the UI to show the characters remaining
+	    	if(typeof(_$targetel) !== 'undefined'){
+	    		_$targetel.html(maxLength - textVal.length);
+	    	}
+
+	    	// Check if a max length has been set. If it hasnt, then return true
+	    	if(typeof(maxLength) === 'number'){
+	    		if(textVal.length <= maxLength){
+		    		return true
+		    	} else{
+		    		return false
+		    	}
+	    	} else{
+	    		return true
+	    	}
+	    },	    	
+	    validateCanvasTextBlock: function(_block){
 
 	    },
-	    convertCanvasToImgDownload: function($el, _canvas){
+
+
+	    /**
+			CANVAS END POINTS
+	    **/
+	    convertCanvasToImgDownload: function(_$el, _canvas){
 	      // Remove selected states and grid before saving img
 	      app.utils.cleanCanvas(_canvas);
 	      app.imagedata = _canvas.toDataURL('image/png');
 	      // console.log(app.imagedata);
-	      $el[0].href = app.imagedata;
-	      app.utils.toggleCanvasGrid($el, true, _canvas);
+	      _$el[0].href = app.imagedata;
+	      app.utils.toggleCanvasGrid(_$el, true, _canvas);
 	    },
-	    generateCanvasPreviewImg: function($el,_canvas, prefix){
+	    generateCanvasPreviewImg: function(_$el,_canvas, prefix){
 	    	// @ _canvas = farbic canvas object | {}
 	    	// @ prefix  = prefix for the hidden canvas | string
 
@@ -1129,12 +1315,13 @@ _$(document).ready(function(){
 	        app.utils.cleanCanvas(_canvas);
 	        // Create an image from the canvas and add it to the relevant div
 	        var imgElement = ReImg.fromCanvas(_$('#' + prefix +'_canvas')[0]).toImg(),
-	            $output    = _$('#' + prefix +'_image');
-	        $output.empty().append(imgElement);
+	            _$output    = _$('#' + prefix +'_image');
+	        _$output.empty().append(imgElement);
 	        // Save the image data so this can be used later when saving the image for the template
 	        app.imagedata = _canvas.toDataURL('image/png');
 	        // Enable the grid again
-	        app.utils.toggleCanvasGrid($el, true, _canvas);
+	        app.utils.toggleCanvasGrid(_$el, true, _canvas);
 	    }
 	};
+	app.utils.initUtils();
 })

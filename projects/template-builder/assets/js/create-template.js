@@ -148,7 +148,7 @@ _$(document).ready(function () {
             });
         },
         loadTempFromJSON: function (canvasData) {
-            // console.log(canvasData);
+            console.log(canvasData);
             // console.log(canvasData.doc);
             var canvasEl = document.createElement('canvas'),
                 docWidth = parseInt(canvasData.doc.page._width),
@@ -158,7 +158,7 @@ _$(document).ready(function () {
             canvasEl.setAttribute('id', 'ct_canvas');
 
             var canvasSettings = app.utils.setCanvasSettings(docWidth, docHeight);
-            console.log(app.templateType);
+            // console.log(app.templateType);
             if(app.templateType === 'default'){
                 // Set the canvas margin (15mm for A4) / Divided by the canvas scale
                 app.canvasFixedMargin = Math.ceil(Math.ceil(15 * app.MMtoPxSize) / 2);
@@ -176,6 +176,8 @@ _$(document).ready(function () {
 
             document.getElementById('template-canvas-container').appendChild(canvasEl);
             app._ct_canvas = new fabric.Canvas('ct_canvas', { selection: false, backgroundColor: '#FFF' });
+            // This functions sets the max/min coordinatations an element can move to.
+            app.utils.setCanvasMaxMargins(app._ct_canvas);
             app.utils.drawGrid(app._ct_canvas);
             // Add all of the elements to the page.
             app.ct.createTempBlockFromXML(canvasData.doc.page, canvasSettings.canvasScale);
@@ -188,6 +190,7 @@ _$(document).ready(function () {
             app.ct.bindCreateTemplateCanvasEvents();
         },
         createTempBlockFromXML: function (templateJSON, scale) {
+            console.log(scale)
             // console.log(templateJSON);
             if (typeof (templateJSON['text-block-group']) !== 'undefined') {
                 if (typeof (templateJSON['text-block-group'].length) === 'undefined') {
@@ -273,7 +276,7 @@ _$(document).ready(function () {
             });
         },
         resetCreateTempBlock: function () {
-            console.log('Called');
+            // console.log('Called');
             // Hide the edit buttons
             app.ct.toggleTempState(false);
 
@@ -398,31 +401,6 @@ _$(document).ready(function () {
                 _$orientationDetail.text('Landscape');
             }
         },
-        // constrainGridMovement: function (e) {
-        //     // Snap to grid
-        //     e.target.set({
-        //       left: Math.round(e.target.left / app.gridSquare) * app.gridSquare,
-        //       top: Math.round(e.target.top / app.gridSquare) * app.gridSquare
-        //     });
-
-        //     // Only allow movement inside the canvas
-        //     var obj = e.target;
-        //     // if object is too big ignore
-        //     if (obj.currentHeight > obj.canvas.height || obj.currentWidth > obj.canvas.width) {
-        //         return;
-        //     }
-        //     obj.setCoords();
-        //     // top-left  corner
-        //     if (obj.getBoundingRect().top < 0 || obj.getBoundingRect().left < 0) {
-        //         obj.top = Math.max(obj.top, obj.top - obj.getBoundingRect().top);
-        //         obj.left = Math.max(obj.left, obj.left - obj.getBoundingRect().left);
-        //     }
-        //     // bot-right corner
-        //     if (obj.getBoundingRect().top + obj.getBoundingRect().height > obj.canvas.height || obj.getBoundingRect().left + obj.getBoundingRect().width > obj.canvas.width) {
-        //         obj.top = Math.min(obj.top, obj.canvas.height - obj.getBoundingRect().height + obj.top - obj.getBoundingRect().top);
-        //         obj.left = Math.min(obj.left, obj.canvas.width - obj.getBoundingRect().width + obj.left - obj.getBoundingRect().left);
-        //     }
-        // },
         deactiveCanvasControls: function () {
             // If the edit state is active, hide the edit options
             if (!_$('.disabled-in-edit-state').hasClass('hidden')) {
@@ -433,7 +411,6 @@ _$(document).ready(function () {
         setAspectRatio: function (aspectRatio) {
             switch (aspectRatio) {
                 case '1:1':
-                    // return [200, 200, true]
                     return [100, 100, true]
                     break;
                 case '1:2':
@@ -534,16 +511,19 @@ _$(document).ready(function () {
                 blockSettings.isManditory = 'true' ? true : false;
 
                 // Convert the unit to its equivelant based on an A4
-                // console.log(data);
-                // console.log('Before Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
                 data._upperrightx = data._upperrightx / data.scale;
                 data._upperrighty = data._upperrighty / data.scale;
                 data._lowerleftx  = data._lowerleftx / data.scale;
                 data._lowerlefty  = data._lowerlefty / data.scale;
+
+                // console.log('Before Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
+                
                 // console.log('After Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
                 // Generic block settings
                 var canvasScale     = app.templateType === 'default' ? 2.0174 : 1,
-                    blockDimensions = {};
+                    blockDimensions = {},                    
+                    canvasWidth     = app._ct_canvas.width,
+                    canvasHeight    = app._ct_canvas.height;
 
                 // Base of 15 at a3...
                 // 1. Convert a unit into its equivelant it would be in a4. || 15 / 1.4142 (10.60670343657191)
@@ -554,12 +534,13 @@ _$(document).ready(function () {
                 blockDimensions.upperY = app.utils.convertMMtoPX(data._upperrighty, canvasScale);
                 blockDimensions.lowerX = app.utils.convertMMtoPX(data._lowerleftx, canvasScale);
                 blockDimensions.lowerY = app.utils.convertMMtoPX(data._lowerlefty, canvasScale);
-                console.log(blockDimensions);
                 
                 blockSettings.height = app.utils.calcHeight(blockDimensions);
-                blockSettings.left   = blockDimensions.lowerX;
-                blockSettings.top    = app._ct_canvas.height - blockDimensions.upperY;
                 blockSettings.width  = app.utils.calcWidth(blockDimensions);
+                blockSettings.left   = app.utils.validateLeftPos(canvasWidth, blockDimensions.lowerX, blockSettings.width);
+                blockSettings.top    = app.utils.validateTopPos(canvasHeight, blockDimensions.upperY, blockSettings.height);
+                
+                console.log(blockDimensions);
                 console.log(blockSettings);
 
                 if (data.block === 'tbg') {
@@ -569,13 +550,13 @@ _$(document).ready(function () {
                     if (typeof (data['text-block'].length) !== 'undefined') {
                         data['text-block'].forEach(function (block) {
                             // console.log(block);
-                            blockSettings = {};
+                            // blockSettings = {};
                             // console.log(block);
                             blockSettings.isEditable = typeof (block._editable) !== 'undefined' ? block._editable : 'false';
                             blockSettings.isManditory = typeof (block._mandatory) !== 'undefined' ? block._mandatory : 'false';
                             blockSettings.fface = typeof (block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
                             blockSettings.fontColor = app.utils.cmykToRGB(block._colour);
-                            blockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
+                            blockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 20; // Default font size
                             blockSettings.lineheight = typeof (block._leading) !== 'undefined' ? String(block._leading).replace('%', '') : '100';
                             blockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
                             blockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
@@ -591,13 +572,13 @@ _$(document).ready(function () {
                     } else {
                         // console.log(block);
                         var singleBlock = data['text-block'];
-                        blockSettings = {};
+                        // blockSettings = {};
                         // console.log(block);
                         blockSettings.isEditable = typeof (singleBlock._editable) !== 'undefined' ? singleBlock._editable : 'false';
                         blockSettings.isManditory = typeof (singleBlock._mandatory) !== 'undefined' ? singleBlock._mandatory : 'false';
                         blockSettings.fface = typeof (singleBlock['_font-family']) !== 'undefined' ? singleBlock['_font-family'] : 'FuturaBT-Book';
                         blockSettings.fontColor = app.utils.cmykToRGB(singleBlock._colour);
-                        blockSettings.fontSize = typeof (singleBlock['_font-size']) !== 'undefined' ? singleBlock['_font-size'] : 12;
+                        blockSettings.fontSize = typeof (singleBlock['_font-size']) !== 'undefined' ? singleBlock['_font-size'] : 20; // Default font size
                         blockSettings.lineheight = typeof (singleBlock._leading) !== 'undefined' ? String(singleBlock._leading).replace('%', '') : '100';
                         blockSettings.id = typeof (singleBlock._id) !== 'undefined' ? singleBlock._id : 'false';
                         blockSettings.label = typeof (singleBlock._title) !== 'undefined' ? singleBlock._title : 'false';
@@ -664,7 +645,6 @@ _$(document).ready(function () {
                     app.ct.createTempBlockRegular(blockSettings);
                 } else if (blockType === 'tbg') {
                     // If is a text block group
-
                     blockSettings.blocktype = 'new-text-block-group';
                     blockSettings.height = 200;
                     blockSettings.spacing = parseInt(_$('#at-spacing-g').val());
@@ -681,7 +661,7 @@ _$(document).ready(function () {
         createTempBlockGroup: function (blockSettings, _block) {
             // Create the fabric js element on the canvas      
             // Only increment the counter if it is a new object
-            // console.log(blockSettings);
+            console.log(blockSettings, blockSettings.width);
             app.tempGroupCnt = typeof (_block) !== 'undefined' ? app.tempGroupCnt : app.tempGroupCnt++;
             var _$textBlockList = _$('#at-text-block-group-list'),
                 _blockId = typeof (_block) !== 'undefined' ? _block.blockId : 'tbg_' + app.tempGroupCnt;
@@ -690,7 +670,7 @@ _$(document).ready(function () {
             // Check if this is creating a group from an exisitng group. (Performing an update)
             if (typeof (_block) !== 'undefined') {
                 // Create indiviual text block for the text block group   
-                var _tblocks = app.ct.createTempBlockGroupItem(_$textBlockList.find('li'), _$('#at-spacing-g'));
+                var _tblocks = app.ct.createTempBlockGroupItem(_$textBlockList.find('li'), _$('#at-spacing-g'), blockSettings);
                 // Add each block to the exiting group
                 console.log(_block);
                 _tblocks.forEach(function (block) {
@@ -699,14 +679,14 @@ _$(document).ready(function () {
                     _block.add(block);
                 });
                 // Add the group to the canvas
-                app._ct_canvas.add(_block);
+                app._ct_canvas.add(_block).renderAll();
             } else if (_$textBlockList.find('li').length > 0) {
                 // Use the settings from 'blockSettings' object if this is a new group
-                var _tblocks = app.ct.createTempBlockGroupItem(_$textBlockList.find('li'), blockSettings.spacing);
+                var _tblocks = app.ct.createTempBlockGroupItem(_$textBlockList.find('li'), blockSettings.spacing, blockSettings);
                 // Add the group elements to the group container
-
+                console.log(blockSettings.left)
                 var _tblockg = new fabric.Group(_tblocks, {
-                    backgroundColor: 'rgb(0,0,0)',
+                    backgroundColor: 'rgb(205,205,205)',
                     fill: 'rgb(0,0,0)',
                     hasBorders: true,
                     hasRotatingPoint: false,
@@ -718,7 +698,7 @@ _$(document).ready(function () {
                     top: typeof (blockSettings.top) !== 'undefined' ? blockSettings.top : app.canvasFixedMargin,
                     left: typeof (blockSettings.left) !== 'undefined' ? blockSettings.left : app.canvasFixedMargin,
                 });
-                console.log(_tblockg);
+                // console.log(_tblockg);
                 // Set the id and blocktype of the Text Block Group
                 // console.log(blockSettings);
                 _tblockg['blockId'] = _blockId;
@@ -730,7 +710,7 @@ _$(document).ready(function () {
                 _tblockg['valign'] = blockSettings.valign;
 
                 // Add the group to the canvas
-                app._ct_canvas.add(_tblockg);
+                app._ct_canvas.add(_tblockg).renderAll();
             } else {
                 alert('No text blocks added to text block group. Please try again');
             }
@@ -788,22 +768,28 @@ _$(document).ready(function () {
             // Empty the input field with the previous component name.
             app.ct.resetCreateTempBlock();
         },
-        createTempBlockGroupItem: function ($els, spacing) {
-            var _blocksCollection = [];
-            // console.log(blockSettings.spacing, blockSettings.spacing * parseInt(i + 1) );
+        createTempBlockGroupItem: function ($els, spacing, parentSettings) {
+            console.log(parentSettings);
+            var _blocksCollection = [],
+                spacingInt        = parseInt(spacing),
+                elHeight          = parentSettings.height / $els.length - (spacingInt * ($els.length - 1));
+            // console.log(parentSettings.height, elHeight, spacingInt)
+            // console.log(blockSettings.spacingInt, blockSettings.spacingInt * parseInt(i + 1) );
             $els.each(function (i) {
-                var $template = _$(this),
+                var $template   = _$(this),
+                    topVal      = i === 0 ? 0 : (i * elHeight) + (i * spacingInt),                    
                     _innerblock = new fabric.Rect({
-                        fill: 'rgb(255,255,255)',
+                        fill: 'rgb(0,0,0)',
                         hasBorders: true,
                         hasRotatingPoint: false,
-                        height: 20,
-                        left: 20,
+                        height: elHeight,
+                        left: 0,
                         lockRotation: true,
                         originX: 'left',
                         originY: 'top',
-                        top: spacing * parseInt(i + 1) + 20,
-                        width: 180
+                        // top: 0,
+                        top: topVal,
+                        width: parentSettings.width
                     });
                 // Add additional non-block specific properties based on blocktype
                 _innerblock['blocktype'] = 'new-text-block';
@@ -1177,7 +1163,10 @@ _$(document).ready(function () {
             BUILD UI CONTROLS
         **/
         createTemplateControls: function(){
-            app.ct.createTempColourControls()
+            app.ct.createTempColourControls();
+            app.ct.createTempFontSizeControls();
+            app.ct.createTempFontFaceControls();
+            app.ct.createTempLineHeights();
         },
         createTempColourControls: function(){
             var colourOptionsString = '';
@@ -1193,6 +1182,54 @@ _$(document).ready(function () {
                 colourOptionsString+= '</button>';
             });
             _$('#at-font-color').append(colourOptionsString);
+        },
+        createTempFontSizeControls: function(){
+            var fontOptionString = '';
+
+            app.fontSizes.forEach(function(fontOpt){
+                var defaultOpt = '';
+                if(fontOpt.isDefault === true){
+                    defaultOpt = 'reset-to-default option-selected';
+                }
+                fontOptionString+= '<button type="button" ';
+                    fontOptionString+= 'class="at-control btn btn-default ' + defaultOpt + '" data-size="' + fontOpt.ptSize + '">';
+                    fontOptionString+= fontOpt.ptSize;
+                fontOptionString+= '</button>';
+            });
+
+            _$('#at-font-size').append(fontOptionString);
+        },
+        createTempFontFaceControls: function(){
+            var fontOptionString = '';
+
+            app.fontFaces.forEach(function(fontFaceOpt){
+                var defaultOpt = '';
+                if(fontFaceOpt.isDefault === true){
+                    defaultOpt = 'reset-to-default option-selected';
+                }
+                fontOptionString+= '<button type="button" ';
+                    fontOptionString+= 'class="at-control btn btn-default ' + defaultOpt + '" data-fface="' + fontFaceOpt.ffname + '">';
+                    fontOptionString+= fontFaceOpt.fftitle;
+                fontOptionString+= '</button>';
+            });
+
+            _$('#at-font-face').append(fontOptionString);
+        },
+        createTempLineHeights: function(){
+            var lineheightOptionString = '';
+
+            app.lineHeights.forEach(function(lineHeightOpt){
+                var defaultOpt = '';
+                if(lineHeightOpt.isDefault === true){
+                    defaultOpt = 'reset-to-default option-selected';
+                }
+                lineheightOptionString+= '<button type="button" ';
+                    lineheightOptionString+= 'class="at-control btn btn-default ' + defaultOpt + '" data-lineheight="' + lineHeightOpt.lineheight + '">';
+                    lineheightOptionString+= lineHeightOpt.lineheight + '%';
+                lineheightOptionString+= '</button>';
+            });
+  
+            _$('#at-lineheight').append(lineheightOptionString);
         },
 
 
