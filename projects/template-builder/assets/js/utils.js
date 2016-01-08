@@ -225,14 +225,6 @@ _$(document).ready(function(){
 	    	// console.log('DEBUG: convertPxToMM:', Math.floor(width * app.mmSize))
 	    	return Math.floor(width * app.mmSize)
 	    },	    
-	    // convertUnit: function(unit, targetUnit){
-	    // 	// 10px > Pts
-	    // 	// Math.floor(10 * 0.264583) = 2.64583
-
-	    // 	// 2.64583pts > PXs = 
-	    //   return parseInt( parseFloat(unit * targetUnit).toFixed(5) );    
-	    //   // return unit * targetUnit;    
-	    // },
 	    convertPtToPx: function(size){
 	    	// console.log( 'convertPtToPx: ' +  Math.round(parseInt(size) * app.ptToPxSize) )
 	    	return Math.round(parseInt(size) * app.ptToPxSize)
@@ -445,6 +437,7 @@ _$(document).ready(function(){
 
 	    dimensionlessDocSettings: function(docWidth, docHeight){
 	    	console.log(docWidth, docHeight)
+	    	debugger
 	    	// Set the level of scaling so the when converting the cooridinates to pixels that are accurate      
 			if((docWidth === 420 && docHeight === 594) || (docHeight=== 420 && docWidth === 594)){
 				// A2 = 420x594 or 594x420
@@ -1281,10 +1274,18 @@ _$(document).ready(function(){
 	    	}
 	    },
 	    validateMaxLengthTextArea: function(textVal, maxLength, _$targetel){
-	    	console.log(textVal, typeof(maxLength));
+	    	console.log(textVal);
+	    	console.log(typeof(maxLength));
 	    	// If a targetElement is set, then update the UI to show the characters remaining
+
+	    	// This is not working correctly... Needs to be looked at. Loading template 1(prod)
 	    	if(typeof(_$targetel) !== 'undefined'){
-	    		_$targetel.html(maxLength - textVal.length);
+	    		console.log(!isNaN(textVal));
+	    		if(!isNaN(textVal)){
+	    			_$targetel.html(5000);	
+	    		} else{
+	    			_$targetel.html(maxLength - textVal.length);
+	    		}	    		
 	    	}
 
 	    	// Check if a max length has been set. If it hasnt, then return true
@@ -1300,6 +1301,24 @@ _$(document).ready(function(){
 	    },	    	
 	    validateCanvasTextBlock: function(_block){
 
+	    },
+	    validateDocDimensions: function(docWidth, docHeight){
+    		// Set the level of scaling so the when converting the cooridinates to pixels that are accurate      
+			if((docWidth === 420 && docHeight === 594) || (docHeight=== 420 && docWidth === 594)){
+				return ['A2'] // 420x594 or 594x420
+			} else if((docWidth === 297 && docHeight === 420) || (docHeight=== 297 && docWidth === 420)){
+				return ['A3'] // 297x420 or 420x297
+			} else if((docWidth === 210 && docHeight === 297) || (docHeight=== 210 && docWidth === 297)){
+				return ['A4'] // 210x297 or 297x210
+			} else if((docWidth === 148 && docHeight === 210) || ((docHeight === 148 || docHeight === 148.5) && docWidth === 210)){
+				return ['A5'] // 148x210 or 210x148   
+			} else if((docWidth === 105 && docHeight === 148) || (docHeight >= 104 && docHeight <= 105 && docWidth === 148)){
+				return ['A6'] // 105x148 or 148x105
+			} else if((docWidth === 74 && docHeight === 105) || (docHeight === 74 && docWidth === 105)){
+				return ['A7'] // 74x105 or 105x74
+			} else if(docWidth === 85 && docHeight === 55){
+				return ['Business Card'] // 85x55
+			}
 	    },
 
 

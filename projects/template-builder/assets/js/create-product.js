@@ -195,9 +195,25 @@ _$(document).ready(function () {
 			        // Set the doc dimenions based of data attribte on _$this
 			        app.docDimensions = ['Business Card'];
 			    } else {
+                    console.log(data);
 			        productData = JSON.parse(app.utils.filterResponse(data));
 			        productJSON = x2js.xml_str2json(productData[0].XML);
-			        app.docDimensions = productData[0].Dimensions.replace(' ', '').split(',');			        
+
+
+                    /**
+                        START HERE MONDAY
+                    **/
+
+
+
+                    // If the docDimensions is empty, then manually set it. The old templates do not have associated doc dimensions
+                    if(app.docDimensions !== ''){
+			         app.docDimensions = productData[0].Dimensions.replace(' ', '').split(',');
+                    } else{
+                        app.docDimensions = app.utils.validateDocDimensions(productJSON.doc.page._width, productJSON.doc.page._height);
+                    }                
+                    console.log(app.docDimensions)
+                    debugger;
 			    }
 
 			    // Update template name hidden field
@@ -215,8 +231,7 @@ _$(document).ready(function () {
 			    _$('#template-name').text(_$this.next().find('.template-name').text());
 
 			    // Create the Canvas Element based of JSON created from the XML
-			    app.cp.loadProductFromJSON(productJSON);			    
-
+			    app.cp.loadProductFromJSON(productJSON);
 			})
 			.fail(function () {
 			    alert('Load product request failed');
@@ -700,7 +715,7 @@ _$(document).ready(function () {
                 // If text is from a source, then it should not be editable.
                 cTBSettings.isEditable === false;
             } else if (typeof (cTBSettings.textVal) === 'undefined' || cTBSettings.textVal === '') {
-                cTBSettings.textVal = 'Default Text';
+                cTBSettings.textVal = '';
             }
 
             // Create Boolean to test if this block is from a source file or free text
@@ -834,18 +849,25 @@ _$(document).ready(function () {
                             // If it is the first item, then reference its parentTop property
                             // console.log(_obj);
                             if(i === 0){
-                                validatedTopPos = app.utils.validateTopPos(canvasHeight, canvasHeight - _obj.parentTop, _obj.height)
+                                validatedTopPos = app.utils.validateTopPos(canvasHeight, canvasHeight - _obj.parentTop, _obj.height)                             
                                 topPos = validatedTopPos;  
                             } else{
                                 topPos = targetTextBlockGroups[prevObjIndex].top + targetTextBlockGroups[prevObjIndex].height + block.spacing;
                             }
 
                             // Set a property to disable vertical movement when a boundary has been met
-                            _obj.set({
-                                width: blockWidth,
-                                top: topPos
-                            });
-
+                            console.log(_obj.text !== '')
+                            if(_obj.text !== ''){
+                                _obj.set({
+                                    width: blockWidth,
+                                    top: topPos
+                                });  
+                            } else{
+                                _obj.set({
+                                    width: blockWidth,
+                                    height: 0
+                                });
+                            }
                             // Reset the _obj's controls coordinates
                             _obj.setCoords();
                             // Re-redner the canvas
@@ -867,11 +889,15 @@ _$(document).ready(function () {
             // Validate if the new text value needs to wrap to a new line
             // app.utils.validateLeftPos(app._cp_canvas.width, app._activeEditEl.left, app._activeEditEl.width)
             // app.utils.validateTopPos(app._cp_canvas.height, app._activeEditEl.top, app._activeEditEl.height)
-
+            if(app._activeEditEl.height === 0 && newTextVal.length === 1){
+                app._activeEditEl.set({
+                    height: app._activeEditEl.fontSize * app._activeEditEl.lineheight
+                })
+            }
             // Update the active canvas objects text and textVal values
             app._activeEditEl.set({
                 text: newTextVal,
-                textVal: newTextVal
+                textVal: newTextVal,
             });
             // Update the text of the canvas element
             app._cp_canvas.renderAll();
@@ -1184,7 +1210,8 @@ _$(document).ready(function () {
             });
 
             app._cp_canvas.on('selection:cleared', function (e) {
-                if(typeof(app._cachedActiveObj) !== 'undefined' || app._cachedActiveObj === null){
+                console.log(typeof(app._cachedActiveObj) !== 'undefined', app._cachedActiveObj !== null)
+                if(typeof(app._cachedActiveObj) !== 'undefined' && app._cachedActiveObj !== null){
                     app._cachedActiveObj.set({
                         lockMovementX: false,
                         lockMovementY: false
@@ -1917,7 +1944,7 @@ _$(document).ready(function () {
 
                 // Check if the new inputted value is valid
                 isValidInput = app.utils.validateMaxLengthTextArea(textVal, maxLength, _$counter);
-
+                console.log(isValidInput)
                 // If it is valid... then update the canvas
                 if(isValidInput === true){
                     // Need to add Debounce
