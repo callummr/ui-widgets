@@ -739,9 +739,9 @@ _$(document).ready(function () {
             _formattedBlock = app.utils.wrapCanvasText(_ptblock, app._cp_canvas, cTBSettings.width, 0, cTBSettings.halign, true);
             // Need to look into adding a background colour, so a user can see the width of a textblock group
                 // Will also need to disable this colour, when saving an image.
-            _formattedBlock.set({
-                backgroundColor: '#000000'
-            });
+            // _formattedBlock.set({
+            //     backgroundColor: '#000000'
+            // });
 
             // console.log(_formattedBlock);
             // console.log(_formattedBlock.width);
@@ -1949,15 +1949,8 @@ _$(document).ready(function () {
             // PRODUCT CREATION TOOLS
             // Saves a new product's XML
             _$('[data-action=save-product]').on('click', function () {
-            	// // Download and image of the product
-            	var confirmDownloadImg = confirm('Would you like to save the product image?');
-            	if(confirmDownloadImg === true){
-            		app.utils.convertCanvasToImgDownload(_$(this), app._cp_canvas);	
-            	}
-            	// Slight bug with this.. if you click 'cancel' on the prompt it doesnt download a thumbnail
-            	// If you then click the button again and chose to download the image it works
-            	// If you were then to click save again and select 'cancel', it still downloads an image.
-
+            	// Save the image of the Product
+            	app.utils.setProductThumbnail(app._cp_canvas);	
                 // Set what type of request this is. Required by the utils.generateXML
                 app.isCreateTemplate = false;
                 // Check if a new template needs to be created

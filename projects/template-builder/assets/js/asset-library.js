@@ -155,7 +155,7 @@ _$(document).ready(function() {
         },
         BuildAssetQuickGrid: function(results) {
 
-            var thumbPath = '/be/SharedAssets/th1/';
+            var thumbPath = globalUrls.smallThumbFolder;
             var resultsString = "";
 
             // For each result, create a list item that can be used by the user to select the image asset
@@ -194,7 +194,7 @@ _$(document).ready(function() {
                 '   <td>' +
                 '       <input type="checkbox" id="asset_id1">' +
                 '       <label for="asset_id1">' +
-                '           <img src="../../SharedAssets/th1/{6}.jpg" alt="Asset title">' +
+                '           <img src="' + globalUrls.smallThumbFolder + '{6}.jpg" alt="Asset title">' +
                 '       </label>' +
                 '   </td>' +
                 '   <td>{0}</td>' +

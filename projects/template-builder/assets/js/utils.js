@@ -1152,6 +1152,8 @@ _$(document).ready(function(){
 
 	      	// Update the hidden field with the generated XML
 	      	_$('#pdfItemAdmin1_hdnXML').val(xmlOutput);
+	      	// Update the hidden image data field
+            _$('#pdfItemAdmin1_hdnTemplateImg').val(app.imagedata);
 
 	      	// console.log(app.templateId);
 	      	console.log(xmlOutput);
@@ -1312,6 +1314,12 @@ _$(document).ready(function(){
 	      _$el[0].href = app.imagedata;
 	      app.utils.toggleCanvasGrid(_$el, true, _canvas);
 	    },
+	    setProductThumbnail: function (_canvas) {
+            app.utils.cleanCanvas(_canvas);
+            app.imagedata = _canvas.toDataURL('image/png');            
+            _$('#pdfItemAdmin1_hdnProductImg').val(app.imagedata);
+        },
+
 	    generateCanvasPreviewImg: function(_$el,_canvas, prefix){
 	    	// @ _canvas = farbic canvas object | {}
 	    	// @ prefix  = prefix for the hidden canvas | string
