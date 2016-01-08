@@ -692,6 +692,7 @@ _$(document).ready(function () {
                     hasRotatingPoint: false,
                     height: typeof (blockSettings.height) !== 'undefined' ? blockSettings.height : 200,
                     lockRotation: true,
+                    lockScalingFlip: true,
                     originX: 'left',
                     originY: 'top',
                     width: typeof (blockSettings.width) !== 'undefined' ? blockSettings.width : 200,
@@ -733,6 +734,7 @@ _$(document).ready(function () {
                 height: blockSettings.height,
                 left: blockSettings.left,
                 lockRotation: true,
+                lockScalingFlip: true,
                 top: blockSettings.top,
                 width: blockSettings.width
             });
@@ -785,9 +787,9 @@ _$(document).ready(function () {
                         height: elHeight,
                         left: 0,
                         lockRotation: true,
+                        lockScalingFlip: true,
                         originX: 'left',
                         originY: 'top',
-                        // top: 0,
                         top: topVal,
                         width: parentSettings.width
                     });
@@ -818,6 +820,7 @@ _$(document).ready(function () {
                 height: blockSettings.height,
                 left: blockSettings.left,
                 lockRotation: true,
+                lockScalingFlip: true,
                 // lockUniScaling: false,
                 top: blockSettings.top,
                 width: blockSettings.width

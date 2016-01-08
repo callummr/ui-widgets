@@ -569,7 +569,8 @@ _$(document).ready(function () {
                         innerBlockSettings.top = blockSettings.top;     // Take from the parent element
                         innerBlockSettings.width = blockSettings.width;   // Take from the parent element
                         innerBlockSettings.left = blockSettings.left;    // Take from the parent element	            
-                        innerBlockSettings.spacing = blockSettings.spacing; // Take from the parent element	
+                        innerBlockSettings.spacing = blockSettings.spacing; // Take from the parent element 
+                        innerBlockSettings.groupPosId = i;
 
                         // Settings need to pass through additional parent information
                         innerBlockSettings.parentId = blockSettings.id;
@@ -659,6 +660,7 @@ _$(document).ready(function () {
 	                height: blockSettings.height,
 	                left: blockSettings.left,
 	                lockRotation: true,
+                    lockScalingFlip: true,
 	                selectable: true,
 	                top: blockSettings.top,
 	                width: blockSettings.width
@@ -713,14 +715,13 @@ _$(document).ready(function () {
                 fontSize: app.utils.convertPtToPx(parseInt(cTBSettings.fontSize)),
                 hasBorders: true,
                 hasRotatingPoint: false,
-                //  height: cTBSettings.height,
                 left: cTBSettings.left,
-                lineHeight: (cTBSettings.lineheight / 100).toString().replace(/%/g, '') ,
+                lineHeight: (cTBSettings.lineheight / 100).toString().replace(/%/g, ''),
                 lockRotation: true,
+                lockScalingFlip: true,
                 selectable: true,
                 textAlign: cTBSettings.halign,
                 top: cTBSettings.top,
-                // width: cTBSettings.width
             });
 
             // This additional property is required within the wrapCanvasText function
@@ -732,12 +733,15 @@ _$(document).ready(function () {
                 cTBSettings.textblocktype = 'itext';
             }
 
-            // app._cp_canvas.add(_ptblock).renderAll();
-
             // Sort the wrapping out for the text element, requires:
-            // fabric block, the canvas, maxWidth, maxHeight, alignment
+            // canvas obj, the canvas obj, maxWidth, maxHeight, alignment
 
-            _formattedBlock = app.utils.wrapCanvasText(_ptblock, app._cp_canvas, cTBSettings.width, 0, cTBSettings.halign);
+            _formattedBlock = app.utils.wrapCanvasText(_ptblock, app._cp_canvas, cTBSettings.width, 0, cTBSettings.halign, true);
+            // Need to look into adding a background colour, so a user can see the width of a textblock group
+                // Will also need to disable this colour, when saving an image.
+            _formattedBlock.set({
+                backgroundColor: '#000000'
+            });
 
             // console.log(_formattedBlock);
             // console.log(_formattedBlock.width);
@@ -764,6 +768,7 @@ _$(document).ready(function () {
 
             if (typeof (cTBSettings.parentId) !== 'undefined') {
                 // console.log(cTBSettings.parentHeight, cTBSettings.parentWidth)
+                _formattedBlock['groupPosId'] = cTBSettings.groupPosId,
                 _formattedBlock['parentId'] = cTBSettings.parentId.replace(/ /g, ''),
 				_formattedBlock['parentTitle'] = cTBSettings.parentTitle;
                 _formattedBlock['parentEditable'] = cTBSettings.parentEditable;
@@ -790,43 +795,65 @@ _$(document).ready(function () {
             // Then deselect the element from the canvas and re-render the canvas
             app._cp_canvas.deactivateAll().renderAll();
         },
-        reformatTextBlockGroups: function () {
+        reformatTextBlockGroups: function (exisitingTextBlockGroup) {
             // There is an error in the block.
-            app.filteredCanvasObjs = app._cp_canvas._objects.filter(function (block) {
-                return typeof (block.id) !== 'undefined'
-            });
-            // console.log(app.filteredCanvasObjs);
-            // For each text block group in the array, format the text blocks inside it.
+            var targetTextBlockGroups,
+                _parentBlock;
+            // console.log('DEBUG: exisitingTextBlockGroup: ', exisitingTextBlockGroup);
 
-            /** NEED TO CHECK IF THERE IS MORE THAN 1 ITEM **/
-
-            app.textBlockGroups.forEach(function (block) {
-                // console.log(block);
-                app.filteredCanvasObjs.forEach(function (obj, i) {
-                    if (block.id === obj.parentId) {
-                        var prevObjIndex = i - 1;
-                        // console.log(i, prevObjIndex, obj)
-                        // If it is the first item, then reference its parentTop property
-                        // console.log(obj);
-                        if(i === 0){
-                        	obj.set({
-	                            width: block.width,
-	                            top: obj.parentTop,
-	                        });
-                        } else{
-                        	obj.set({
-	                            width: block.width,
-	                            top: app.filteredCanvasObjs[prevObjIndex].top + app.filteredCanvasObjs[prevObjIndex].height + block.spacing,
-	                        });
-                        }
-                        
-                        // Reset the obj's controls coordinates
-                        obj.setCoords();
-                        // Re-redner the canvas
-                        app._cp_canvas.renderAll();			    			
-                    }
+            if(typeof(exisitingTextBlockGroup) !== 'undefined'){
+                targetTextBlockGroups = exisitingTextBlockGroup;
+                _parentBlock = [{
+                                    id: targetTextBlockGroups[0].parentId,
+                                    width: targetTextBlockGroups[0].width,
+                                    spacing: app.utils.convertPxToMM(targetTextBlockGroups[0].spacing)
+                                }];
+            } else{
+                targetTextBlockGroups = app._cp_canvas._objects.filter(function (block) {
+                    return typeof(block.id) !== 'undefined'
                 });
-            });
+                _parentBlock = app.textBlockGroups;
+            }
+            
+            // console.log('DEBUG: _parentBlock: ', _parentBlock);
+            // console.log('DEBUG: TEXTBLOCK GROUPS: ', targetTextBlockGroups);
+            // console.log('DEBUG: Validate TEXTBLOCK GROUP has more than 1 item: ', typeof(targetTextBlockGroups.length) !== 'undefined');
+            
+            var validatedTopPos,
+                canvasHeight = app._cp_canvas.height;
+            // For each text block group in the array, format the text blocks inside it.
+            if(typeof(targetTextBlockGroups.length) !== 'undefined'){
+                _parentBlock.forEach(function (block) {
+                    // console.log('DEBUG: block', block);
+                    targetTextBlockGroups.forEach(function (_obj, i) {
+                        var blockWidth = block.width,
+                            topPos     = 0;
+                        if (block.id === _obj.parentId) {
+                            var prevObjIndex = i - 1;
+                            // console.log(i, prevObjIndex, _obj)
+                            // If it is the first item, then reference its parentTop property
+                            // console.log(_obj);
+                            if(i === 0){
+                                validatedTopPos = app.utils.validateTopPos(canvasHeight, canvasHeight - _obj.parentTop, _obj.height)
+                                topPos = validatedTopPos;  
+                            } else{
+                                topPos = targetTextBlockGroups[prevObjIndex].top + targetTextBlockGroups[prevObjIndex].height + block.spacing;
+                            }
+
+                            // Set a property to disable vertical movement when a boundary has been met
+                            _obj.set({
+                                width: blockWidth,
+                                top: topPos
+                            });
+
+                            // Reset the _obj's controls coordinates
+                            _obj.setCoords();
+                            // Re-redner the canvas
+                            app._cp_canvas.renderAll();                         
+                        }
+                    });
+                });
+            }           
         },
         updateCanvasBlockText: function (_$el) {
             console.log(_$el)
@@ -836,14 +863,17 @@ _$(document).ready(function () {
 
             // Set the active canvas obj
             app.cp.setActiveCanvasObj(canvasBlockId);
+
+            // Validate if the new text value needs to wrap to a new line
+            // app.utils.validateLeftPos(app._cp_canvas.width, app._activeEditEl.left, app._activeEditEl.width)
+            // app.utils.validateTopPos(app._cp_canvas.height, app._activeEditEl.top, app._activeEditEl.height)
+
             // Update the active canvas objects text and textVal values
             app._activeEditEl.set({
                 text: newTextVal,
                 textVal: newTextVal
             });
-
             // Update the text of the canvas element
-            // Then reformat it
             app._cp_canvas.renderAll();
         },
         setActiveCanvasObj: function (id) {
@@ -928,6 +958,99 @@ _$(document).ready(function () {
                 app._cp_canvas.deactivateAll();  
             	app._cp_canvas.renderAll();
             });            
+        },
+        setOtherGroupMembersCoords: function(_movingObj, direction, distanceMoved){
+            // Create an array containing all of the elements that are in the same group as the moved object
+            var _filterGroupObjs = app._cp_canvas._objects.filter(function(_obj){
+                        return _obj.parentId === _movingObj.parentId;
+                    });
+
+            // Check if there is more than 1 element in the group
+            if(_filterGroupObjs.length > 1){
+                var movingObjLeftPos  = _movingObj.left,
+                    movingObjWidth    = _movingObj.width,
+                    movingObjTop      = _movingObj.top,
+                    movingObjHeight   = _movingObj.height,
+                    movingObjGroupPos = _movingObj.groupPosId,
+                    _firstGroupObj    = _filterGroupObjs[0],
+                    _lastGroupObj     = _filterGroupObjs[_filterGroupObjs.length - 1],
+                    groupHeight       = (_lastGroupObj.top + _lastGroupObj.height) - _firstGroupObj.top,
+                    maxParentTop      = app.canvasMargins.maxBottom - groupHeight;
+
+                app._cachedActiveObj = _movingObj;
+
+                // console.log(app.canvasMargins.maxBottom, _lastGroupObj.top,  _firstGroupObj.top)
+                // Check if this is a horiztonal movement
+                if(direction === 'horiztonal'){
+                    var validatedLeftPos = app.utils.validateLeftPos(app._cp_canvas.width, movingObjLeftPos, movingObjWidth);
+                    /**
+                        NEED TO ADD DEBOUNCE...
+                    **/
+                    _filterGroupObjs.forEach(function(_obj){
+                        _obj.set({
+                            left: validatedLeftPos,
+                        });
+                        _obj.setCoords();
+                    });
+                } else{
+                    // This is a vertical movement
+
+                    // If this is a movement upwards, then allow movement again. The lockMovementY is only enabled when the maxBottom is reached
+                    if(distanceMoved < 0){
+                        movingObjTop = movingObjTop - 1;
+                    }
+                    // console.log('DEBUG: Moving Object Group Position: ' + movingObjGroupPos)
+                    if(movingObjGroupPos === 0){
+                        // This is the first obj in the group so just update the children objects
+                        // Update the groups parentTop property as this is needed by reformatTextBlockGroups to place the first element within a group
+                        if(movingObjTop > maxParentTop){
+                            _movingObj.parentTop = maxParentTop;
+                            // Needs further work here so the active object
+                            _movingObj.set({
+                                lockMovementY: true
+                           });
+                        } else{
+                            _movingObj.parentTop    = movingObjTop;
+                            _movingObj.parentHeight = groupHeight;
+                            _movingObj.set({
+                                lockMovementY: false
+                           });
+                        }
+                        app.cp.reformatTextBlockGroups(_filterGroupObjs);                        
+                                                
+                    } else{
+                        // Only interested in group items before this obj so the parentTop can be worked out
+                        var newParentTopPos,
+                            isMovementValid = true;
+
+                        // Validate if the the last element is still within the boundaries        
+                        var _lastObj = _filterGroupObjs[_filterGroupObjs.length - 1],
+                            lastGroupMemberTopPos = _lastObj.top + _lastObj.height;
+                        if(lastGroupMemberTopPos > app.canvasMargins.maxBottom){
+                            isMovementValid = false;
+                        }
+
+                        // console.log(_firstGroupObj.parentTop, distanceMoved, _firstGroupObj.parentTop + distanceMoved)
+                        newParentTopPos = _firstGroupObj.parentTop + distanceMoved;
+                        if(!isNaN(newParentTopPos) && isMovementValid){
+                            // Validate if the movement is valid
+                            var parentTop =  newParentTopPos > maxParentTop ? maxParentTop : newParentTopPos;
+                            _filterGroupObjs.forEach(function(_obj){
+                                _obj.parentTop = parentTop;
+                                _obj.parentHeight = groupHeight;
+                            });
+                            
+                            // console.log(newParentTopPos);
+                            _firstGroupObj.parentTop = newParentTopPos;
+                            app.cp.reformatTextBlockGroups(_filterGroupObjs);                               
+                            /**
+                                NEED TO ADD DEBOUNCE...
+                            **/                            
+                        }                        
+                    }
+                }
+                app._cp_canvas.renderAll();
+            }
         },
         updateCanvasObjSetting: function (_$el) {
             var _$this = _$el,
@@ -1048,17 +1171,29 @@ _$(document).ready(function () {
             // This event handles whether to enter edit mode or not
             app._cp_canvas.on('object:selected', function (e) {
                 // Get the id of the selected element 
-                var _activeObj = app._cp_canvas.getActiveObject();
+                var _obj = app._cp_canvas.getActiveObject();
 
                 /**
                     FIX BUG, MULTIPLE OBJECTS ARE MOVING
                 **/
-                console.log(_activeObj);
+                console.log(_obj);
                 // Allow a user to move elements on the canvas with keyboard arrows
-                app.utils.activeKeyboardMovements(_activeObj, app._cp_canvas);
+                app.utils.activeKeyboardMovements(_obj, app._cp_canvas);
                 // Show the relevant blocks' settings that has been selected
-                // _$('[data-prodblockid=' + _activeObj.parentId + ']').find('[data-action=toggle-product-block]').click();
+                // _$('[data-prodblockid=' + _obj.parentId + ']').find('[data-action=toggle-product-block]').click();
             });
+
+            app._cp_canvas.on('selection:cleared', function (e) {
+                if(typeof(app._cachedActiveObj) !== 'undefined' || app._cachedActiveObj === null){
+                    app._cachedActiveObj.set({
+                        lockMovementX: false,
+                        lockMovementY: false
+                    });                
+                    app._cp_canvas.renderAll();
+                    app._cachedActiveObj = null;
+                }
+            });
+
             // This event handles when an IText Field has beem edited
             app._cp_canvas.on('text:changed', function (e) {
                 var obj     = e.target,
@@ -1073,33 +1208,89 @@ _$(document).ready(function () {
                     app._cp_canvas.renderAll();
                     alert('Max character limit has been reached.');
                 } else{
+                    // Update the relevant textarea
                     app.cp.setBlockControlTextarea(e);
                     e.target['textVal'] = e.target.text; 
-                }                
-            });// This event handles when an IText Field has beem edited
+                }
+            });
+            // This event handles when an IText Field has beem edited
             app._cp_canvas.on('text:editing:entered', function (e) {
                 // Set 2 new properties to store the elements original width and height
-                var _activeObj = e.target;
-                _activeObj.origWidth = _activeObj.width;
-                _activeObj.origHeight = _activeObj.height;
+                var _obj = e.target;
+                _obj.origWidth = _obj.width;
+                _obj.origHeight = _obj.height;
             });
             app._cp_canvas.on('text:editing:exited', function (e) {
                 // console.log(e);
                 // Check the width and the height are not any smaller than what the block was originally before editing
                 // This is required as after editing a textblock its dimensions are changed to wrap the new text value;
-                var _activeObj = e.target;
-                if (_activeObj.width < _activeObj.origWidth) {
-                    _activeObj.width = _activeObj.origWidth;
+                var _obj = e.target;
+                if (_obj.width < _obj.origWidth) {
+                    _obj.width = _obj.origWidth;
                 }
-                if (_activeObj.height < _activeObj.origHeight) {
-                    _activeObj.height = _activeObj.origHeight;
+                if (_obj.height < _obj.origHeight) {
+                    _obj.height = _obj.origHeight;
                 }
+
+                // Set the max width. If the textblock is within a textblock group, then its max width is determined by its parent.
+                var maxWidth;
+                if(typeof(_obj.parentWidth) !== 'undefined'){
+                    maxWidth = _obj.parentWidth;
+                } else{
+                    maxWidth = _obj.width;
+                }
+                // console.log(maxWidth);
+
+                // // Format the text value, so that it wraps correctly and fits inside
+                // var formattedText = app.utils.wrapCanvasText(_obj, app._cp_canvas, maxWidth, 0, _obj.textAlign, false);
+
+                // _obj.set({
+                //     text: formattedText,
+                //     textVal: formattedText
+                // });
+                // // Update the canvas with the new text
+                // _obj.setCoords();
+                // app._cp_canvas.renderAll();
+
+                // // Update the relevant textarea
+                // app.cp.setBlockControlTextarea(e);
+
+
+                // // NEED TO VALIDATE X,Y ETC
+                // _obj.set({
+                //     width: maxWidth,
+                // });
+                // Update the canvas with the new text
+                _obj.setCoords();
                 app._cp_canvas.renderAll();
             });
-            // This capatures when an object has been modified
+            // This captures when an object has been modified
             app._cp_canvas.on('object:modified', function (e) {
                 app.cp.setModifedBlockScale(e.target);
             });
+
+            app._cp_canvas.on('object:moving', function (e) {
+                var _obj = e.target,
+                    direction,
+                    distanceMoved;
+                // console.log('DEBUG: Active Obj', e);
+                // console.log('DEBUG: movementX: ' + e.e.movementX, 'movementY: ' + e.e.movementY)
+
+                // Set the direction variable based on the movement
+                if(e.e.movementX !== 0){
+                    direction = 'horiztonal';
+                    distanceMoved  = e.e.movementX;
+                } else if(e.e.movementY !== 0){
+                    direction = 'vertical';
+                    distanceMoved  = e.e.movementY;
+                }                
+                // console.log('DEBUG: Movement direction: ' + direction);
+
+                // Update the group memebers coordinates
+                if(typeof(_obj.parentId) !== 'undefined'){
+                    app.cp.setOtherGroupMembersCoords(_obj, direction, distanceMoved);
+                }
+            });           
         },
 
         /**
@@ -1735,6 +1926,7 @@ _$(document).ready(function () {
                     console.log('Max character limit reached');
                 }
             });
+            
             // After finishing editing a canvas objects's text, handle that event
             app._$body.on('blur', '[data-action=update-block-text]', app.cp.textareaBlurHandler);
 

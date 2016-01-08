@@ -32,7 +32,6 @@ _$(document).ready(function(){
 	app.templateId      = null;
 	app.tempGroupCnt    = 0;
 	app.tempGBlockCnt   = 0;
-	app.filteredCanvasObjs;
 
 	// State Handlers
 	app.isCreateTemplate = false;
@@ -223,7 +222,7 @@ _$(document).ready(function(){
 	    	return rgb;
 	    },
 	    convertPxToMM: function(width){
-	    	console.log(Math.floor(width * app.mmSize))
+	    	// console.log('DEBUG: convertPxToMM:', Math.floor(width * app.mmSize))
 	    	return Math.floor(width * app.mmSize)
 	    },	    
 	    // convertUnit: function(unit, targetUnit){
@@ -475,8 +474,9 @@ _$(document).ready(function(){
 	    /**
 			CANVAS UPDATE FUNCTIONS
 	    **/
-	    wrapCanvasText: function(t, canvas, maxW, maxH, justify){
+	    wrapCanvasText: function(t, canvas, maxW, maxH, justify, createNewObj){
 	    	// console.log(maxW);
+	    	// console.log(maxW, maxH)
 	    	// http://jsfiddle.net/maxenko/nyw5myq5/4/light/
 		    if (typeof maxH === "undefined") {
 		        maxH = 0;
@@ -489,6 +489,7 @@ _$(document).ready(function(){
 
 		    // clear newlines
 		    var sansBreaks = t.text.replace(/(\r\n|\n|\r)/gm, "");
+		    // console.log(sansBreaks);
 		    // calc line height
 		    var lineHeight = new fabric.Text(sansBreaks, {
 		        fontFamily: t.fontFamily,
@@ -579,13 +580,12 @@ _$(document).ready(function(){
 			        fill: t.fill,	
                     fontFamily: t.fontFamily,
                     fontSize: t.fontSize,
-      				// hasBorders: t.hasBorders,
       				hasBorders: true,
                     hasRotatingPoint: t.hasRotatingPoint,
-                    // height: t.height,
                     left: t.left,
                     lineHeight: t.lineHeight,
                     lockRotation: t.lockRotation,
+                    lockScalingFlip: t.lockScalingFlip,
                     originX: t.originX,
         			originY: t.originY,
         			selectable: t.selectable,                                         
@@ -593,16 +593,20 @@ _$(document).ready(function(){
                     top: t.top
 			    };
 
-		    // console.log(t['text-block-type']);
-		    if(typeof(t['text-block-type']) === 'undefined' || t['text-block-type'] === 'text'){
-		    	_canvasobj = new fabric.Text(formatted, _objSettings);
-		    	_canvasobj['textblocktype'] = 'text';
-		    } else{
-		    	_canvasobj = new fabric.IText(formatted, _objSettings);
-		    	_canvasobj['textblocktype'] = 'itext';
-		    }
-		    
-		    return _canvasobj;
+			// Only return a new obj when creating a text block, when loading or creating a product 
+			if(createNewObj === true){
+				// console.log(t['text-block-type']);
+			    if(typeof(t['text-block-type']) === 'undefined' || t['text-block-type'] === 'text'){
+			    	_canvasobj = new fabric.Text(formatted, _objSettings);
+			    	_canvasobj['textblocktype'] = 'text';
+			    } else{
+			    	_canvasobj = new fabric.IText(formatted, _objSettings);
+			    	_canvasobj['textblocktype'] = 'itext';
+			    }			    
+			    return _canvasobj
+			} else{
+				return formatted
+			}		    
 		},
 		selectCanvasPropertyToEdit: function(_$el){
 			var updatedVal = _$el.val(),
@@ -731,7 +735,7 @@ _$(document).ready(function(){
 					// Prevent the page scrolling
 					e.preventDefault();
 					if(e.keyCode === 37){
-						// Left Arrow	
+						// Left Arrow
 						if((_activeObj.left - app.gridSquare) > app.canvasMargins.maxLeft){					
 							_activeObj.set({
 								left: _activeObj.left - app.gridSquare
@@ -1039,7 +1043,7 @@ _$(document).ready(function(){
 	            '_lowerlefty': app.utils.calcLowerLeftY(elDimensions),
 	            '_mandatory': 'False',
 	            '_orientate': 'north',
-	            '_spacing': el.spacing,
+	            '_spacing': app.utils.convertPxToMM(el.spacing),
 	            '_upperrightx': app.utils.calcUpperRightX(elDimensions),
 	            '_upperrighty': app.utils.calcUpperRightY(elDimensions),
 	            '_verticalalign': el.valign
@@ -1052,7 +1056,7 @@ _$(document).ready(function(){
 	                                                          '_colour': app.utils.rgbToCMYK(tEl.fontColor),
 	                                                          '_editable': tEl.isEditable,
 	                                                          '_font-family': tEl.fontFamily,
-	                                                          '_font-size': app.convertPtToPx(tEl.fontSize),
+	                                                          '_font-size': app.utils.convertPtToPx(tEl.fontSize),
 	                                                          '_id': 'TextBlockG_' + i,
 	                                                          '_leading': tEl.lineheight + '%',
 	                                                          '_mandatory': tEl.isManditory,
@@ -1081,7 +1085,6 @@ _$(document).ready(function(){
 	                                    '_align': el.halign,
 	                                    '_colour': app.utils.rgbToCMYK(el.fontColor),
 	                                    '_editable': el.isEditable,
-	                                    // '_fitmethod': 'clip',
 	                                    '_font-family': el.fontFamily,
 	                                    '_font-size': app.utils.convertPtToPx(el.fontSize),
 	                                    '_id': 'TextBlock_' + i,
@@ -1240,18 +1243,19 @@ _$(document).ready(function(){
 	    /**
 			Validation
 	    **/
-	    validateLeftPos: function(canvasWidth, leftPos, elWidth){
-	    	// This function checks whether the top position is valid    	
-	    	if(leftPos < app.canvasMargins.bleed){
-	    		// console.log(app.canvasMargins.bleed)
+	    validateLeftPos: function(canvasWidth, leftPos, elWidth){	    	
+	    	// console.log('DEBUG: Left margin reached: ', app.canvasMargins.bleed)
+	    	// console.log('DEBUG: Right margin reached: ', canvasWidth - app.canvasMargins.bleed - elWidth)
+	    	// console.log('DEBUG: Current position ok: ', leftPos)
+
+	    	// This function checks whether the top position is valid
+	    	if(leftPos < app.canvasMargins.bleed){	    		
 	    		// Check the element position is greater than the left margin
 	    		return app.canvasMargins.bleed
-	    	} else if(leftPos + elWidth > canvasWidth - app.canvasMargins.bleed){
-	    		// console.log(canvasWidth - app.canvasMargins.bleed - elWidth)
+	    	} else if(leftPos + elWidth > canvasWidth - app.canvasMargins.bleed){	    		
 	    		// Check the element position is less than the right margin
 	    		return canvasWidth - app.canvasMargins.bleed - elWidth
-	    	} else{
-	    		// console.log(leftPos)
+	    	} else{	    		
 	    		// Otherwise the left position is ok and outside of both sides margins
 	    		return leftPos
 	    	}
@@ -1260,7 +1264,9 @@ _$(document).ready(function(){
 	    	// This function checks whether the top position is valid
 	    	var maxTopPos   = canvasHeight - (app.canvasMargins.bleed * 2),
 	    		topPosition = canvasHeight - upperX;
-
+	    	// console.log('DEBUG: Validate Bottom margin: ', topPosition + elHeight > maxTopPos);
+	    	// console.log('DEBUG: Validate Top margin: ', topPosition < app.canvasMargins.bleed);
+	    	// console.log('DEBUG: Validate Top Position: ', upperX, maxTopPos);
 	    	if(topPosition + elHeight > maxTopPos){
 	    		// Check the elements position is outside the bottom margin
 	    		return canvasHeight - app.canvasMargins.bleed - elHeight
@@ -1321,7 +1327,23 @@ _$(document).ready(function(){
 	        app.imagedata = _canvas.toDataURL('image/png');
 	        // Enable the grid again
 	        app.utils.toggleCanvasGrid(_$el, true, _canvas);
-	    }
+	    },
+	    // Not in use currently.
+	    debounce: function(func, wait, immediate) {
+			var timeout;
+			return function() {
+				var context = this,
+					args = arguments;
+				var later = function() {
+					timeout = null;
+					if (!immediate) func.apply(context, args);
+				};
+				var callNow = immediate && !timeout;
+				clearTimeout(timeout);
+				timeout = setTimeout(later, wait);
+				if (callNow) func.apply(context, args);
+			};
+		}
 	};
 	app.utils.initUtils();
 })
