@@ -74,7 +74,13 @@ _$(document).ready(function () {
                 app.docDimensions = app._$hiddenDimensions.val().split(',');
 
                 // Set the products available dimensions
-			    app.utils.setProductDimensions();
+                if(app.docDimensions.length > 1){
+                    app.docDimensions.forEach(function(size){
+                        app.utils.setProductDimensions(size);
+                    });
+                } else{
+                    app.utils.setProductDimensions(app.docDimensions[0]);
+                }
 
                 // Create the Canvas Element based of JSON created from the XML				
                 app.cp.loadProductFromJSON(productJSON);
@@ -199,21 +205,14 @@ _$(document).ready(function () {
 			        productData = JSON.parse(app.utils.filterResponse(data));
 			        productJSON = x2js.xml_str2json(productData[0].XML);
 
-
-                    /**
-                        START HERE MONDAY
-                    **/
-
-
-
                     // If the docDimensions is empty, then manually set it. The old templates do not have associated doc dimensions
-                    if(app.docDimensions !== ''){
-			         app.docDimensions = productData[0].Dimensions.replace(' ', '').split(',');
+                    console.log(typeof(productData[0].Dimensions), productData[0].Dimensions, productData[0].Dimensions !== '');
+                    if(productData[0].Dimensions !== ''){
+			            app.docDimensions = productData[0].Dimensions.replace(' ', '').split(',');
                     } else{
-                        app.docDimensions = app.utils.validateDocDimensions(productJSON.doc.page._width, productJSON.doc.page._height);
+                        app.docDimensions = app.utils.validateDocDimensions(parseInt(productJSON.doc.page._width), parseInt(productJSON.doc.page._height));
                     }                
-                    console.log(app.docDimensions)
-                    debugger;
+                    console.log(app.docDimensions);
 			    }
 
 			    // Update template name hidden field
@@ -221,7 +220,13 @@ _$(document).ready(function () {
 			    app._$fromTempName.text(existingTempName + ' (id: ' + app.templateId + ') ');
 
 			    // Set the products available dimensions
-			    app.utils.setProductDimensions();
+                if(app.docDimensions.length > 1){
+                    app.docDimensions.forEach(function(size){
+                        app.utils.setProductDimensions(size);
+                    });
+                } else{
+                    app.utils.setProductDimensions(app.docDimensions[0]);
+                }
 
 			    // Set the dimensions of the template
 			    // _$('#template-size-options').text(app.docDimensions.join(','));
@@ -336,7 +341,11 @@ _$(document).ready(function () {
             // Sets the defualt image for each canvas block
             setTimeout(function(){
             	app.cp.setImageBlockDefaultImg();
-            }, 1000);            
+            }, 1000);  
+            // Re-render the canvas after all elements have been added
+            setTimeout(function(){
+                app._cp_canvas.renderAll();    
+            }, 500);      
             // app.cp.setActiveBlock();
             // console.log(app._cp_canvas);
         },
@@ -543,6 +552,7 @@ _$(document).ready(function () {
             blockSettings.top 	 = app.utils.validateTopPos(canvasHeight, blockDimensions.upperY, blockSettings.height);
             // console.log(blockDimensions);
             // console.log(blockSettings);
+
             if (data.block === 'ib') {
                 app.cp.createProductImageBlock(blockSettings);
             } else if (data.block == 'tb') {
@@ -701,7 +711,8 @@ _$(document).ready(function () {
 	            // If it has a default image, set it as the background image.
 
 	            // Add the new component to the canvas. This needs to be done, before we can update the background img of the object
-	            app._cp_canvas.add(_block).renderAll();
+                // app._cp_canvas.add(_block).renderAll();
+	            app._cp_canvas.add(_block);
 			});
         },
         createProductTextBlock: function (settings) {
@@ -759,7 +770,7 @@ _$(document).ready(function () {
             // });
 
             // console.log(_formattedBlock);
-            // console.log(_formattedBlock.width);
+            // console.log(_formattedBlock.width);           
 
             // Add additional block proprties to the newly formatted block;
             _formattedBlock['blocktype'] = cTBSettings.blocktype;
@@ -801,7 +812,8 @@ _$(document).ready(function () {
             }
 
             // Add the new component to the canvas. This needs to be done, before we can update the background img of the object            
-            app._cp_canvas.add(_formattedBlock).renderAll();
+            // app._cp_canvas.add(_formattedBlock).renderAll();
+            app._cp_canvas.add(_formattedBlock);
         },
 
         deactiveCanvasObj: function () {
@@ -1929,12 +1941,13 @@ _$(document).ready(function () {
             app._$body.on('keyup focus', '[data-action=update-block-text]', function () {
                 // Need to add Debounce
                 var _$this    = _$(this),
-                    _$counter = _$this.next().find('.badge'), 
-                    blockId   = _$this.attr('id').substr(_$this.attr('id').indexOf('_') + 1),
+                    _$counter = _$this.next().find('.badge'),
                     textVal   = _$this.val(),                    
-                    _$maxLengthTextarea = _$('#at-maxlengthTextBlockG_' + blockId),                                       
+                    _$maxLengthTextarea = _$this.closest('.text-block-defaults-container').find('[id^=at-maxlength]'),                                       
                     maxLength = _$maxLengthTextarea.val(),
                     isValidInput = true;
+
+                console.log(_$maxLengthTextarea)
 
                 // Check if the maxlength has been set
                 if(maxLength !== ''){
@@ -2043,7 +2056,10 @@ _$(document).ready(function () {
     };
 
     // Iniate Create Product only on the create/update product pages.
-    if (_$('[data-template=build-product]').length > 0) {
-        app.cp.initCreateProduct();
-    }
+    // Need to do this once the fonts have loaded, using a timeout for now.
+    setTimeout(function(){
+        if (_$('[data-template=build-product]').length > 0) {
+            app.cp.initCreateProduct();
+        }
+    }, 500)    
 });

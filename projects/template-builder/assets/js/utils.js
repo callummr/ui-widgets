@@ -285,25 +285,23 @@ _$(document).ready(function(){
 	        } 
 	      }     
 	    },	    
-        setProductDimensions: function(){
+        setProductDimensions: function(size){
         	// console.log(app.docDimensions);
 			var patt = new RegExp('A[0-9]'),
 				res;
         	// Handle business card options
-        	app.docDimensions.forEach(function(size){
-        		// Test for A-Something format doc size. If found remove the business card option.
-        		// Otherwise remove all of the A- options
-        		res = patt.test(size);
-        		if(res === true){
-        			// Hide the business type option as a user cannot change an A4 document into a business card
-        			_$('.doc-size-business').parent().addClass('hidden');
-        			_$('input[value="' + size + '"]').prop('checked', true).addClass('template-default-size');
-        		} else{
-        			// Hide all A- options as a user cannot change an Business Card to an A- document
-        			_$('input[id^=a]').parent().addClass('hidden');
-        			_$('input[value="' + size + '"]').prop('checked', true).attr('disabled', 'disabled');
-        		}
-        	});
+    		// Test for A-Something format doc size. If found remove the business card option.
+    		// Otherwise remove all of the A- options
+    		res = patt.test(size);
+    		if(res === true){
+    			// Hide the business type option as a user cannot change an A4 document into a business card
+    			_$('.doc-size-business').parent().addClass('hidden');
+    			_$('input[value="' + size + '"]').prop('checked', true).addClass('template-default-size');
+    		} else{
+    			// Hide all A- options as a user cannot change an Business Card to an A- document
+    			_$('input[id^=a]').parent().addClass('hidden');
+    			_$('input[value="' + size + '"]').prop('checked', true).attr('disabled', 'disabled');
+    		}
         },
 
 
@@ -1255,13 +1253,14 @@ _$(document).ready(function(){
 	    		return leftPos
 	    	}
 	    },
-	    validateTopPos: function(canvasHeight, upperX, elHeight){
+	    validateTopPos: function(canvasHeight, upperY, elHeight){
 	    	// This function checks whether the top position is valid
 	    	var maxTopPos   = canvasHeight - (app.canvasMargins.bleed * 2),
-	    		topPosition = canvasHeight - upperX;
-	    	// console.log('DEBUG: Validate Bottom margin: ', topPosition + elHeight > maxTopPos);
-	    	// console.log('DEBUG: Validate Top margin: ', topPosition < app.canvasMargins.bleed);
-	    	// console.log('DEBUG: Validate Top Position: ', upperX, maxTopPos);
+	    		topPosition = canvasHeight - upperY;
+	    	console.log(maxTopPos, topPosition)
+	    	console.log('DEBUG: Validate Bottom margin: ', topPosition + elHeight > maxTopPos);
+	    	console.log('DEBUG: Validate Top margin: ', topPosition < app.canvasMargins.bleed);
+	    	console.log('DEBUG: Validate Top Position: ', upperY, maxTopPos);
 	    	if(topPosition + elHeight > maxTopPos){
 	    		// Check the elements position is outside the bottom margin
 	    		return canvasHeight - app.canvasMargins.bleed - elHeight
@@ -1273,22 +1272,33 @@ _$(document).ready(function(){
 	    		return topPosition
 	    	}
 	    },
+	    validateWidth: function(canvasWidth, elWidth){
+	    	if(elWidth > canvasWidth - (app.canvasMargins.bleed * 2)){
+	    		return canvasWidth - (app.canvasMargins.bleed * 2)
+	    	} else{
+	    		return elWidth
+	    	}
+	    },
+	    validateHeight: function(canvasHeight, elHeight){
+	    	if(elHeight > canvasHeight - (app.canvasMargins.bleed * 2)){
+	    		return canvasHeight - (app.canvasMargins.bleed * 2)
+	    	} else{
+	    		return elHeight
+	    	}
+	    },
 	    validateMaxLengthTextArea: function(textVal, maxLength, _$targetel){
-	    	console.log(textVal);
-	    	console.log(typeof(maxLength));
+	    	// console.log(textVal, maxLength, typeof(maxLength), _$targetel);
 	    	// If a targetElement is set, then update the UI to show the characters remaining
-
-	    	// This is not working correctly... Needs to be looked at. Loading template 1(prod)
+	    	console.log(typeof(_$targetel) !== 'undefined')
 	    	if(typeof(_$targetel) !== 'undefined'){
-	    		console.log(!isNaN(textVal));
-	    		if(!isNaN(textVal)){
-	    			_$targetel.html(5000);	
+	    		if(typeof(textVal.length) === 'undefined'){
+	    			_$targetel.html(maxLength);	
 	    		} else{
 	    			_$targetel.html(maxLength - textVal.length);
 	    		}	    		
 	    	}
 
-	    	// Check if a max length has been set. If it hasnt, then return true
+	    	// Check if a max length has been set. If it hasn't, then return true
 	    	if(typeof(maxLength) === 'number'){
 	    		if(textVal.length <= maxLength){
 		    		return true
@@ -1303,6 +1313,7 @@ _$(document).ready(function(){
 
 	    },
 	    validateDocDimensions: function(docWidth, docHeight){
+	    	console.log(docWidth, docHeight)
     		// Set the level of scaling so the when converting the cooridinates to pixels that are accurate      
 			if((docWidth === 420 && docHeight === 594) || (docHeight=== 420 && docWidth === 594)){
 				return ['A2'] // 420x594 or 594x420

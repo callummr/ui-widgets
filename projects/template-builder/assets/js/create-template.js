@@ -184,7 +184,16 @@ _$(document).ready(function () {
             // Change the position of the document size controls within the DOM
             app.ct.repositionTempSizesControls(true);
             // Set the relevant dimensions checkboxs and disabled invalid ones.
-            app.utils.setProductDimensions();
+            console.log(app.docDimensions.length > 1)
+            if(app.docDimensions.length > 1){
+                app.docDimensions.forEach(function(size){
+                    console.log(size)
+                    app.utils.setProductDimensions(size);
+                });
+            } else{
+                app.utils.setProductDimensions(app.docDimensions[0]);
+            }
+            
             // Bind Global and Create Template specific - Canvas events
             app.utils.bindGlobalCanvasEvents();
             app.ct.bindCreateTemplateCanvasEvents();
@@ -535,8 +544,8 @@ _$(document).ready(function () {
                 blockDimensions.lowerX = app.utils.convertMMtoPX(data._lowerleftx, canvasScale);
                 blockDimensions.lowerY = app.utils.convertMMtoPX(data._lowerlefty, canvasScale);
                 
-                blockSettings.height = app.utils.calcHeight(blockDimensions);
-                blockSettings.width  = app.utils.calcWidth(blockDimensions);
+                blockSettings.height = app.utils.validateHeight(canvasHeight, app.utils.calcHeight(blockDimensions));
+                blockSettings.width  = app.utils.validateWidth(canvasWidth, app.utils.calcWidth(blockDimensions));
                 blockSettings.left   = app.utils.validateLeftPos(canvasWidth, blockDimensions.lowerX, blockSettings.width);
                 blockSettings.top    = app.utils.validateTopPos(canvasHeight, blockDimensions.upperY, blockSettings.height);
                 
