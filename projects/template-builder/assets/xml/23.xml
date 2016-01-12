@@ -1,0 +1,12 @@
+<doc>
+   <page width="85" height="55">
+      <image id="partnerlogodigital" title="Partner Logo" lowerleftx="64.5" lowerlefty="5" upperrightx="80" upperrighty="50" editable="true" align="right" verticalalign="top" />
+      <text-block id="Name" title="Name" font-family="FuturaBT-Heavy" font-size="12" editable="true" maxlen="30" lowerleftx="5" lowerlefty="44.5" upperrightx="63" upperrighty="50" align="left" verticalalign="top">Person's name</text-block>
+      <text-block id="Position" title="Position" font-family="FuturaBT-Heavy" font-size="10" editable="true" maxlen="50" textmode="multiline" lowerleftx="5" lowerlefty="36.5" upperrightx="63" upperrighty="43" align="left" verticalalign="top">Person's position within the company</text-block>
+      <text-block id="Address1" title="Address1" font-family="FuturaBT-Heavy" font-size="10" editable="true" maxlen="50" lowerleftx="5" lowerlefty="30.125" upperrightx="63" upperrighty="33.5" align="left" verticalalign="bottom">1st line of address</text-block>
+      <text-block id="Address2" title="Address2" font-family="FuturaBT-Heavy" font-size="10" editable="true" maxlen="50" lowerleftx="5" lowerlefty="26.75" upperrightx="63" upperrighty="30.125" align="left" verticalalign="bottom">2nd line of address</text-block>
+      <text-block id="Address3" title="Address3" font-family="FuturaBT-Heavy" font-size="10" editable="true" maxlen="50" lowerleftx="5" lowerlefty="23.375" upperrightx="63" upperrighty="26.75" align="left" verticalalign="bottom">3rd line of address</text-block>
+      <text-block id="Address4" title="Address4" font-family="FuturaBT-Heavy" font-size="10" editable="true" maxlen="50" lowerleftx="5" lowerlefty="20" upperrightx="63" upperrighty="23.375" align="left" verticalalign="bottom">4th line of address</text-block>
+      <text-block id="Details" title="Contact Details" font-family="FuturaBT-Heavy" font-size="10" editable="true" maxlen="200" textmode="multiline" lowerleftx="5" lowerlefty="5" upperrightx="63" upperrighty="15" align="left" verticalalign="bottom">tel 01234 456 789  email personname@macmillan.org.uk  www.macmillan.org.uk</text-block>
+   </page>
+</doc>

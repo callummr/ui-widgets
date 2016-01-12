@@ -89,13 +89,19 @@ _$(document).ready(function () {
             // Update UI to show additional input field to name the template
             app._$tempNameFromTemp.removeClass('hidden');
             app.templateId = parseInt(_$selectedInput.val());
+            console.log(app.templateId)
 
             if (app.isLocalEnv) {
                 ajaxUrl = 'assets/xml/' + app.templateId + '.xml';
                 // Set the doc dimensions here
                 _$.get('assets/data/data.templates.txt', function (data) {
                     var localData = JSON.parse(app.utils.filterResponse(data));
-                    app.docDimensions = localData[app.templateId - 1].Dimensions.replace(' ', '').split(',');
+                    localData.forEach(function(data){
+                        if(parseInt(data.ID) === app.templateId){
+                            console.log(data)
+                            app.docDimensions = data.Dimensions.replace(' ', '').split(',');
+                        }
+                    });     
                 }, 'text');
             } else {
                 ajaxUrl = '/be/api/PDF/Template.ashx?id=' + app.templateId + '&incXml=true'
@@ -158,7 +164,8 @@ _$(document).ready(function () {
             canvasEl.setAttribute('id', 'ct_canvas');
 
             var canvasSettings = app.utils.setCanvasSettings(docWidth, docHeight);
-            // console.log(app.templateType);
+            // console.log(canvasSettings)
+            console.log(app.templateType);
             if(app.templateType === 'default'){
                 // Set the canvas margin (10mm for A4) / Divided by the canvas scale
                 app.canvasMargins.bleed = Math.ceil(Math.ceil(10 * app.MMtoPxSize) / 2);
@@ -174,18 +181,21 @@ _$(document).ready(function () {
             canvasEl.width = canvasSettings.width;
             canvasEl.height = canvasSettings.height;
 
-            document.getElementById('template-canvas-container').appendChild(canvasEl);
+            document.getElementById('template-canvas-container').appendChild(canvasEl);         
+
             app._ct_canvas = new fabric.Canvas('ct_canvas', { selection: false, backgroundColor: '#FFF' });
             // This functions sets the max/min coordinatations an element can move to.
             app.utils.setCanvasMaxMargins(app._ct_canvas);
             // Draw the grid on the template
             app.utils.drawGrid(app._ct_canvas);
             // Add all of the elements to the page.
-            app.ct.createTempBlockFromXML(canvasData.doc.page, canvasSettings.canvasScale);
-            // Change the position of the document size controls within the DOM
+            app.ct.createTempBlockFromXML(canvasData.doc.page, app.canvasScale);
+            // Change the position of the 'document size controls' within the DOM
+                // Fix bug here
             app.ct.repositionTempSizesControls(true);
             // Set the relevant dimensions checkboxes and disabled invalid ones.
             // console.log(app.docDimensions.length > 1)
+            console.log(app.docDimensions)
             if(app.docDimensions.length > 1){
                 app.docDimensions.forEach(function(size){
                     console.log(size)
@@ -194,6 +204,7 @@ _$(document).ready(function () {
             } else{
                 app.utils.setProductDimensions(app.docDimensions[0]);
             }
+
             
             // Bind Global and Create Template specific - Canvas events
             app.utils.bindGlobalCanvasEvents();
@@ -201,7 +212,7 @@ _$(document).ready(function () {
         },
         createTempBlockFromXML: function (templateJSON, scale) {
             // console.log(scale)
-            // console.log(templateJSON);
+            console.log(templateJSON);
             if (typeof (templateJSON['text-block-group']) !== 'undefined') {
                 if (typeof (templateJSON['text-block-group'].length) === 'undefined') {
                     // Only a single text block group
@@ -1030,14 +1041,27 @@ _$(document).ready(function () {
             var blockTypeName = 'template' + _selectedEl.blocktype.replace('new', '');
             //console.log(blockTypeName);
 
+            console.log(_selectedEl.halign)
+            console.log(_selectedEl.valign)
+            
+
             // Set the title
             app._$tempBlockName.val(_selectedEl.blockTitle);
 
-            // Set H Align      
-            _$('input[value=' + _selectedEl.halign + ']').prop('checked', true);
-            // Set V Align
-            _$('input[value=' + _selectedEl.valign + ']').prop('checked', true);
+            // Set H Align  
+            if(_selectedEl.halign !== ''){                  
+                _$('input[value=' + _selectedEl.halign + ']').prop('checked', true);
+            } else{
+                 _$('input[value=left]').prop('checked', true);
+            }
 
+            // Set V Align   
+            if(_selectedEl.valign !== ''){                  
+                _$('input[value=' + _selectedEl.valign + ']').prop('checked', true);
+            } else{
+                 _$('input[value=top]').prop('checked', true);
+            }
+            
             // Set Editable
             if (_selectedEl.isEditable === true) {
                 _$('#at-editable').prop('checked', true);
@@ -1184,7 +1208,7 @@ _$(document).ready(function () {
             app.gEditActive = false;
         },
         toggleTempState: function (isEditing) {
-            console.log(isEditing);
+            // console.log(isEditing);
             if (isEditing === true) {
                 _$('.disabled-in-edit-state').addClass('hidden');
                 _$('.enabled-in-edit-state').removeClass('hidden');
@@ -1361,7 +1385,7 @@ _$(document).ready(function () {
         },
         handleTbgState: function (state) {
             // Update the UI
-            console.log(state)
+            // console.log(state)
             if (state === true) {
                 _$('[data-state=disable-text-block-controls]').addClass('hidden');
                 _$('[data-state=enable-text-block-controls]').removeClass('hidden');

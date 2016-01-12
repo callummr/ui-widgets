@@ -45,7 +45,7 @@ _$(document).ready(function(){
 									name:  	   'Light Green',
 									className: 'color-light-green',
 									isDefault: true // This setting is required for when creating a template we can set a default
-								},
+								},								
 								{
 									rgb:       '0,162,70',
 									cmyk:      '94,0,100,0',
@@ -305,12 +305,15 @@ _$(document).ready(function(){
 	    },	    
         setProductDimensions: function(size){
         	// console.log(app.docDimensions);
+
 			var patt = new RegExp('A[0-9]'),
 				res;
         	// Handle business card options
     		// Test for A-Something format doc size. If found remove the business card option.
     		// Otherwise remove all of the A- options
     		res = patt.test(size);
+    		// Remove the default checked setting
+    		_$('#a4').prop('checked', false);
     		if(res === true){
     			// Hide the business type option as a user cannot change an A4 document into a business card
     			_$('.doc-size-business').parent().addClass('hidden');
@@ -381,6 +384,7 @@ _$(document).ready(function(){
 	      	_canvas.renderAll();
 	    },
 	    setCanvasSettings: function(docWidth, docHeight){
+	    	// console.log(docWidth, docHeight)
 	    	var settings = {};
 	    	// Set the orientation
 			if(docWidth < docHeight){
@@ -417,25 +421,25 @@ _$(document).ready(function(){
 			// Set the level of scaling so the when converting the cooridinates to pixels that are accurate      
 			if((docWidth === 420 && docHeight === 594) || (docHeight=== 420 && docWidth === 594)){
 				// A2 = 420x594 or 594x420
-				settings.canvasScale = 2;
+				app.canvasScale = 2;
 			} else if((docWidth === 297 && docHeight === 420) || (docHeight=== 297 && docWidth === 420)){
 				// A3 = 297x420 or 420x297
-				settings.canvasScale = 1.4142;
+				app.canvasScale = 1.4142;
 			} else if((docWidth === 210 && docHeight === 297) || (docHeight=== 210 && docWidth === 297)){
 				// A4 = 210x297 or 297x210
-				settings.canvasScale = 1;
+				app.canvasScale = 1;
 			} else if((docWidth === 148 && docHeight === 210) || ((docHeight === 148 || docHeight === 148.5) && docWidth === 210)){
 				// A5 = 148x210 or 210x148
-				settings.canvasScale = 0.7071;    
+				app.canvasScale = 0.7071;    
 			} else if((docWidth === 105 && docHeight === 148) || (docHeight >= 104 && docHeight <= 105 && docWidth === 148)){
 				// A6 = 105x148 or 148x105
-				settings.canvasScale = 0.5;
+				app.canvasScale = 0.5;
 			} else if((docWidth === 74 && docHeight === 105) || (docHeight === 74 && docWidth === 105)){
 				// A7 = 74x105 or 105x74
-				settings.canvasScale = 0.3536;
+				app.canvasScale = 0.3536;
 			} else if(docWidth === 85 && docHeight === 55){
 				// Business Card = 85x55
-				settings.canvasScale = 1;
+				app.canvasScale = 1;
 			}
 			return settings;
 	    },
@@ -484,6 +488,7 @@ _$(document).ready(function(){
 			CANVAS UPDATE FUNCTIONS
 	    **/
 	    wrapCanvasText: function(t, canvas, maxW, maxH, justify, createNewObj){
+	    	console.log()
 	    	// console.log(maxW);
 	    	// console.log(maxW, maxH)
 	    	// http://jsfiddle.net/maxenko/nyw5myq5/4/light/
@@ -514,8 +519,11 @@ _$(document).ready(function(){
 		    var currentLine = '';
 		    var breakLineCount = 0;
 
-		    var n = 0;
-		    while (n < words.length) {
+		    // var n = 0;
+
+		    for(var n=0; n < words.length; n++) {
+
+		    // while (n < words.length) {
 		        var isNewLine = currentLine == "";
 		        var testOverlap = currentLine + ' ' + words[n];
 
@@ -540,7 +548,8 @@ _$(document).ready(function(){
 
 		                    if (context.measureText(withHypeh).width >= maxW) {
 		                        // add hyphen when splitting a word
-		                        withHypeh = wordOverlap.substr(0, wordOverlap.length - 2) + "-";
+		                        // withHypeh = wordOverlap.substr(0, wordOverlap.length - 2) + "-";
+		                        withHypeh = wordOverlap.substr(0, wordOverlap.length - 2);
 		                        // update current word with remainder
 		                        words[n] = words[n].substr(wordOverlap.length - 1, words[n].length);
 		                        formatted += withHypeh; // add hypenated word
@@ -566,7 +575,7 @@ _$(document).ready(function(){
 		            currentLine = "";
 		            break;
 		        }
-		        n++;
+		        // n++;
 		    }
 
 		    if (currentLine != '') {
@@ -1402,4 +1411,4 @@ _$(document).ready(function(){
 		}
 	};
 	app.utils.initUtils();
-})
+});

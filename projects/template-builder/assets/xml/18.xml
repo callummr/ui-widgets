@@ -1,0 +1,25 @@
+<doc>
+   <page width="297" height="420">
+      <image id="partnerlogo" title="Partner logo" lowerleftx="15" lowerlefty="355" upperrightx="282" upperrighty="405" editable="true" align="right" />
+      <pdf id="logo" title="Logo" lowerleftx="15" lowerlefty="289" upperrightx="282" upperrighty="355" editable="false" />
+      <text-block id="footer" title="Footer" lowerleftx="15" lowerlefty="43" upperrightx="190.334" upperrighty="109" font-family="FuturaBT-Heavy" font-size="24" editable="true" textmode="multiline" maxlen="200" verticalalign="bottom" leading="125%">This is just a sample text to show you how your resource will look. Please replace it with your own copy, keeping it as brief as possible.</text-block>
+      <image id="groupphoto" title="Group Photo" lowerleftx="15" lowerlefty="117" upperrightx="190.334" upperrighty="281" editable="true" />
+      <text-block-group id="Group1" title="Group 1" lowerleftx="198.334" lowerlefty="89" upperrightx="282" upperrighty="281" editable="true" align="left" verticalalign="top" spacing="5">
+         <text-block id="key" title="Key" font-family="FuturaBT-Book" font-size="24" editable="false">From left to right:</text-block>
+         <text-block id="name1" title="Name 1" font-family="FuturaBT-Heavy" font-size="24" editable="true" leading="125%" maxlen="50">Name Surname</text-block>
+         <text-block id="details1" title="Details 1" font-family="FuturaBT-Book" font-size="24" editable="true" leading="125%" maxlen="100" textmode="multiline">job description tel 01234 567890</text-block>
+         <text-block id="name2" title="Name 2" font-family="FuturaBT-Heavy" font-size="24" editable="true" leading="125%" maxlen="50">Name Surname</text-block>
+         <text-block id="details2" title="Details 2" font-family="FuturaBT-Book" font-size="24" editable="true" leading="125%" maxlen="100" textmode="multiline">job description tel 01234 567890</text-block>
+         <text-block id="name3" title="Name 3" font-family="FuturaBT-Heavy" font-size="24" editable="true" leading="125%" maxlen="50">Name Surname</text-block>
+         <text-block id="details3" title="Details 3" font-family="FuturaBT-Book" font-size="24" editable="true" leading="125%" maxlen="100" textmode="multiline">job description tel 01234 567890</text-block>
+         <text-block id="name4" title="Name 4" font-family="FuturaBT-Heavy" font-size="24" editable="true" leading="125%" maxlen="50">Name Surname</text-block>
+         <text-block id="details4" title="Details 4" font-family="FuturaBT-Book" font-size="24" editable="true" leading="125%" maxlen="100" textmode="multiline">job description tel 01234 567890</text-block>
+         <text-block id="name5" title="Name 5" font-family="FuturaBT-Heavy" font-size="24" editable="true" leading="125%" maxlen="50">Name Surname</text-block>
+         <text-block id="details5" title="Details 5" font-family="FuturaBT-Book" font-size="24" editable="true" leading="125%" maxlen="100" textmode="multiline">job description tel 01234 567890</text-block>
+         <text-block id="name6" title="Name 6" font-family="FuturaBT-Heavy" font-size="24" editable="true" leading="125%" maxlen="50">Name Surname</text-block>
+         <text-block id="details6" title="Details 6" font-family="FuturaBT-Book" font-size="24" editable="true" leading="125%" maxlen="100" textmode="multiline">job description tel 01234 567890</text-block>
+      </text-block-group>
+      <text-block id="cancerline" title="CancerLine" font-family="FuturaBT-Heavy" font-size="24" editable="false" align="left" verticalalign="bottom" lowerleftx="15" lowerlefty="15" upperrightx="190.334" upperrighty="35" leading="125%" source="E:\Websites\beMacmillan\Assets\CancerLine.txt" />
+      <text-block id="Terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="9" editable="false" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="267" lowerlefty="15" upperrightx="282" upperrighty="81" orientate="west" />
+   </page>
+</doc>

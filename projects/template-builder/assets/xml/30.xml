@@ -1,0 +1,12 @@
+<doc>
+   <page width="297" height="420" fitmethod="auto">
+      <text-block font-family="FuturaBT-Medium" font-size="10" source="E:\Websites\beMacmillan\Assets\Terms.txt" textmode="singleline" maxlen="" colour="94,0,100,0" align="left" id="Terms" mandatory="False" editable="False" title="Terms and Conditions" lowerleftx="16" lowerlefty="397" upperrightx="223" upperrighty="403" />
+      <pdf id="maclogo" title="Background Silhouette" lowerleftx="16" lowerlefty="192" upperrightx="280" upperrighty="391" editable="false" />
+      <text-block-group id="GroupElements" title="EventGroup" lowerleftx="16" lowerlefty="66" upperrightx="281" upperrighty="186" editable="true" align="left" verticalalign="top" spacing="10" width="265" height="120">
+         <text-block id="Title" title="Title" font-family="FuturaBT-Heavy" font-size="50" editable="true" maxlen="25" align="left">Event Title</text-block>
+         <text-block id="Medium" title="Medium Text" font-family="FuturaBT-Heavy" font-size="30" editable="true" textmode="multiline" maxlen="400" align="left" leading="125%">This flyer is designed for events which need a longer description. The maximum is 400 characters in this section, but this should not be more than 8 lines of text – including the line spaces between paragraphs. Putting in more lines of text than this will make the text too small to be read easily. Fewer lines of text mean that the text will be larger.</text-block>
+         <text-block id="Small" title="Small Text" font-family="FuturaBT-Heavy" font-size="20" editable="true" textmode="multiline" maxlen="325" align="left" leading="125%">No more than 5 lines of text and up to 325 characters in this section. The rest of this text is holding text, so that you can get an idea of what your resource will look like. Time, date and location of event  Contact tel 01234 567 890 or email anyone@myorg.org.uk</text-block>
+      </text-block-group>
+      <image id="logo" title="Partner Logo" lowerleftx="16" lowerlefty="16" upperrightx="280" upperrighty="60" mandatory="False" editable="True" align="left" verticalalign="bottom" width="264" height="44" fitmethod="auto" />
+   </page>
+</doc>

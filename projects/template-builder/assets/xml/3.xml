@@ -1,8 +1,11 @@
-<doc assetspath="C:\Projects\bemac_discovery\BeMacDiscovery\Assets\">
-   <page width="85" height="55">
-      <image id="partnerlogodigital" title="Partner Logo" lowerleftx="5" lowerlefty="40" upperrightx="80" upperrighty="50" editable="true" align="right" verticalalign="top" width="75" height="10" lowresfilename="demo-800.jpg" highresfilename="demo-800.jpg" />
-      <text-block id="Position" title="Position" font-family="FuturaBT-Heavy" font-size="12" editable="true" maxlen="60" lowerleftx="5" lowerlefty="30.25" upperrightx="80" upperrighty="38.75" align="left" verticalalign="top">Position within the company</text-block>
-      <text-block id="People" title="People" font-family="FuturaBT-Heavy" font-size="10" editable="true" maxlen="140" textmode="multiline" lowerleftx="5" lowerlefty="16.5" upperrightx="80" upperrighty="29" align="left" verticalalign="top">Peoples names: first name, second name, third name, fourth name, fifth name, sixth name, seventh name, eighth name, ninth name.</text-block>
-      <text-block id="Details" title="Contact Details" font-family="FuturaBT-Heavy" font-size="10" editable="true" maxlen="120" textmode="multiline" lowerleftx="5" lowerlefty="5" upperrightx="80" upperrighty="15" align="left" verticalalign="bottom">tel 01234 456 789  email personname@macmillan.org.uk  www.macmillan.org.uk</text-block>
+<doc>
+   <page width="297" height="420">
+      <pdf id="back" title="Background Silhouette" lowerleftx="0" lowerlefty="0" upperrightx="297" upperrighty="420" editable="false" />
+      <text-block-group id="Group1" title="Group 1" lowerleftx="15" lowerlefty="15" upperrightx="173.2" upperrighty="108.75" editable="true" align="left" verticalalign="bottom" spacing="10">
+         <text-block id="Title" title="Title" font-family="FuturaBT-Heavy" font-size="36" editable="true" maxlen="30" />
+         <text-block id="Medium" title="Medium Text" font-family="FuturaBT-Heavy" font-size="24" editable="true" maxlen="200" textmode="multiline" leading="125%">20 Month 2006  11am to 4pm  Name of venue/location  Street address, town, county</text-block>
+         <text-block id="Small" title="Small Text" font-family="FuturaBT-Heavy" font-size="20" editable="true" maxlen="150" textmode="multiline" leading="125%">call Contact Name on 01234 567890  or email cname@macmillan.org.uk</text-block>
+      </text-block-group>
+      <text-block id="Terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="9" editable="false" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="top" lowerleftx="15" lowerlefty="395" upperrightx="118.8" upperrighty="405" />
    </page>
 </doc>

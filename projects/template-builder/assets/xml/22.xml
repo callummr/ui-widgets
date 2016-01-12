@@ -1,0 +1,12 @@
+<doc>
+   <page width="297" height="420">
+      <image id="Logo" title="Logo" type="1" lowerleftx="15" lowerlefty="347" upperrightx="282" upperrighty="405" editable="true" align="right" />
+      <pdf id="Macmillanlogo" title="Macmillan Logo" lowerleftx="244.167" lowerlefty="165" upperrightx="282" upperrighty="339" editable="false" />
+      <pdf id="heading" title="Heading" lowerleftx="15" lowerlefty="165" upperrightx="236.167" upperrighty="339" editable="false" />
+      <text-block-group id="Group1" title="Group 1" lowerleftx="15" lowerlefty="43" upperrightx="236.167" upperrighty="157" editable="true" align="left" verticalalign="bottom" spacing="0">
+         <text-block id="Details" title="Details" font-family="FuturaBT-Heavy" font-size="24" editable="true" textmode="multiline" leading="125%" maxlen="200">This is just a sample text to show you how your resource will look. Please replace it with your own copy, keeping it as brief as possible. We are: Persons Name, Another Person, Persons Name You can find us at: Location Name Tel 01234 567890 Fax 01234 567 891</text-block>
+      </text-block-group>
+      <text-block id="cancerline" title="CancerLine" font-family="FuturaBT-Heavy" font-size="24" editable="false" align="left" verticalalign="bottom" lowerleftx="15" lowerlefty="15" upperrightx="236.167" upperrighty="35" source="E:\Websites\beMacmillan\Assets\CancerLine.txt" />
+      <text-block id="Terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="9" editable="false" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="244.167" lowerlefty="15" upperrightx="282" upperrighty="157" orientate="west" />
+   </page>
+</doc>

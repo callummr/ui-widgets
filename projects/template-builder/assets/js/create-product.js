@@ -12,6 +12,7 @@ _$(document).ready(function () {
     app.textBlockGroups = [];
     app._activeEditEl = null;
     app.activeImageBlockId;
+    app.canvasScale;
 
     app.defaultMaxCharLength = 2500;
 
@@ -254,7 +255,6 @@ _$(document).ready(function () {
             canvasEl.setAttribute('id', 'cp_canvas');
             canvasEl.width = canvasSettings.width;
             canvasEl.height = canvasSettings.height;
-            app.blockScale = canvasSettings.canvasScale;
 
             document.getElementById('product-canvas-container').appendChild(canvasEl);
 
@@ -278,7 +278,7 @@ _$(document).ready(function () {
                     // Only a single text block group
                     // console.log(productData['text-block-group']);
                     productData['text-block-group']['block'] = 'tbg';
-                    productData['text-block-group']['scale'] = app.blockScale;
+                    productData['text-block-group']['scale'] = app.canvasScale;
                     blockListingString += app.cp.createTextBlockGroupBlockSettings(productData['text-block-group']);
                     app.cp.createBlockDataFromXML(productData['text-block-group']);
                 } else {
@@ -286,7 +286,7 @@ _$(document).ready(function () {
                     productData['text-block-group'].forEach(function (textBlockGroup) {
                         // console.log(textBlockGroup);
                         textBlockGroup['block'] = 'tbg';
-                        textBlockGroup['scale'] = app.blockScale;
+                        textBlockGroup['scale'] = app.canvasScale;
                         blockListingString += app.cp.createTextBlockGroupBlockSettings(textBlockGroup);
                         app.cp.createBlockDataFromXML(textBlockGroup);
                     });
@@ -297,14 +297,14 @@ _$(document).ready(function () {
                 if (typeof (productData['text-block'].length) === 'undefined') {
                     // Only a single text block
                     productData['text-block']['block'] = 'tb';
-                    productData['text-block']['scale'] = app.blockScale;
+                    productData['text-block']['scale'] = app.canvasScale;
                     blockListingString += app.cp.createTextBlockBlockSettings(productData['text-block'], false);
                     app.cp.createBlockDataFromXML(productData['text-block']);
                 } else {
                     // Multiple text blocks
                     productData['text-block'].forEach(function (textBlock) {
                         textBlock['block'] = 'tb';
-                        textBlock['scale'] = app.blockScale;
+                        textBlock['scale'] = app.canvasScale;
                         blockListingString += app.cp.createTextBlockBlockSettings(textBlock, false);
                         app.cp.createBlockDataFromXML(textBlock);
                     });
@@ -315,14 +315,14 @@ _$(document).ready(function () {
                 if (typeof (productData['image'].length) === 'undefined') {
                     // Only a single image block
                     productData['image']['block'] = 'ib';
-                    productData['image']['scale'] = app.blockScale;
+                    productData['image']['scale'] = app.canvasScale;
                     blockListingString += app.cp.createImageBlockSettings(productData['image']);
                     app.cp.createBlockDataFromXML(productData['image']);
                 } else {
                     // Multiple image blocks
                     productData['image'].forEach(function (imgBlock) {
                         imgBlock['block'] = 'ib';
-                        imgBlock['scale'] = app.blockScale;
+                        imgBlock['scale'] = app.canvasScale;
                         blockListingString += app.cp.createImageBlockSettings(imgBlock);
                         app.cp.createBlockDataFromXML(imgBlock);
                     });
@@ -715,9 +715,9 @@ _$(document).ready(function () {
 	            app._cp_canvas.add(_block);
 			});
         },
-        createProductTextBlock: function (settings) {
+        createProductTextBlock: function (cTBSettings) {
             // Create the fabric js element on the canvas using the settings from 'settings' object
-            var cTBSettings = settings;
+            console.log(cTBSettings)
             // Set the text of the element
             // console.log(cTBSettings);
             if (typeof (cTBSettings.stringSrc) !== 'undefined') {
@@ -730,90 +730,76 @@ _$(document).ready(function () {
             }
 
             // Create Boolean to test if this block is from a source file or free text
-            var fromTextSrc = typeof (cTBSettings.stringSrc) !== 'undefined' ? true : false;
+            var fromTextSrc = typeof (cTBSettings.stringSrc) !== 'undefined' ? true : false,
+                _ptblock;
 
-            var _ptblock,
-	      		_formattedBlock;
-            // console.log(cTBSettings.lineheight, (cTBSettings.lineheight / 100).toString().replace(/%/g, ''));
-            _ptblock = new fabric.Text(cTBSettings.textVal, {
+            _ptblock = new fabric.Textbox(cTBSettings.textVal, {
                 fill: cTBSettings.fontColor,
                 fontFamily: cTBSettings.fontFamily,
-                fontSize: app.utils.convertPtToPx(parseInt(cTBSettings.fontSize)),
+                fontSize: app.utils.convertPtToPx(parseInt(cTBSettings.fontSize)) * app.canvasScale,
                 hasBorders: true,
                 hasRotatingPoint: false,
+                height: cTBSettings.height,
                 left: cTBSettings.left,
                 lineHeight: (cTBSettings.lineheight / 100).toString().replace(/%/g, ''),
                 lockRotation: true,
                 lockScalingFlip: true,
                 selectable: true,
-                textAlign: cTBSettings.halign,
+                textAlign: cTBSettings.halign, 
                 top: cTBSettings.top,
+                width: cTBSettings.width
             });
+
+            // console.log(_ptblock)
 
             // This additional property is required within the wrapCanvasText function
             if (fromTextSrc) {
                 _ptblock['text-block-type'] = 'text';
-                cTBSettings.textblocktype = 'text';
+                cTBSettings.blocktype = 'text';
             } else {
                 _ptblock['text-block-type'] = 'itext';
-                cTBSettings.textblocktype = 'itext';
+                cTBSettings.blocktype = 'itext';
             }
-
-            // Sort the wrapping out for the text element, requires:
-            // canvas obj, the canvas obj, maxWidth, maxHeight, alignment
-
-            _formattedBlock = app.utils.wrapCanvasText(_ptblock, app._cp_canvas, cTBSettings.width, 0, cTBSettings.halign, true);
-            // Need to look into adding a background colour, so a user can see the width of a textblock group
-                // Will also need to disable this colour, when saving an image.
-            // _formattedBlock.set({
-            //     backgroundColor: '#000000'
-            // });
-
-            // console.log(_formattedBlock);
-            // console.log(_formattedBlock.width);           
+        
 
             // Add additional block proprties to the newly formatted block;
-            _formattedBlock['blocktype'] = cTBSettings.blocktype;
-            _formattedBlock['blockTitle'] = cTBSettings.blockTitle;
-            _formattedBlock['halign'] = cTBSettings.halign;
-            _formattedBlock['isEditable'] = cTBSettings.isEditable;
-            _formattedBlock['isManditory'] = cTBSettings.isManditory;
-            _formattedBlock['id'] = cTBSettings.id.replace(/ /g, ''),
-			_formattedBlock['valign'] = cTBSettings.valign;
+            _ptblock['blocktype'] = cTBSettings.blocktype;
+            _ptblock['blockTitle'] = cTBSettings.blockTitle;
+            _ptblock['fontColor'] = cTBSettings.fontColor;
+            _ptblock['halign'] = cTBSettings.halign;
+            _ptblock['isEditable'] = cTBSettings.isEditable;
+            _ptblock['isManditory'] = cTBSettings.isManditory;
+            _ptblock['id'] = cTBSettings.id.replace(/ /g, ''),
+			_ptblock['valign'] = cTBSettings.valign;
 
-            _formattedBlock['origWidth'] = cTBSettings.width,
-			_formattedBlock['origHeight'] = cTBSettings.height,
-
-			_formattedBlock['fontColor'] = cTBSettings.fontColor;
-            _formattedBlock['fontFamily'] = cTBSettings.fontFamily;
-            _formattedBlock['fontSize'] = parseInt(cTBSettings.fontSize);
-            _formattedBlock['lineheight'] = cTBSettings.lineheight.toString().replace('%', '');
-            _formattedBlock['maxLength'] = parseInt(cTBSettings.maxLength);
-            _formattedBlock['textVal'] = cTBSettings.textVal;
-            _formattedBlock['textblocktype'] = cTBSettings.textblocktype;
+            _ptblock['origWidth'] = cTBSettings.width,
+			_ptblock['origHeight'] = cTBSettings.height,			
+            _ptblock['maxLength'] = parseInt(cTBSettings.maxLength);
+            _ptblock['textVal'] = cTBSettings.textVal;
+            _ptblock['textblocktype'] = cTBSettings.blocktype;
 
             if (typeof (cTBSettings.parentId) !== 'undefined') {
                 // console.log(cTBSettings.parentHeight, cTBSettings.parentWidth)
-                _formattedBlock['groupPosId'] = cTBSettings.groupPosId,
-                _formattedBlock['parentId'] = cTBSettings.parentId.replace(/ /g, ''),
-				_formattedBlock['parentTitle'] = cTBSettings.parentTitle;
-                _formattedBlock['parentEditable'] = cTBSettings.parentEditable;
-                _formattedBlock['parentManditory'] = cTBSettings.parentManditory;
-                _formattedBlock['parentHalign'] = cTBSettings.parentHalign;
-                _formattedBlock['parentValign'] = cTBSettings.parentValign;
-                _formattedBlock['parentHeight'] = cTBSettings.parentHeight;
-                _formattedBlock['parentTop'] = cTBSettings.parentTop;
-                _formattedBlock['parentWidth'] = cTBSettings.parentWidth;
-                _formattedBlock['spacing'] = app.utils.convertMMtoPX(cTBSettings.spacing);
+                _ptblock['groupPosId'] = cTBSettings.groupPosId,
+                _ptblock['parentId'] = cTBSettings.parentId.replace(/ /g, ''),
+				_ptblock['parentTitle'] = cTBSettings.parentTitle;
+                _ptblock['parentEditable'] = cTBSettings.parentEditable;
+                _ptblock['parentManditory'] = cTBSettings.parentManditory;
+                _ptblock['parentHalign'] = cTBSettings.parentHalign;
+                _ptblock['parentValign'] = cTBSettings.parentValign;
+                _ptblock['parentHeight'] = cTBSettings.parentHeight;
+                _ptblock['parentTop'] = cTBSettings.parentTop;
+                _ptblock['parentWidth'] = cTBSettings.parentWidth;
+                _ptblock['spacing'] = app.utils.convertMMtoPX(cTBSettings.spacing);
             }
 
             if (typeof (cTBSettings.stringSrc) !== 'undefined') {
-                _formattedBlock['stringSrc'] = cTBSettings.stringSrc;
+                _ptblock['stringSrc'] = cTBSettings.stringSrc;
             }
 
             // Add the new component to the canvas. This needs to be done, before we can update the background img of the object            
-            // app._cp_canvas.add(_formattedBlock).renderAll();
-            app._cp_canvas.add(_formattedBlock);
+            // app._cp_canvas.add(_ptblock)
+            app._cp_canvas.add(_ptblock).renderAll();;
         },
 
         deactiveCanvasObj: function () {

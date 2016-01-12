@@ -1,0 +1,23 @@
+<doc>
+   <page width="210" height="297">
+      <pdf id="Back1" title="First page background silhouette" lowerleftx="0" lowerlefty="0" upperrightx="210" upperrighty="297" editable="false" fitmethod="auto" />
+      <image id="EventLogo" title="Your logo" lowerleftx="123" lowerlefty="216" upperrightx="163" upperrighty="256" editable="true" />
+      <text-block-group id="Group1" title="" lowerleftx="39" lowerlefty="210" upperrightx="113" upperrighty="254.6" editable="true" align="left" verticalalign="top" spacing="8">
+         <text-block id="EventName" title="Event name" font-family="FuturaBT-Heavy" font-size="12" editable="true">Event name up to 30 characters</text-block>
+         <text-block id="EventDate" title="Event date" font-family="FuturaBT-Heavy" font-size="12" editable="true">Event date</text-block>
+         <text-block id="Name" title="Name" font-family="FuturaBT-Heavy" font-size="12" editable="true">Name line</text-block>
+         <text-block id="Address1" title="Address" font-family="FuturaBT-Heavy" font-size="12" editable="true">Address line</text-block>
+         <text-block id="Address2" title="Address line 2" font-family="FuturaBT-Heavy" font-size="12" editable="true">Address line 2</text-block>
+      </text-block-group>
+      <text-block id="EventPostcode" title="Postcode" font-family="FuturaBT-Heavy" font-size="12" editable="true" align="left" lowerleftx="39" lowerlefty="211.7" upperrightx="65" upperrighty="218.7">EC2N 3AB</text-block>
+      <text-block id="DateOfBirth" title="Date of Birth" font-family="FuturaBT-Heavy" font-size="12" editable="true" align="left" lowerleftx="90" lowerlefty="211.7" upperrightx="113" upperrighty="218.7">23/12/78</text-block>
+      <text-block-group id="Group2" title="" lowerleftx="39" lowerlefty="170" upperrightx="213" upperrighty="199.5" editable="true" align="left" verticalalign="top" spacing="6">
+         <text-block id="PersonName" title="Name" font-family="FuturaBT-Heavy" font-size="14" editable="true">Macmillan Cancer Support</text-block>
+         <text-block id="PersonAddress1" title="Address line 1" font-family="FuturaBT-Heavy" font-size="14" editable="true">FREEPOST LON15851</text-block>
+         <text-block id="PersonAddress2" title="Address line 2" font-family="FuturaBT-Heavy" font-size="14" editable="true">89 Albert Embankment, London SE1 7UQ</text-block>
+      </text-block-group>
+   </page>
+   <page width="210" height="297">
+      <pdf id="Back2" title="Second page background silhouette" lowerleftx="0" lowerlefty="0" upperrightx="210" upperrighty="297" editable="false" fitmethod="auto" />
+   </page>
+</doc>

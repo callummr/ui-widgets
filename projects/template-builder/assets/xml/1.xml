@@ -1,11 +1,15 @@
-<doc>
-   <page width="420" height="297">
-      <pdf id="back" title="Background Silhouette" lowerleftx="0" lowerlefty="0" upperrightx="420" upperrighty="297" editable="false" />
-      <text-block-group id="Group1" title="Group 1" lowerleftx="15" lowerlefty="178.2" upperrightx="179.29" upperrighty="282" editable="true" align="left" verticalalign="top" spacing="10">
-         <text-block id="Title" title="Title" font-family="FuturaBT-Heavy" font-size="36" editable="true" maxlen="30" />
-         <text-block id="Medium" title="Medium Text" font-family="FuturaBT-Heavy" font-size="24" editable="true" maxlen="200" textmode="multiline" leading="125%">20 Month 2006 11am to 4pm Name of venue/location Street address, town, county</text-block>
-         <text-block id="Small" title="Small Text" font-family="FuturaBT-Heavy" font-size="20" editable="true" maxlen="150" textmode="multiline" leading="125%">call Contact Name on 01234 567890 or email cname@macmillan.org.uk</text-block>
-      </text-block-group>
-      <text-block id="Terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="9" editable="false" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="15" lowerlefty="15" upperrightx="122.86" upperrighty="25" />
-   </page>
+<doc assetspath="@" scalex="1" scaley="1">
+	<page height="105" width="148">
+		<pdf align="left" editable="false" id="bglayer" lowerleftx="0" lowerlefty="0" orientate="north" title="background" upperrightx="148" upperrighty="105" verticalalign="top"/>
+		<text-block-group align="left" editable="True" id="Group0" lowerleftx="11.5" lowerlefty="48.5" mandatory="False" maxlen="200" orientate="north" spacing="5" upperrightx="127" upperrighty="78.5" verticalalign="top">
+			<text-block colour="75,68,97,90" editable="true" font-family="FuturaBT-Heavy" font-size="36" id="TextBlockG_0" leading="100%" mandatory="false" textmode="multiline" title="Paragraph 1">My name is John Smith  My role involves:</text-block>
+			<text-block colour="75,68,97,90" editable="true" font-family="FuturaBT-Heavy" font-size="11" id="TextBlockG_1" leading="100%" mandatory="false" textmode="multiline" title="Paragraph 2">Providing Ensure effective communication – Assessing</text-block>
+		</text-block-group>
+		<text-block align="left" colour="75,68,97,90" editable="true" font-family="FuturaBT-Heavy" font-size="13" id="TextBlock_1" leading="100%" lowerleftx="6" lowerlefty="24.5" mandatory="true" maxlen="5000" orientate="north" textmode="multiline" title="Next meeting" upperrightx="33.5" upperrighty="27.5" verticalalign="bottom">Our next meeting will be:</text-block>
+		<text-block align="left" colour="75,68,97,90" editable="true" font-family="FuturaBT-Heavy" font-size="12" id="TextBlock_2" leading="100%" lowerleftx="6" lowerlefty="19.5" mandatory="true" maxlen="5000" orientate="north" textmode="multiline" title="Date" upperrightx="10.5" upperrighty="22" verticalalign="bottom">Date</text-block>
+		<text-block align="left" colour="75,68,97,90" editable="true" font-family="FuturaBT-Heavy" font-size="12" id="TextBlock_3" leading="100%" lowerleftx="60" lowerlefty="19.5" mandatory="true" maxlen="5000" orientate="north" textmode="multiline" title="Time" upperrightx="65" upperrighty="22" verticalalign="bottom">Time</text-block>
+		<text-block align="left" colour="75,68,97,90" editable="true" font-family="FuturaBT-Heavy" font-size="12" id="TextBlock_4" leading="100%" lowerleftx="6" lowerlefty="9.5" mandatory="true" maxlen="5000" orientate="north" textmode="multiline" title="Location" upperrightx="15" upperrighty="12" verticalalign="bottom">Date</text-block>
+		<text-block align="left" colour="75,68,97,90" editable="true" font-family="FuturaBT-Medium" font-size="8" id="TextBlock_5" leading="100%" lowerleftx="6" lowerlefty="5" mandatory="true" maxlen="5000" orientate="north" source="@E:\Websites\beMacmillan\Assets\Terms.txt" textmode="multiline" title="Terms and Conditions" upperrightx="91.5" upperrighty="8.5" verticalalign="bottom"/>
+		<image align="right" editable="true" fitmethod="auto" highresfilename="null" id="Partner Logo6" lowerleftx="6" lowerlefty="85.5" lowresfilename="null" mandatory="true" orientate="north" title="Partner Logo" upperrightx="132.5" upperrighty="99" verticalalign="top"/>
+	</page>
 </doc>

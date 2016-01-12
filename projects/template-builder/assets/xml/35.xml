@@ -1,0 +1,14 @@
+<doc>
+   <page width="297" height="420">
+      <text-block id="terms" title="Terms and Conditions" font-family="FuturaBT-Medium" font-size="12" editable="false" leading="125%" source="E:\Websites\beMacmillan\Assets\Terms.txt" align="left" verticalalign="bottom" lowerleftx="16" lowerlefty="397" upperrightx="281" upperrighty="403" />
+      <pdf lowresfilename="" highresfilename="" align="center" verticalalign="top" id="back" mandatory="False" editable="False" title="Background Silhouette" lowerleftx="11" lowerlefty="30" upperrightx="285" upperrighty="389" />
+      <text-block-group id="Group1" title="Group 1" spacing="10" lowerleftx="16" lowerlefty="66" upperrightx="281" upperrighty="186" editable="true" align="left" verticalalign="top">
+         <text-block id="title" title="Event Title" font-family="FuturaBT-Heavy" font-size="56" textmode="multiline" editable="true" leading="125%" align="left" verticalalign="bottom" maxlen="25">Event Title</text-block>
+         <text-block id="para1" title="Paragraph 1" font-family="FuturaBT-Heavy" font-size="36" leading="125%" editable="true" textmode="multiline" maxlen="700">This flyer is designed for events which need a longer description. The maximum is 700 characters in this section.</text-block>
+         <text-block id="para2" title="Paragraph 2" font-family="FuturaBT-Heavy" font-size="28" leading="125%" editable="true" textmode="multiline" maxlen="300">No more than 5 lines of text and up to 300 characters in this section. The rest of this text is holding text, so that you can get an idea of what your resource will look like. Time, date and location of event Contact tel 01234 567 890 or email anyone@myorg.org.uk</text-block>
+      </text-block-group>
+      <image id="EditableLogo1" title="Brand Logo 1" lowerleftx="16" lowerlefty="16" upperrightx="100" upperrighty="60" mandatory="false" editable="true" align="center" verticalalign="bottom" fitmethod="auto" orientate="north" width="84" height="44" />
+      <image id="EditableLogo2" title="Brand Logo 2" lowerleftx="106.5" lowerlefty="16" upperrightx="190.5" upperrighty="60" mandatory="false" editable="true" align="center" verticalalign="bottom" fitmethod="auto" orientate="north" width="84" height="44" />
+      <image id="EditableLogo3" title="Brand Logo 3" lowerleftx="197.5" lowerlefty="16" upperrightx="281" upperrighty="60" mandatory="false" editable="true" align="center" verticalalign="bottom" fitmethod="auto" orientate="north" width="83.5" height="44" />
+   </page>
+</doc>
