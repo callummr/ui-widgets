@@ -2,6 +2,10 @@
 	text-align: left;
 }
 
+.font-headline{
+	font-family: 'Macmillan-Headline';
+}
+
 /* Store front overrides */
 h1,h2,h3,h4,h5,h6{
 	border-bottom: none;
@@ -148,6 +152,18 @@ input:checked + .align-icon{
 }
 .color-red{
 	background: rgb(227,35,51);
+}
+.color-turquoise{
+	background: rgb(154,204,201);
+}
+.color-lilac{
+	background: rgb(140,157,184);
+}
+.color-brown{
+	background: rgb(192,97,91);
+}
+.color-black{
+	background: rgb(0,0,0);
 }
 .color-option{
 	width: 30px;

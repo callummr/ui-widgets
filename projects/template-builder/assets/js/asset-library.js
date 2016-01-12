@@ -13,6 +13,10 @@ _$(document).ready(function() {
     app.al = {
         initAssetLibrary: function() {
             app.al.bindAssetLibraryDOMEvents();
+            var BaseUrl;
+            if (!app.isLocalEnv && typeof(app.isLocalEnv) !== 'undefined') {
+                BaseUrl = globalUrls.assetBaseUrl;
+            }
         },
 
         /**
@@ -310,10 +314,4 @@ _$(document).ready(function() {
     };
 
     app.al.initAssetLibrary();
-
-    var BaseUrl;
-
-    if (!app.isLocalEnv) {
-        BaseUrl = globalUrls.assetBaseUrl;
-    }
 });

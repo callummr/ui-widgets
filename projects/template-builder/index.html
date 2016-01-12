@@ -5,15 +5,15 @@
 	<!-- Load the webfonts before canvas -->
 	<style>
 		@font-face {
-		    font-family: 'Macmillan-Headline';
-		    src:url("assets/fonts/macmillan_headline_02_12-webfont.eot");
-		    src:url("assets/fonts/macmillan_headline_02_12-webfont.eot?#iefix") format("embedded-opentype"),
-		  	    url("assets/fonts/macmillan_headline_02_12-webfont.woff") format("woff"),
-		  	    url("assets/fonts/macmillan_headline_02_12-webfont.ttf") format("truetype"),
-		  	    url("assets/fonts/macmillan_headline_02_12-webfont.svg#macmillan_headlineregular") format("svg");
-		    font-weight: normal;
-		    font-style: normal;
-		}
+            font-family: 'Macmillan-Headline';
+            src:url("assets/fonts/macmillan_headline_02_12-webfont.eot");
+            src:url("assets/fonts/macmillan_headline_02_12-webfont.eot?#iefix") format("embedded-opentype"),
+                  url("assets/fonts/macmillan_headline_02_12-webfont.woff") format("woff"),
+                  url("assets/fonts/macmillan_headline_02_12-webfont.ttf") format("truetype"),
+                  url("assets/fonts/macmillan_headline_02_12-webfont.svg#macmillan_headlineregular") format("svg");
+            font-weight: normal;
+            font-style: normal;
+        }
 
 		@font-face{
 			font-family:"FuturaBT-Heavy";
@@ -231,7 +231,7 @@
 									</div>
 								</div>
 
-								<div class="hidden template-options" id="new-template-text-block-group">	
+								<div class="hidden template-options" id="new-template-text-block-group">
 									<div data-state="disable-text-block-controls">							
 										<h3>Text block Spacing</h3>
 										<input type="number" value="10" id="at-spacing-g" class="reset-to-default at-control form-control">
@@ -250,26 +250,17 @@
 										<input type="text" id="at-text-block-title" class="at-control reset-to-default form-control" placeholder="Name of text block...">
 										<h3>Font Face</h3>
 										<div id="at-font-face-g" class="text-editor-option">
-											<button type="button" class="btn btn-default" data-fface="FuturaBT-Book">Regular</button>
-											<button type="button" class="btn btn-default" data-fface="FuturaBT-Medium">Medium</button>
-											<button type="button" class="at-control btn btn-default" data-fface="FuturaBT-Heavy">Headline</button>
+											<!-- Populated by JS -->
 										</div>
 
 										<h3>Font Size</h3>
 										<div id="at-font-size-g" class="text-editor-option">
-											<button type="button" class="at-control reset-to-default btn btn-default option-selected" data-size="12">Small</button>
-											<button type="button" class="at-control btn btn-default" data-size="24">Medium</button>
-											<button type="button" class="at-control btn btn-default" data-size="36">Large</button>
+											<!-- Populated by JS -->
 										</div>							
 
 										<h3>Colour</h3>
 										<div id="at-font-color-g" class="text-editor-option">
-											<button type="button" class="at-control reset-to-default btn btn-default color-option color-light-green option-selected" data-rgb="140,198,63">Light Green</button>
-											<button type="button" class="at-control btn btn-default color-option color-mid-green" data-rgb="0,162,70">Mid Green</button>
-											<button type="button" class="at-control btn btn-default color-option color-dark-green" data-rgb="0,92,70">Dark Green</button>
-											<button type="button" class="at-control btn btn-default color-option color-purple" data-rgb="104,44,136">Purple</button>
-											<button type="button" class="at-control btn btn-default color-option color-orange" data-rgb="241,131,21">Orange</button>
-											<button type="button" class="at-control btn btn-default color-option color-red" data-rgb="227,35,51">Red</button>
+											<!-- Populated by JS -->
 										</div>
 
 										<div class="row text-editor-option">
@@ -279,9 +270,7 @@
 											</div>
 											<div class="col-md-7" id="at-lineheight-g">
 												<h3>Line height</h3>
-												<button type="button" class="at-control btn btn-default" data-lineheight="75">75%</button>
-												<button type="button" class="at-control btn btn-default reset-to-default option-selected" data-lineheight="100">100%</button>
-												<button type="button" class="at-control btn btn-default" data-lineheight="125">125%</button>
+												<!-- Populated by JS -->
 											</div>										
 										</div>										
 
@@ -429,17 +418,21 @@
 
 						<hr data-state="disable-in-tgb-edit-state">
 
-						<div class="disabled-in-edit-state" data-state="disable-text-block-controls">
-							<button type="button" class="btn btn-primary new-block-controls" id="add-template-block" data-state="disable-in-tgb-edit-state">Add Template Block</button>
-							<button type="button" class="btn btn-primary new-group-controls hidden" id="at-save-block-to-group">Add Text Block to group</button>
-							<button type="button" class="btn btn-danger new-group-controls hidden" id="at-close-block-to-group">Close</button>
-							<hr>
+						<div data-state="disable-text-block-controls">
+							<div class="disabled-in-edit-state">
+								<button type="button" class="btn btn-primary new-block-controls" id="add-template-block" data-state="disable-in-tgb-edit-state">Add Template Block</button>
+								<button type="button" class="btn btn-primary new-group-controls hidden" id="at-save-block-to-group">Add Text Block to group</button>
+								<button type="button" class="btn btn-danger new-group-controls hidden" id="at-close-block-to-group">Close</button>
+								<hr>
+							</div>
 						</div>
-						<div class="enabled-in-edit-state hidden" data-state="disable-text-block-controls">
-							<button type="button" class="at-control btn btn-primary" id="at-update-component">Update</button>
-							<button type="button" class="at-control btn btn-info" id="at-stop-update-component">Stop</button>							
-							<button type="button" class="at-control btn btn-danger" id="at-remove-component">Delete</button>
-							<hr>
+						<div data-state="disable-text-block-controls">
+							<div class="enabled-in-edit-state hidden">
+								<button type="button" class="at-control btn btn-primary" id="at-update-component">Update</button>
+								<button type="button" class="at-control btn btn-info" id="at-stop-update-component">Stop</button>							
+								<button type="button" class="at-control btn btn-danger" id="at-remove-component">Delete</button>
+								<hr>
+							</div>
 						</div>						
 					</div>
 				</div>

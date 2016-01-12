@@ -148,7 +148,7 @@ _$(document).ready(function () {
             });
         },
         loadTempFromJSON: function (canvasData) {
-            console.log(canvasData);
+            // console.log(canvasData);
             // console.log(canvasData.doc);
             var canvasEl = document.createElement('canvas'),
                 docWidth = parseInt(canvasData.doc.page._width),
@@ -160,15 +160,15 @@ _$(document).ready(function () {
             var canvasSettings = app.utils.setCanvasSettings(docWidth, docHeight);
             // console.log(app.templateType);
             if(app.templateType === 'default'){
-                // Set the canvas margin (15mm for A4) / Divided by the canvas scale
-                app.canvasFixedMargin = Math.ceil(Math.ceil(15 * app.MMtoPxSize) / 2);
+                // Set the canvas margin (10mm for A4) / Divided by the canvas scale
+                app.canvasMargins.bleed = Math.ceil(Math.ceil(10 * app.MMtoPxSize) / 2);
                 // Make the number a multiple of 8, so its fits to the grid properly
-                app.canvasFixedMargin = Math.ceil(app.canvasFixedMargin / 8) * 8;
+                app.canvasMargins.bleed = Math.ceil(app.canvasMargins.bleed / 8) * 8;
             } else{
                 // Set the canvas margin (5mm for business cards) / Divided by the canvas scale
-                app.canvasFixedMargin = Math.ceil(Math.ceil(5 * app.MMtoPxSize) / 2);
+                app.canvasMargins.bleed = Math.ceil(Math.ceil(5 * app.MMtoPxSize) / 2);
                  // Make the number a multiple of 8, so its fits to the grid properly
-                app.canvasFixedMargin = Math.ceil(app.canvasFixedMargin / 8) * 8;                
+                app.canvasMargins.bleed = Math.ceil(app.canvasMargins.bleed / 8) * 8;                
             }
 
             canvasEl.width = canvasSettings.width;
@@ -178,13 +178,14 @@ _$(document).ready(function () {
             app._ct_canvas = new fabric.Canvas('ct_canvas', { selection: false, backgroundColor: '#FFF' });
             // This functions sets the max/min coordinatations an element can move to.
             app.utils.setCanvasMaxMargins(app._ct_canvas);
+            // Draw the grid on the template
             app.utils.drawGrid(app._ct_canvas);
             // Add all of the elements to the page.
             app.ct.createTempBlockFromXML(canvasData.doc.page, canvasSettings.canvasScale);
             // Change the position of the document size controls within the DOM
             app.ct.repositionTempSizesControls(true);
-            // Set the relevant dimensions checkboxs and disabled invalid ones.
-            console.log(app.docDimensions.length > 1)
+            // Set the relevant dimensions checkboxes and disabled invalid ones.
+            // console.log(app.docDimensions.length > 1)
             if(app.docDimensions.length > 1){
                 app.docDimensions.forEach(function(size){
                     console.log(size)
@@ -199,7 +200,7 @@ _$(document).ready(function () {
             app.ct.bindCreateTemplateCanvasEvents();
         },
         createTempBlockFromXML: function (templateJSON, scale) {
-            console.log(scale)
+            // console.log(scale)
             // console.log(templateJSON);
             if (typeof (templateJSON['text-block-group']) !== 'undefined') {
                 if (typeof (templateJSON['text-block-group'].length) === 'undefined') {
@@ -351,10 +352,10 @@ _$(document).ready(function () {
             // Check if the document size desired template should be a regular paper size or business card.
             // All regular paper sizes use the same bases size (A4), but business cards are different.
             if (_$('[name=doc-size]:checked').val() !== 'Business Card') {
-                // Set the canvas margin (15mm for standard A4 Documents) / Divided by the canvas scale
-                app.canvasFixedMargin = Math.ceil(Math.ceil(15 * app.MMtoPxSize) / 2.0174);
+                // Set the canvas margin (10mm for standard A4 Documents) / Divided by the canvas scale
+                app.canvasMargins.bleed = Math.ceil(Math.ceil(10 * app.MMtoPxSize) / 2.0174);
                 // Make the number a multiple of 8, so its fits to the grid properly
-                app.canvasFixedMargin = Math.ceil(app.canvasFixedMargin / 8) * 8;
+                app.canvasMargins.bleed = Math.ceil(app.canvasMargins.bleed / 8) * 8;
                 // Check if the template should be portrait or landscape
                 // The canvas needs to be set to a specific size based on the 2 checks above.
                 if (_$('[name=doc-orientation]:checked').val() === 'p') {
@@ -368,9 +369,9 @@ _$(document).ready(function () {
                 }
             } else {
                 // Set the canvas margin (5mm for business cards) / Divided by the canvas scale
-                app.canvasFixedMargin = Math.ceil(Math.ceil(5 * app.MMtoPxSize) / 2);
+                app.canvasMargins.bleed = Math.ceil(Math.ceil(5 * app.MMtoPxSize) / 2);
                 // Make the number a multiple of 8, so its fits to the grid properly
-                app.canvasFixedMargin = Math.ceil(app.canvasFixedMargin / 8) * 8;
+                app.canvasMargins.bleed = Math.ceil(app.canvasMargins.bleed / 8) * 8;
                 // Only update the templateType when it is not a the default size of A4 being used
                 app.orientation = 'l'; // Landscape
                 app.templateType = 'business';
@@ -381,9 +382,11 @@ _$(document).ready(function () {
 
             document.getElementById('template-canvas-container').appendChild(canvasEl);
             app._ct_canvas = new fabric.Canvas('ct_canvas', { selection: false, backgroundColor: '#FFF' });
-            app.utils.bindGlobalCanvasEvents();
-            app.ct.bindCreateTemplateCanvasEvents();
+            // Draw the grid and bleed area
             app.utils.drawGrid(app._ct_canvas);
+            // Bind the global and template specific events
+            app.utils.bindGlobalCanvasEvents();
+            app.ct.bindCreateTemplateCanvasEvents();            
         },
         setTemplateDetails: function () {
             var _$orientationDetail = _$('#template-orientation');
@@ -549,8 +552,8 @@ _$(document).ready(function () {
                 blockSettings.left   = app.utils.validateLeftPos(canvasWidth, blockDimensions.lowerX, blockSettings.width);
                 blockSettings.top    = app.utils.validateTopPos(canvasHeight, blockDimensions.upperY, blockSettings.height);
                 
-                console.log(blockDimensions);
-                console.log(blockSettings);
+                // console.log(blockDimensions);
+                // console.log(blockSettings);
 
                 if (data.block === 'tbg') {
                     var listItems = '',
@@ -617,8 +620,8 @@ _$(document).ready(function () {
                 blockSettings.height = blockSize[1];
                 blockSettings.isEditable = _$('#at-editable').is(':checked') ? true : false;
                 blockSettings.isManditory = _$('#at-manditory').is(':checked') ? true : false;
-                blockSettings.left = app.canvasFixedMargin;
-                blockSettings.top = app.canvasFixedMargin;
+                blockSettings.left = app.canvasMargins.bleed;
+                blockSettings.top = app.canvasMargins.bleed;
                 blockSettings.valign = _$('input[name=v-pos]:checked').val();
                 blockSettings.width = blockSize[0];
 
@@ -670,33 +673,76 @@ _$(document).ready(function () {
         createTempBlockGroup: function (blockSettings, _block) {
             // Create the fabric js element on the canvas      
             // Only increment the counter if it is a new object
-            console.log(blockSettings, blockSettings.width);
+            // console.log(blockSettings, blockSettings.width);
             app.tempGroupCnt = typeof (_block) !== 'undefined' ? app.tempGroupCnt : app.tempGroupCnt++;
             var _$textBlockList = _$('#at-text-block-group-list'),
                 _blockId = typeof (_block) !== 'undefined' ? _block.blockId : 'tbg_' + app.tempGroupCnt;
-
-            // console.log(_block);
             // Check if this is creating a group from an exisitng group. (Performing an update)
-            if (typeof (_block) !== 'undefined') {
-                // Create indiviual text block for the text block group   
-                var _tblocks = app.ct.createTempBlockGroupItem(_$textBlockList.find('li'), _$('#at-spacing-g'), blockSettings);
+            if (typeof(_block) !== 'undefined') {
+                console.log(_block)
+                var parentSettings = {
+                    left: _block.left,
+                    top: _block.top,
+                    width: _block.width,
+                    height: _block.height,
+                    blockId: _blockId.blockId,
+                    halign: _blockId.halign,
+                    isEditable: _block.isEditable,
+                    isManditory: _block.isManditory,
+                    spacing: _block.spacing,
+                    valign: _block.valign
+                }
+                console.log(_block)
+
+                // Remove the old group
+                app._ct_canvas.remove(_block).renderAll();
+
+                // Create indiviual text block for the text block group
+                // console.log(_block)
+                var _tblocks = app.ct.createTempBlockGroupItem(_$textBlockList.find('li'), _$('#at-spacing-g').val(), parentSettings);
                 // Add each block to the exiting group
-                console.log(_block);
+                // console.log(_block);
                 _tblocks.forEach(function (block) {
-                    console.log(block);
+                    // console.log(block);
                     // Add each block to the group
+                    // console.log(block)
                     _block.add(block);
                 });
+
+                // Need to refactor the below so it doesnt get repeated.
+
+                var _tblockg = new fabric.Group(_tblocks, {
+                    fill: '#000000', // Fill is not being set on the group.
+                    hasBorders: true,
+                    hasRotatingPoint: false,
+                    height: typeof (parentSettings.height) !== 'undefined' ? parentSettings.height : 200,
+                    lockRotation: true,
+                    lockScalingFlip: true,
+                    originX: 'left',
+                    originY: 'top',
+                    width: typeof (parentSettings.width) !== 'undefined' ? parentSettings.width : 200,
+                    top: typeof (parentSettings.top) !== 'undefined' ? parentSettings.top : app.canvasMargins.bleed,
+                    left: typeof (parentSettings.left) !== 'undefined' ? parentSettings.left : app.canvasMargins.bleed,
+                });
+
+                _tblockg['blockId'] = _blockId;
+                _tblockg['blocktype'] = 'new-text-block-group';
+                _tblockg['halign'] = parentSettings.halign;
+                _tblockg['isEditable'] = parentSettings.isEditable;
+                _tblockg['isManditory'] = parentSettings.isManditory;
+                _tblockg['spacing'] = parentSettings.spacing;
+                _tblockg['valign'] = parentSettings.valign;
+
                 // Add the group to the canvas
-                app._ct_canvas.add(_block).renderAll();
+                app._ct_canvas.add(_tblockg).renderAll();
+               
             } else if (_$textBlockList.find('li').length > 0) {
                 // Use the settings from 'blockSettings' object if this is a new group
                 var _tblocks = app.ct.createTempBlockGroupItem(_$textBlockList.find('li'), blockSettings.spacing, blockSettings);
                 // Add the group elements to the group container
-                console.log(blockSettings.left)
+                // console.log(blockSettings.left)
                 var _tblockg = new fabric.Group(_tblocks, {
-                    backgroundColor: 'rgb(205,205,205)',
-                    fill: 'rgb(0,0,0)',
+                    fill: '#000000', // Fill is not being set on the group.
                     hasBorders: true,
                     hasRotatingPoint: false,
                     height: typeof (blockSettings.height) !== 'undefined' ? blockSettings.height : 200,
@@ -705,8 +751,8 @@ _$(document).ready(function () {
                     originX: 'left',
                     originY: 'top',
                     width: typeof (blockSettings.width) !== 'undefined' ? blockSettings.width : 200,
-                    top: typeof (blockSettings.top) !== 'undefined' ? blockSettings.top : app.canvasFixedMargin,
-                    left: typeof (blockSettings.left) !== 'undefined' ? blockSettings.left : app.canvasFixedMargin,
+                    top: typeof (blockSettings.top) !== 'undefined' ? blockSettings.top : app.canvasMargins.bleed,
+                    left: typeof (blockSettings.left) !== 'undefined' ? blockSettings.left : app.canvasMargins.bleed,
                 });
                 // console.log(_tblockg);
                 // Set the id and blocktype of the Text Block Group
@@ -736,7 +782,7 @@ _$(document).ready(function () {
         createTempBlockRegular: function (blockSettings) {
             // Create the fabric js element on the canvas
             // Use the settings from 'blockSettings' objetect
-            console.log(blockSettings);
+            // console.log(blockSettings);
             var _block = new fabric.Rect({
                 hasBorders: false,
                 hasRotatingPoint: false,
@@ -780,21 +826,23 @@ _$(document).ready(function () {
             app.ct.resetCreateTempBlock();
         },
         createTempBlockGroupItem: function ($els, spacing, parentSettings) {
-            console.log(parentSettings);
+            // console.log($els, spacing, parentSettings);
             var _blocksCollection = [],
                 spacingInt        = parseInt(spacing),
-                elHeight          = parentSettings.height / $els.length - (spacingInt * ($els.length - 1));
-            // console.log(parentSettings.height, elHeight, spacingInt)
+                elHeight          = parentSettings.height / $els.length - (spacingInt * ($els.length - 1)),
+                leftPos           = 0; // typeof(parentSettings.scaleX) !== 'undefined' ? 0 : '-' + (parentSettings.left/2)
+            // console.log(leftPos)
+            // console.log(parentSettings, elHeight)
             // console.log(blockSettings.spacingInt, blockSettings.spacingInt * parseInt(i + 1) );
             $els.each(function (i) {
                 var $template   = _$(this),
-                    topVal      = i === 0 ? 0 : (i * elHeight) + (i * spacingInt),                    
+                    topVal      = i === 0 ? parentSettings.top : parentSettings.top + (i * elHeight) + (i * spacingInt),                    
                     _innerblock = new fabric.Rect({
                         fill: 'rgb(0,0,0)',
                         hasBorders: true,
                         hasRotatingPoint: false,
                         height: elHeight,
-                        left: 0,
+                        left: leftPos,
                         lockRotation: true,
                         lockScalingFlip: true,
                         originX: 'left',
@@ -861,7 +909,7 @@ _$(document).ready(function () {
             app.ct.resetCreateTempBlock();
         },
         editTempBlock: function () {
-            var _block = app._ct_canvas.getActiveObject(),
+            var _block    = app._ct_canvas.getActiveObject(),
                 blockType = app.ct.setBlockType(_$('input[name=template-block-type]:checked').val());
             // console.log(blockType);
             // console.log(_block);
@@ -881,20 +929,20 @@ _$(document).ready(function () {
                 _block.blocktype = 'new-image-block';
             } else if (blockType === 'tbg') {
                 // Remove the current objects inside of the group
-                console.log(_block);
-                _block.forEachObject(function (o) {
-                    console.log(o);
-                    _block.remove(o);
-                    console.log(_block);
+                // console.log(_block);
+                _block.forEachObject(function (_obj) {
+                    // console.log(_obj);
+                    _block.remove(_obj);
+                    // console.log(_block);
                 });
                 // Add new items...
-                console.log('Should be empty', _block);
+                console.log('IS TBG --- Should be empty', _block);
 
                 if (_$('#at-text-block-group-list').find('li').length > 0) {
                     app.ct.createTempBlockGroup(_$('#at-text-block-group-list').find('li'), _block);
                 } else {
                     alert('The text block does not contain any text blocks, so it will be removed.');
-                    app._ct_canvas.remove(_block);
+                    app._ct_canvas.remove(_block).renderAll();
                 }
             }
             // Set non-specific block settings
@@ -906,6 +954,7 @@ _$(document).ready(function () {
 
             // Set the relevant background image for block, based on blocktype
             if (blockType !== 'tbg') {
+                console.log('THIS IS A TEXT BLOXK GROUP');
                 app.ct.setTempBlockBackgroundImg(_block, blockType);
             }
             // Reset the component creation tool.
@@ -1135,7 +1184,7 @@ _$(document).ready(function () {
             app.gEditActive = false;
         },
         toggleTempState: function (isEditing) {
-            // console.log(isEditing);
+            console.log(isEditing);
             if (isEditing === true) {
                 _$('.disabled-in-edit-state').addClass('hidden');
                 _$('.enabled-in-edit-state').removeClass('hidden');
@@ -1193,7 +1242,7 @@ _$(document).ready(function () {
                     colourOptionsString+= colorOpt.name;
                 colourOptionsString+= '</button>';
             });
-            _$('#at-font-color').append(colourOptionsString);
+            _$('#at-font-color, #at-font-color-g').append(colourOptionsString);
         },
         createTempFontSizeControls: function(){
             var fontOptionString = '';
@@ -1209,7 +1258,7 @@ _$(document).ready(function () {
                 fontOptionString+= '</button>';
             });
 
-            _$('#at-font-size').append(fontOptionString);
+            _$('#at-font-size, #at-font-size-g').append(fontOptionString);
         },
         createTempFontFaceControls: function(){
             var fontOptionString = '';
@@ -1225,7 +1274,7 @@ _$(document).ready(function () {
                 fontOptionString+= '</button>';
             });
 
-            _$('#at-font-face').append(fontOptionString);
+            _$('#at-font-face, #at-font-face-g').append(fontOptionString);
         },
         createTempLineHeights: function(){
             var lineheightOptionString = '';
@@ -1241,7 +1290,7 @@ _$(document).ready(function () {
                 lineheightOptionString+= '</button>';
             });
   
-            _$('#at-lineheight').append(lineheightOptionString);
+            _$('#at-lineheight, #at-lineheight-g').append(lineheightOptionString);
         },
 
 
@@ -1253,17 +1302,17 @@ _$(document).ready(function () {
             $this.siblings().removeClass('option-selected').end()
                  .addClass('option-selected');
         },
-        showTemplates: function ($el) {
-            console.log($el);
+        showTemplates: function (_$el) {
+            console.log(_$el);
             var $templateControlsContainer = _$('#template-tools-navigation'),
                 $templateCanvasContainer = _$('.new-template-container');
-            if ($el.attr('id') === 'at-show-templates') {
+            if (_$el.attr('id') === 'at-show-templates') {
                 $templateControlsContainer.removeClass('col-md-4');
             } else {
                 $templateControlsContainer.addClass('col-md-4')
             }
 
-            if ($el.hasClass('at-from-template')) {
+            if (_$el.hasClass('at-from-template')) {
                 $templateCanvasContainer.addClass('load-template-state');
             } else {
                 $templateCanvasContainer.removeClass('load-template-state');
@@ -1312,7 +1361,7 @@ _$(document).ready(function () {
         },
         handleTbgState: function (state) {
             // Update the UI
-            //console.log('handleTbgState ' + state)
+            console.log(state)
             if (state === true) {
                 _$('[data-state=disable-text-block-controls]').addClass('hidden');
                 _$('[data-state=enable-text-block-controls]').removeClass('hidden');
@@ -1392,7 +1441,6 @@ _$(document).ready(function () {
             app._$exitBlockToGroup = _$('#at-close-block-to-group');
             app._$stepBtns = _$('.step-option-btn:not(.at-from-template)');
             app._$newTempBtn = _$('#at-new-template');
-            app._$fromTempBtn = _$('.at-from-template');
             app._$toggleElTriggers = _$('.js-toggle-target-el');
             app._$updateTbBtn = _$('[data-action=update-tb-from-tbg]');
             app._$stopTbBtn = _$('[data-action=stop-tb-from-tbg');
@@ -1401,12 +1449,6 @@ _$(document).ready(function () {
             app._$tempNameFromTemp.on('keyup', function () {
                 _$.debounce(app._$templateName.text(_$(this).val()), 500);
             });
-
-
-            // Edit Canvas Component Triggers
-            app._$delComponentBtn = _$('#at-remove-component');
-            app._$editComponentBtn = _$('#at-update-component');
-            app._$stopComponentBtn = _$('#at-stop-update-component');
 
             // Bind to dom elements to functions
             app._$reserCreateTemp.on('click', app.ct.resetTemplate);
@@ -1425,10 +1467,11 @@ _$(document).ready(function () {
             app._$stepBtns.on('click', function () {
                 app.utils.steppedOptionHandler(_$(this));
             });
-            app._$fromTempBtn.on('click', function () {
+            _$('.at-from-template').on('click', function () {
                 var $this = _$(this);
                 app.utils.steppedOptionHandler($this);
-                app.ct.toggleTempState(false);
+                // Set editing state to false
+                // app.ct.toggleTempState(false);
                 app.ct.loadExistingTemp();
             });
             app._$addTempArea.on('click', app.ct.createTempBlockData);
@@ -1446,9 +1489,9 @@ _$(document).ready(function () {
             app._$body.on('click', '.text-editor-option button', app.ct.setSelectedOption);
             app._$templateName.on('keyup blur', app.ct.validateTemplateName);
             app._$toggleElTriggers.on('click', app.ct.toggleElements);
-            app._$delComponentBtn.on('click', app.ct.delTempBlock);
-            app._$editComponentBtn.on('click', app.ct.editTempBlock);
-            app._$stopComponentBtn.on('click', app.ct.stopTempBlock);
+            _$('#at-remove-component').on('click', app.ct.delTempBlock);
+            _$('#at-update-component').on('click', app.ct.editTempBlock);
+            _$('#at-stop-update-component').on('click', app.ct.stopTempBlock);
             app._$body.on('click', 'button[data-action=remove-tb-from-tbg]', function () {
                 _$(this).parent().remove();
                 if (_$('#at-text-block-group-list li').length > 0) {
@@ -1456,6 +1499,7 @@ _$(document).ready(function () {
                 }
             });
             app._$body.on('click', 'button[data-action=edit-tb-from-tbg]', function () {
+                // Passing true hides the parent's additional block
                 app.ct.handleTbgState(true);
                 app.ct.editBlockFromGroup(_$(this));
             });

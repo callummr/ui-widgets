@@ -41,40 +41,58 @@ _$(document).ready(function(){
 	app.fontColours		=	[
 								{
 									rgb:       '140,198,63',
-									cmyk:      '54,0,99,0',
+									cmyk:      '50,0,100,0',
 									name:  	   'Light Green',
 									className: 'color-light-green',
 									isDefault: true // This setting is required for when creating a template we can set a default
 								},
 								{
 									rgb:       '0,162,70',
-									cmyk:      '84,9,100,1',
+									cmyk:      '94,0,100,0',
 									name:  	   'Mid Green',
 									className: 'color-mid-green'
 								},
 								{
 									rgb:       '0,92,70',
-									cmyk:      '90,39,76,33',
+									cmyk:      '100,0,75,45',
 									name:  	   'Dark Green',
 									className: 'color-dark-green'
 								},
 								{
 									rgb:       '104,44,136',
-									cmyk:      '74,99,7,1',
-									name:  	   'Purple',
+									cmyk:      '53,99,0,0',
+									name:  	   'Pop Purple',
 									className: 'color-purple'
 								},
 								{
 									rgb:       '241,131,21',
-									cmyk:      '2,59,100,0',
-									name:  	   'Orange',
+									cmyk:      '0,60,100,0',
+									name:  	   'Pop Orange',
 									className: 'color-orange'
 								},
 								{
 									rgb:       '227,35,51',
-									cmyk:      '5,99,87,1',
-									name:  	   'Red',
+									cmyk:      '0,100,80,0',
+									name:  	   'Pop Red',
 									className: 'color-red'
+								},
+								{
+									rgb:       '154,204,201',
+									cmyk:      '55,0,35,0',
+									name:  	   'Sensitive Turquoise',
+									className: 'color-turquoise'
+								},
+								{
+									rgb:       '140,157,184',
+									cmyk:      '43,30,20,0',
+									name:  	   'Sensitive Lilac',
+									className: 'color-lilac'
+								},
+								{
+									rgb:       '192,97,91',
+									cmyk:      '10,70,60,0',
+									name:  	   'Sensitive Brown',
+									className: 'color-brown'
 								},
 								{
 									rgb:       '0,0,0',
@@ -179,9 +197,9 @@ _$(document).ready(function(){
 	          fin       = response.indexOf(']');
 	      return response.substr(start,fin+1)
 	    },
-	    steppedOptionHandler: function($el){
-	      // console.log($el);
-	      var $this               = $el,
+	    steppedOptionHandler: function(_$el){
+	      // console.log(_$el);
+	      var $this               = _$el,
 	          $activeContainer    = _$('.active-option'),
 	          activeStep          = $activeContainer.data('step'),
 	          btnPrimaryAction    = $this.data('step-action'),
@@ -333,8 +351,8 @@ _$(document).ready(function(){
 							                strokeWidth: app.canvasMargins.bleed,
 							                stroke: 'rgba(205,205,205,0.5)'
 							            });
+
 		  gridLines.push(_bleedarea);
-	      //console.log(gridLines);
 	      _grid = new fabric.Group(gridLines, {
 	                  left: 0,
 	                  top: 0,
@@ -390,8 +408,8 @@ _$(document).ready(function(){
 				 	settings.width  = 561;
 				 	settings.height = 396;
 				}
-				// Set the canvas margin (15mm for standard A4 Documents) / Divided by the canvas scale
-                app.canvasMargins.bleed = Math.ceil(Math.ceil(15 * app.MMtoPxSize) / 2.0174);
+				// Set the canvas margin (10mm for standard A4 Documents) / Divided by the canvas scale
+                app.canvasMargins.bleed = Math.ceil(Math.ceil(10 * app.MMtoPxSize) / 2.0174);
                 // Make the number a multiple of 8, so its fits to the grid properly
                 app.canvasMargins.bleed = Math.ceil(app.canvasMargins.bleed / 8) * 8;
 			}
@@ -1257,10 +1275,10 @@ _$(document).ready(function(){
 	    	// This function checks whether the top position is valid
 	    	var maxTopPos   = canvasHeight - (app.canvasMargins.bleed * 2),
 	    		topPosition = canvasHeight - upperY;
-	    	console.log(maxTopPos, topPosition)
-	    	console.log('DEBUG: Validate Bottom margin: ', topPosition + elHeight > maxTopPos);
-	    	console.log('DEBUG: Validate Top margin: ', topPosition < app.canvasMargins.bleed);
-	    	console.log('DEBUG: Validate Top Position: ', upperY, maxTopPos);
+	    	// console.log(maxTopPos, topPosition)
+	    	// console.log('DEBUG: Validate Bottom margin: ', topPosition + elHeight > maxTopPos);
+	    	// console.log('DEBUG: Validate Top margin: ', topPosition < app.canvasMargins.bleed);
+	    	// console.log('DEBUG: Validate Top Position: ', upperY, maxTopPos);
 	    	if(topPosition + elHeight > maxTopPos){
 	    		// Check the elements position is outside the bottom margin
 	    		return canvasHeight - app.canvasMargins.bleed - elHeight
