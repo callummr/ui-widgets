@@ -123,14 +123,14 @@ _$(document).ready(function(){
 							];
 	app.lineHeights		=   [
 								{
-									lineheight: 75									
+									lineHeight: 75									
 								},
 								{
-									lineheight: 100,
+									lineHeight: 100,
 									isDefault: true // This setting is required for when creating a template we can set a default
 								},
 								{
-									lineheight: 125
+									lineHeight: 125
 								}
 							];
 	
@@ -325,6 +325,14 @@ _$(document).ready(function(){
     		}
         },
 
+        /**
+			UI DOM CHANGES
+        **/
+        setSelectedOption: function () {
+            var $this = _$(this);
+            $this.siblings().removeClass('option-selected').end()
+                 .addClass('option-selected');
+        },
 
 	    /**
 			CREATE CANVAS & CANVAS ELEMENTS FUNCTIONS
@@ -487,155 +495,15 @@ _$(document).ready(function(){
 	    /**
 			CANVAS UPDATE FUNCTIONS
 	    **/
-	    wrapCanvasText: function(t, canvas, maxW, maxH, justify, createNewObj){
-	    	console.log()
-	    	// console.log(maxW);
-	    	// console.log(maxW, maxH)
-	    	// http://jsfiddle.net/maxenko/nyw5myq5/4/light/
-		    if (typeof maxH === "undefined") {
-		        maxH = 0;
-		    }
-		    var words = t.text.split(" ");
-		    var formatted = '';
-
-		    // This works only with monospace fonts
-		    justify = justify || 'left';
-
-		    // clear newlines
-		    var sansBreaks = t.text.replace(/(\r\n|\n|\r)/gm, "");
-		    // console.log(sansBreaks);
-		    // calc line height
-		    var lineHeight = new fabric.Text(sansBreaks, {
-		        fontFamily: t.fontFamily,
-		        fontSize: t.fontSize
-		    }).height;
-
-		    // adjust for vertical offset
-		    var maxHAdjusted = maxH > 0 ? maxH - lineHeight : 0;
-		    var context = canvas.getContext("2d");
-
-
-		    context.font = t.fontSize + "px " + t.fontFamily;
-		    var currentLine = '';
-		    var breakLineCount = 0;
-
-		    // var n = 0;
-
-		    for(var n=0; n < words.length; n++) {
-
-		    // while (n < words.length) {
-		        var isNewLine = currentLine == "";
-		        var testOverlap = currentLine + ' ' + words[n];
-
-		        // are we over width?
-		        var w = context.measureText(testOverlap).width;
-
-		        if (w < maxW) { // if not, keep adding words
-		            if (currentLine != '') currentLine += ' ';
-		            currentLine += words[n];
-		            // formatted += words[n] + ' ';
-		        } else {
-
-		            // if this hits, we got a word that need to be hypenated
-		            if (isNewLine) {
-		                var wordOverlap = "";
-
-		                // test word length until its over maxW
-		                for (var i = 0; i < words[n].length; ++i) {
-
-		                    wordOverlap += words[n].charAt(i);
-		                    var withHypeh = wordOverlap + "-";
-
-		                    if (context.measureText(withHypeh).width >= maxW) {
-		                        // add hyphen when splitting a word
-		                        // withHypeh = wordOverlap.substr(0, wordOverlap.length - 2) + "-";
-		                        withHypeh = wordOverlap.substr(0, wordOverlap.length - 2);
-		                        // update current word with remainder
-		                        words[n] = words[n].substr(wordOverlap.length - 1, words[n].length);
-		                        formatted += withHypeh; // add hypenated word
-		                        break;
-		                    }
-		                }
-		            }
-		            while (justify == 'right' && context.measureText(' ' + currentLine).width < maxW)
-		            currentLine = ' ' + currentLine;
-
-		            while (justify == 'center' && context.measureText(' ' + currentLine + ' ').width < maxW)
-		            currentLine = ' ' + currentLine + ' ';
-
-		            formatted += currentLine + '\n';
-		            breakLineCount++;
-		            currentLine = "";
-
-		            continue; // restart cycle
-		        }
-		        if (maxHAdjusted > 0 && (breakLineCount * lineHeight) > maxHAdjusted) {
-		            // add ... at the end indicating text was cutoff
-		            formatted = formatted.substr(0, formatted.length - 3) + "...\n";
-		            currentLine = "";
-		            break;
-		        }
-		        // n++;
-		    }
-
-		    if (currentLine != '') {
-		        while (justify == 'right' && context.measureText(' ' + currentLine).width < maxW)
-		        currentLine = ' ' + currentLine;
-
-		        while (justify == 'center' && context.measureText(' ' + currentLine + ' ').width < maxW)
-		        currentLine = ' ' + currentLine + ' ';
-
-		        formatted += currentLine + '\n';
-		        breakLineCount++;
-		        currentLine = "";
-		    }
-
-		    // get rid of empy newline at the end
-		    formatted = formatted.substr(0, formatted.length - 1);
-		    // console.log(formatted);
-		    var _canvasobj,
-		    	_objSettings = {
-			        fill: t.fill,	
-                    fontFamily: t.fontFamily,
-                    fontSize: t.fontSize,
-      				hasBorders: true,
-                    hasRotatingPoint: t.hasRotatingPoint,
-                    left: t.left,
-                    lineHeight: t.lineHeight,
-                    lockRotation: t.lockRotation,
-                    lockScalingFlip: t.lockScalingFlip,
-                    originX: t.originX,
-        			originY: t.originY,
-        			selectable: t.selectable,                                         
-                    textAlign: t.textAlign,
-                    top: t.top
-			    };
-
-			// Only return a new obj when creating a text block, when loading or creating a product 
-			if(createNewObj === true){
-				// console.log(t['text-block-type']);
-			    if(typeof(t['text-block-type']) === 'undefined' || t['text-block-type'] === 'text'){
-			    	_canvasobj = new fabric.Text(formatted, _objSettings);
-			    	_canvasobj['textblocktype'] = 'text';
-			    } else{
-			    	_canvasobj = new fabric.IText(formatted, _objSettings);
-			    	_canvasobj['textblocktype'] = 'itext';
-			    }			    
-			    return _canvasobj
-			} else{
-				return formatted
-			}		    
-		},
-		selectCanvasPropertyToEdit: function(_$el){
+		selectCanvasPropertyToEdit: function(_$el, canvasobjId){
 			var updatedVal = _$el.val(),
 				elType	   = _$el.data('canvas-setting-type'),
 				elChecked  = _$el.is(':checked');
 
-			console.log(elType, updatedVal, elChecked);
-
-			app.utils.setDomPropertiesOnEdit(_$el);
-			// Futher dom manipulation is needed when updating the max length value
-		   
+			// console.log(elType, updatedVal, elChecked);
+			// Update the DOM with new values on update
+			app.utils.setDomPropertiesOnEdit(_$el, canvasobjId);
+			// Futher dom manipulation is needed when updating the max length value		   
 			
 			switch(elType) {
 		        case 'bt': // Block Title
@@ -668,7 +536,6 @@ _$(document).ready(function(){
 		            break;
 		        case 'lh':
 		            return {
-		            	lineheight: updatedVal,
 		            	lineHeight: updatedVal / 100
 		            }
 		            break;
@@ -703,40 +570,68 @@ _$(document).ready(function(){
 		        	break;
 		    }
 		},
-		setDomPropertiesOnEdit: function(_$el){
+		setDomPropertiesOnEdit: function(_$el, canvasobjId){
 			var elType 	   = _$el.data('canvas-setting-type'),
 				updatedVal = _$el.val();
 
 		    if(elType === 'ml'){
-		    	var blockId 		= _$el.attr('id').substr(_$el.attr('id').indexOf('_') + 1),
-		    		_$blockTextArea = _$('#text-block-TextBlockG_' + blockId),
-		    		textAreaValue   = _$blockTextArea.val(),
-		    		charsRemaining	= parseInt(updatedVal) - textAreaValue.length;
+		    	console.log(_$el.attr('id'))
+		    	var _$parentBlock	= _$el.closest('[data-prodblockid]'),
+		    		_$blockTextArea,
+		    		textAreaValue,
+		    		charsRemaining;
+
+		    	console.log(_$parentBlock.attr('data-parentblockid'))
+		    	if(_$parentBlock.attr('data-parentblockid')){
+		    		_$blockTextArea = _$parentBlock.find('[id*=text-blockTextBlockG_]');
+		    	} else{
+		    		_$blockTextArea = _$parentBlock.find('[id*=text-blockTextBlock]');
+		    	}
+
+		    	// Checks if the textarea is from a textblock group or a standalone text block
+		    	// console.log(_$('[id*=text-blockTextBlockG_' + blockId + ']').length)
+		    	// if(_$('[id*=text-blockTextBlockG_' + blockId + ']').length > 0){ // _-text-blockTextBlock_2
+		    	// 	_$blockTextArea = _$('[id*=text-blockTextBlockG_' + blockId + ']') 
+		    	// } else{
+		    	// 	_$blockTextArea =  _$('[id*=text-blockTextBlock_' + blockId + ']')
+		    	// }
+		    	// console.log(_$blockTextArea )
+		    	
+		    	// Set the texatrea value and the chars remaining length
+	    		textAreaValue   = _$blockTextArea.val(),
+	    		charsRemaining	= parseInt(updatedVal) - textAreaValue.length;
 
 		    	if(charsRemaining < 0 || isNaN(charsRemaining) ){
 		    		charsRemaining = 0;
 		    	}
+
+		    	_$blockTextArea.next().find('.badge').css('background', 'red');
 
 		    	// Update the UI to show how many characters are left
 		    	_$blockTextArea.next().find('.badge').html(charsRemaining);
 
 		    	// Update the text string so it has the correct number of characters
 		    	textAreaValue = textAreaValue.substr(0, parseInt(updatedVal));
+		    	console.log(charsRemaining, textAreaValue)
 
 		    	// Update the textarea's attribute and value
 		    	_$blockTextArea.attr('maxlength', updatedVal).val(textAreaValue);
 
 		    	// Update the canvas obj with the new text value
-		    	app.utils.setActiveTextBlockText(textAreaValue);
+		    	app.utils.setActiveTextBlockText(textAreaValue, canvasobjId);
 		    }
 		},
-		setActiveTextBlockText: function(objText){
+		setActiveTextBlockText: function(textAreaValue, canvasBlockId){
+			app._activeEditEl = null;
 			// This function updates the relevant canvas obj, after the maxlength control has been changed
-			var _activeObj = app._cp_canvas.getActiveObject();
-			_activeObj.set({
-				text: objText
+			// Set the relevant object to its active state
+            app.cp.setActiveCanvasObj(canvasBlockId);
+            console.log(app._activeEditEl)
+			app._activeEditEl.set({
+				text: textAreaValue,
+				textVal: textAreaValue
 			});
-			_activeObj.setCoords();
+			app._activeEditEl.setCoords();
 			app._cp_canvas.renderAll();
 		},
 
@@ -901,7 +796,7 @@ _$(document).ready(function(){
 	        'isEditable',
 	        'isManditory',
 	        'label',
-	        'lineheight',
+	        'lineHeight',
 	        'maxLength',
 	        'spacing',
 	        'stringSrc',	        
@@ -1032,7 +927,7 @@ _$(document).ready(function(){
 
 	      // Create collection of objects for the JSON, which will be converted to XML
 	      canvasData.forEach(function(el, i) {
-	        // console.log(el);
+	        console.log(el);
 	        // Check if the element has been scaled. If it has then get the scaled value
 	        var scalex        = el.scaleX === 1 ? 1 : el.scaleX,
 	            scaley        = el.scaleY === 1 ? 1 : el.scaleY,
@@ -1076,7 +971,7 @@ _$(document).ready(function(){
 	                                                          '_font-family': tEl.fontFamily,
 	                                                          '_font-size': app.utils.convertPtToPx(tEl.fontSize),
 	                                                          '_id': 'TextBlockG_' + i,
-	                                                          '_leading': tEl.lineheight + '%',
+	                                                          '_leading': tEl.lineHeight + '%',
 	                                                          '_mandatory': tEl.isManditory,
 	                                                          '_textmode': 'multiline',
 	                                                          '_title': tEl.blockTitle                                                     
@@ -1106,7 +1001,7 @@ _$(document).ready(function(){
 	                                    '_font-family': el.fontFamily,
 	                                    '_font-size': app.utils.convertPtToPx(el.fontSize),
 	                                    '_id': 'TextBlock_' + i,
-	                                    '_leading': el.lineheight + '%',
+	                                    '_leading': el.lineHeight + '%',
 	                                    '_lowerleftx': app.utils.calcLowerLeftX(elDimensions),
 	                                    '_lowerlefty': app.utils.calcLowerLeftY(elDimensions),
 	                                    '_mandatory': el.isManditory,
@@ -1166,7 +1061,7 @@ _$(document).ready(function(){
 	      	// Need to update the object names so they dont contain the _[number] prefix so the XML is correct
 	      	xmlOutput = xmlOutput.replace(/text-block-group_[0-9][0-9]?/g, 'text-block-group');
 	      	xmlOutput = xmlOutput.replace(/text-block_[0-9][0-9]?/g, 'text-block');
-	     	 xmlOutput = xmlOutput.replace(/image_[0-9][0-9]?/g, 'image');
+	     	xmlOutput = xmlOutput.replace(/image_[0-9][0-9]?/g, 'image');
 
 	      	// Update the hidden field with the generated XML
 	      	_$('#pdfItemAdmin1_hdnXML').val(xmlOutput);
@@ -1175,6 +1070,11 @@ _$(document).ready(function(){
 
 	      	// console.log(app.templateId);
 	      	console.log(xmlOutput);
+	      	console.log(app.isCreateProduct || app.isUpdateProduct)
+	      	if(app.isCreateProduct || app.isUpdateProduct){
+	      		// Change the lineheight back to a measurement for canvas
+                app.cp.convertObjectLineheights(false);
+	      	}
 
 	      	if(!app.isLocalEnv){
 		      	if(app.isCreateTemplate){
@@ -1337,7 +1237,6 @@ _$(document).ready(function(){
 	    	}
 	    },	    	
 	    validateCanvasTextBlock: function(_block){
-
 	    },
 	    validateDocDimensions: function(docWidth, docHeight){
 	    	console.log(docWidth, docHeight)

@@ -108,12 +108,6 @@
         "XML": ""
     },
     {
-        "Dimensions": "A3,A4,A5 ",
-        "ID": 22,
-        "Name": "Template 15",
-        "XML": ""
-    },
-    {
         "Dimensions": "A3",
         "ID": 22,
         "Name": "Template 22",
@@ -200,7 +194,7 @@
     {
         "Dimensions": "A4",
         "ID": 36,
-        "Name": "Template 36",
+        "Name": "Template 36 Double Sided",
         "XML": ""
     },
     {

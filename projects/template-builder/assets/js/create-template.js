@@ -508,7 +508,7 @@ _$(document).ready(function () {
                     blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : 'left';
                     blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
                     blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
-                    blockSettings.lineheight = typeof (data._leading) !== 'undefined' ? String(data._leading).replace('%', '') : '100';
+                    blockSettings.lineHeight = typeof (data._leading) !== 'undefined' ? String(data._leading).replace('%', '') : '100';
                     blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
                     // Text Block Specific
                     blockSettings.fontColor = app.utils.cmykToRGB(data._colour);
@@ -580,7 +580,7 @@ _$(document).ready(function () {
                             blockSettings.fface = typeof (block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
                             blockSettings.fontColor = app.utils.cmykToRGB(block._colour);
                             blockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 20; // Default font size
-                            blockSettings.lineheight = typeof (block._leading) !== 'undefined' ? String(block._leading).replace('%', '') : '100';
+                            blockSettings.lineHeight = typeof (block._leading) !== 'undefined' ? String(block._leading).replace('%', '') : '100';
                             blockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
                             blockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
                             blockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : '';
@@ -602,7 +602,7 @@ _$(document).ready(function () {
                         blockSettings.fface = typeof (singleBlock['_font-family']) !== 'undefined' ? singleBlock['_font-family'] : 'FuturaBT-Book';
                         blockSettings.fontColor = app.utils.cmykToRGB(singleBlock._colour);
                         blockSettings.fontSize = typeof (singleBlock['_font-size']) !== 'undefined' ? singleBlock['_font-size'] : 20; // Default font size
-                        blockSettings.lineheight = typeof (singleBlock._leading) !== 'undefined' ? String(singleBlock._leading).replace('%', '') : '100';
+                        blockSettings.lineHeight = typeof (singleBlock._leading) !== 'undefined' ? String(singleBlock._leading).replace('%', '') : '100';
                         blockSettings.id = typeof (singleBlock._id) !== 'undefined' ? singleBlock._id : 'false';
                         blockSettings.label = typeof (singleBlock._title) !== 'undefined' ? singleBlock._title : 'false';
                         blockSettings.maxLength = typeof (singleBlock._maxlen) !== 'undefined' ? singleBlock._maxlen : '';
@@ -647,7 +647,7 @@ _$(document).ready(function () {
                     blockSettings.fontColor = 'rgb(' + _$('#at-font-color .option-selected').attr('data-rgb') + ')';
                     blockSettings.fontFamily = _$('#at-font-face .option-selected').data('fface');
                     blockSettings.fontSize = _$('#at-font-size .option-selected').data('size');
-                    blockSettings.lineheight = _$('#at-lineheight .option-selected').data('lineheight');
+                    blockSettings.lineHeight = _$('#at-lineheight .option-selected').data('lineheight');
                     blockSettings.maxLength = _$('#at-maxlength').val();
                     if (_$('#at-source-yes').is(':checked')) {
                         blockSettings.stringSrc = _$('#at-src').val();
@@ -820,7 +820,7 @@ _$(document).ready(function () {
                 _block['fontColor'] = blockSettings.fontColor;
                 _block['fontFamily'] = blockSettings.fontFamily;
                 _block['fontSize'] = parseInt(blockSettings.fontSize);
-                _block['lineheight'] = String(blockSettings.lineheight).replace('%', '');
+                _block['lineHeight'] = String(blockSettings.lineHeight).replace('%', '');
                 _block['maxLength'] = parseInt(blockSettings.maxLength);
                 _block['stringSrc'] = blockSettings.stringSrc;
                 _block['textVal'] = blockSettings.textVal;
@@ -867,7 +867,7 @@ _$(document).ready(function () {
                 _innerblock['isEditable'] = $template.data('editable');
                 _innerblock['isManditory'] = $template.data('manditory');
                 _innerblock['id'] = $template.data('id');
-                _innerblock['lineheight'] = $template.data('lineheight');
+                _innerblock['lineHeight'] = $template.data('lineheight');
                 _innerblock['fontColor'] = $template.data('rgb');
                 _innerblock['fontFamily'] = $template.data('fface');
                 _innerblock['fontSize'] = parseInt($template.data('size'));
@@ -929,7 +929,7 @@ _$(document).ready(function () {
                 _block.fontColor = 'rgb(' + _$('#at-font-color .option-selected').attr('data-rgb') + ')';
                 _block.fontFamily = _$('#at-font-face .option-selected').data('fface');
                 _block.fontSize = _$('#at-font-size .option-selected').data('size');
-                _block.lineheight = _$('#at-lineheight .option-selected').data('lineheight');
+                _block.lineHeight = _$('#at-lineheight .option-selected').data('lineheight');
                 _block.maxLength = _$('#at-maxlength').val();
                 if (typeof (_block.stringSrc) !== 'undefined') {
                     _block.stringSrc = _$('#at-src').val();
@@ -1088,7 +1088,7 @@ _$(document).ready(function () {
                 var rgb = _selectedEl.fontColor.replace('rgb(', '').replace(')', ''),
                     rgbAttr = 'data-rgb="' + rgb + '"',
                     ffaceAttr = 'data-fface="' + _selectedEl.fontFamily + '"',
-                    linehAttr = 'data-lineheight="' + _selectedEl.lineheight + '"';
+                    linehAttr = 'data-lineheight="' + _selectedEl.lineHeight + '"';
 
                 // Color
                 _$('button[' + rgbAttr + ']').siblings().removeClass('option-selected').end()
@@ -1147,7 +1147,7 @@ _$(document).ready(function () {
                     blockDetails.isEditable = _textBlock.isEditable;
                     blockDetails.isManditory = _textBlock.isManditory;
                     blockDetails.label = _textBlock.label;
-                    blockDetails.lineheight = _textBlock.lineheight;
+                    blockDetails.lineHeight = _textBlock.lineHeight;
                     blockDetails.maxLength = _textBlock.maxLength;
                     blockDetails.textVal = _textBlock.textVal;
                     // console.log(blockDetails);
@@ -1309,8 +1309,8 @@ _$(document).ready(function () {
                     defaultOpt = 'reset-to-default option-selected';
                 }
                 lineheightOptionString+= '<button type="button" ';
-                    lineheightOptionString+= 'class="at-control btn btn-default ' + defaultOpt + '" data-lineheight="' + lineHeightOpt.lineheight + '">';
-                    lineheightOptionString+= lineHeightOpt.lineheight + '%';
+                    lineheightOptionString+= 'class="at-control btn btn-default ' + defaultOpt + '" data-lineheight="' + lineHeightOpt.lineHeight + '">';
+                    lineheightOptionString+= lineHeightOpt.lineHeight + '%';
                 lineheightOptionString+= '</button>';
             });
   
@@ -1321,11 +1321,6 @@ _$(document).ready(function () {
         /**
           UI Specific Functions
         **/        
-        setSelectedOption: function () {
-            var $this = _$(this);
-            $this.siblings().removeClass('option-selected').end()
-                 .addClass('option-selected');
-        },
         showTemplates: function (_$el) {
             console.log(_$el);
             var $templateControlsContainer = _$('#template-tools-navigation'),
@@ -1377,7 +1372,7 @@ _$(document).ready(function () {
             blockDetails.isEditable = _$('#at-editable-g').is(':checked') ? true : false;
             blockDetails.isManditory = _$('#at-manditory-g').is(':checked') ? true : false;
             blockDetails.label = _$('#at-text-block-title').val().length > 0 ? _$('#at-text-block-title').val() : 'Text Block ' + blockId;
-            blockDetails.lineheight = _$('#at-lineheight-g .option-selected').data('lineheight');
+            blockDetails.lineHeight = _$('#at-lineheight-g .option-selected').data('lineheight');
             blockDetails.maxLength = _$('#at-maxlength-g').val();
 
             blockHTML = app.ct.textBlockHtmlSnippet(blockDetails);
@@ -1404,7 +1399,7 @@ _$(document).ready(function () {
             htmlString += 'data-size="' + settings.fontSize + '" ';
             htmlString += 'data-id="' + settings.id + '" ';
             htmlString += 'data-label="' + settings.label + '" ';
-            htmlString += 'data-lineheight="' + settings.lineheight + '" ';
+            htmlString += 'data-lineheight="' + settings.lineHeight + '" ';
             htmlString += 'data-manditory="' + settings.isManditory + '" ';
             htmlString += 'data-maxlength="' + settings.maxLength + '">';
             htmlString += '<span class="badge">' + settings.label + '</span>';
@@ -1510,7 +1505,7 @@ _$(document).ready(function () {
                 app.ct.toggleTempGroupOpts(false);
                 app.ct.resetGroupTextBlock();
             });
-            app._$body.on('click', '.text-editor-option button', app.ct.setSelectedOption);
+            app._$body.on('click', '.text-editor-option button', app.utils.setSelectedOption);
             app._$templateName.on('keyup blur', app.ct.validateTemplateName);
             app._$toggleElTriggers.on('click', app.ct.toggleElements);
             _$('#at-remove-component').on('click', app.ct.delTempBlock);
