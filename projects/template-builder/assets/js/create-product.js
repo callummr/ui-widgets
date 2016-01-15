@@ -737,11 +737,13 @@ _$(document).ready(function () {
             var fromTextSrc = typeof (cTBSettings.stringSrc) === 'undefined' ? true : false,
                 _ptblock;
 
+            console.log(app.canvasScale);
+
             _ptblock = new fabric.Textbox(cTBSettings.textVal, {
                 editable: fromTextSrc, // If from a source the text cant be edited
                 fill: cTBSettings.fontColor,
                 fontFamily: cTBSettings.fontFamily,
-                fontSize: app.utils.convertPtToPx(parseInt(cTBSettings.fontSize)) * app.canvasScale,
+                fontSize: app.utils.convertPtToPx(cTBSettings.fontSize) * app.canvasScale, 
                 hasBorders: true,
                 hasRotatingPoint: false,
                 height: cTBSettings.height,
@@ -756,9 +758,7 @@ _$(document).ready(function () {
             });
 
             // console.log(_ptblock)
-
-            // console.log(cTBSettings)
-        
+            // console.log(cTBSettings)        
 
             // Add additional block proprties to the newly formatted block;
             _ptblock['blocktype'] = cTBSettings.blocktype;
@@ -1501,22 +1501,6 @@ _$(document).ready(function () {
                 }
             }
         },
-        convertObjectLineheights: function(convertToForLeading){
-            // Convert all of the text values 
-            var _textBlockObjs = app._cp_canvas._objects.filter(function(_obj){
-                return _obj.blocktype === 'new-text-block'
-            });
-
-            if(convertToForLeading){
-                _textBlockObjs.forEach(function(_textBlock){
-                    _textBlock.lineHeight = parseInt(_textBlock.lineHeight) * 100;
-                });
-            } else{
-                _textBlockObjs.forEach(function(_textBlock){
-                    _textBlock.lineHeight = parseInt(_textBlock.lineHeight) / 100;
-                });
-            }            
-        },
 
         /**
 			ASSET LIBRARY CONTROLS
@@ -1696,8 +1680,8 @@ _$(document).ready(function () {
         createImageBlockAssetList: function () {
             // Check if there is any assetBlock JSON
             var blockAssetJSON = JSON.stringify(app._$blockAssetsJSONel.val());
-            // console.log(blockAssetJSON, blockAssetJSON !== '[]');
-            if (blockAssetJSON !== '[]') {
+            console.log(blockAssetJSON);
+            if (blockAssetJSON !== '[]' && blockAssetJSON !== '""') {
                 blockAssetJSON = JSON.parse(app._$blockAssetsJSONel.val());
                 _$('[data-block-type=block-item]').each(function (i) {
                     var _$this = _$(this),
@@ -1973,8 +1957,8 @@ _$(document).ready(function () {
         },
         createUserSettings: function (id, editable, manditory, fromTbg) {
             var userSettings = '',
-	    		isEditable = editable.toLowerCase() === 'true' && typeof (editable) !== 'undefined' ? 'checked' : '',
-	    		isManditory = manditory.toLowerCase() === 'true' && typeof (manditory) !== 'undefined' ? 'checked' : '',
+	    		isEditable = typeof(editable) !== 'undefined' && editable.toLowerCase() === 'true' ? 'checked' : '',
+	    		isManditory = typeof(manditory) !== 'undefined' && manditory.toLowerCase() === 'true' ? 'checked' : '',
                 idGroupString = fromTbg ? 'Group' : '';
 
             userSettings += '<div class="col-md-6">';
@@ -2228,8 +2212,8 @@ _$(document).ready(function () {
                 app.cp.isCreateNewTemplateRequired();
                 // Create JSON for each image block
                 app.cp.createImageBlockAssetJSON();
-                // Change the lineheight to a percentage
-                app.cp.convertObjectLineheights(true);
+                // // Change the lineheight to a percentage
+                // app.cp.convertObjectFontSettings(true);
                 // Generate the Canvas's JSON and then group any text block groups into groups.
                 var _flattenedCanvasData = app.utils.generateFlattendedJSON(app.utils.generateJSON(app._cp_canvas));
                 // Create a preview image on the page of what is on the canvas

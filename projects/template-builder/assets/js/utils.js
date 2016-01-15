@@ -22,6 +22,7 @@ _$(document).ready(function(){
 	app.mmSize          = 0.2645833333333; // 1px > 1mm
 	app.MMtoPxSize      = 3.779527559055; // 1mm > 1px
 	app.ptToPxSize		= 1.333333333333; // 1pt > 1px
+	app.pxToPtSize		= 0.75; // 1px > 1pt
 
 	// Template Creation Settings/Values
 	app.orientation;
@@ -244,8 +245,13 @@ _$(document).ready(function(){
 	    	return Math.floor(width * app.mmSize)
 	    },	    
 	    convertPtToPx: function(size){
-	    	// console.log( 'convertPtToPx: ' +  Math.round(parseInt(size) * app.ptToPxSize) )
+	    	console.log(size, app.ptToPxSize, size * app.ptToPxSize)
+	    	console.log( 'convertPtToPx: ' +  Math.round(parseInt(size) * app.ptToPxSize) )
 	    	return Math.round(parseInt(size) * app.ptToPxSize)
+	    },
+	    convertPxToPt: function(size){
+	    	console.log(Math.round((parseInt(size) * app.pxToPtSize) / app.canvasScale))
+	    	return Math.round((parseInt(size) * app.pxToPtSize) / app.canvasScale)
 	    },
 	    convertMMtoPX: function(unit, canvasScale){
 	    	// console.log(unit, canvasScale);
@@ -265,6 +271,12 @@ _$(document).ready(function(){
 		    } else{
 		    	return pxUnit
 		    }
+	    },
+	    convertLineheight: function(lineheight){
+
+	    	var wholeNumber = isNaN(lineheight) ? parseInt(lineheight) : lineheight;
+	    	// console.log((wholeNumber * 100).toString()  + '%')
+	    	return (wholeNumber * 100).toString() + '%'
 	    },
 	    setDocumentSize: function(){
 	      // X, Y, % of A4.
@@ -962,16 +974,19 @@ _$(document).ready(function(){
 	            '_verticalalign': el.valign
 	          };
 	          el.objects.forEach(function(tEl, i){
-	            console.log(tEl);
+	            // console.log(tEl);
 	            // Create <text-block>
-	            var textBlockName  = 'text-block_' + i;         
+	            var textBlockName  = 'text-block_' + i,
+	            	fontSize 	   = app.isCreateTemplate ? tEl.fontSize : app.utils.convertPxToPt(tEl.fontSize),
+	            	lineHeight     = app.isCreateTemplate ? tEl.lineHeight + '%' : app.utils.convertLineheight(tEl.lineHeight);
+	            	console.log(fontSize, lineHeight);
 	            baseObj[textBlockGroupName][textBlockName] = {
 	                                                          '_colour': app.utils.rgbToCMYK(tEl.fontColor),
 	                                                          '_editable': tEl.isEditable,
 	                                                          '_font-family': tEl.fontFamily,
-	                                                          '_font-size': app.utils.convertPtToPx(tEl.fontSize),
+	                                                          '_font-size': fontSize,
 	                                                          '_id': 'TextBlockG_' + i,
-	                                                          '_leading': tEl.lineHeight + '%',
+	                                                          '_leading': lineHeight,
 	                                                          '_mandatory': tEl.isManditory,
 	                                                          '_textmode': 'multiline',
 	                                                          '_title': tEl.blockTitle                                                     
@@ -992,16 +1007,19 @@ _$(document).ready(function(){
 	        } else if(el.blocktype === 'new-text-block'){
 	          // If it is a text element that uses an external source, it DOES NOT require a wrapping 'text-block-group'
 	          // Create <text-block>
-	          console.log(el);
-	          var textBlockName  = 'text-block_' + i;
+	          // console.log(el);
+	          var textBlockName  = 'text-block_' + i,
+	          	  fontSize 	     = app.isCreateTemplate ? el.fontSize : app.utils.convertPxToPt(el.fontSize),
+	          	  lineHeight     = app.isCreateTemplate ? el.lineHeight + '%' : app.utils.convertLineheight(el.lineHeight);
+	          	  console.log(fontSize, lineHeight);
 	          baseObj[textBlockName] = {
 	                                    '_align': el.halign,
 	                                    '_colour': app.utils.rgbToCMYK(el.fontColor),
 	                                    '_editable': el.isEditable,
 	                                    '_font-family': el.fontFamily,
-	                                    '_font-size': app.utils.convertPtToPx(el.fontSize),
+	                                    '_font-size': fontSize,
 	                                    '_id': 'TextBlock_' + i,
-	                                    '_leading': el.lineHeight + '%',
+	                                    '_leading': lineHeight,
 	                                    '_lowerleftx': app.utils.calcLowerLeftX(elDimensions),
 	                                    '_lowerlefty': app.utils.calcLowerLeftY(elDimensions),
 	                                    '_mandatory': el.isManditory,
@@ -1070,11 +1088,6 @@ _$(document).ready(function(){
 
 	      	// console.log(app.templateId);
 	      	console.log(xmlOutput);
-	      	console.log(app.isCreateProduct || app.isUpdateProduct)
-	      	if(app.isCreateProduct || app.isUpdateProduct){
-	      		// Change the lineheight back to a measurement for canvas
-                app.cp.convertObjectLineheights(false);
-	      	}
 
 	      	if(!app.isLocalEnv){
 		      	if(app.isCreateTemplate){
