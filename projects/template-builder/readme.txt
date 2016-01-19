@@ -58,3 +58,13 @@ auto  - PDF_fit_textflow( ) will repeatedly be called in blind mode with reduced
         minfontsize)
 clip  - The text will be truncated at the bottom of the fitbox.
 nofit - The text can extend beyond the bottom of the fitbox
+
+
+A4 = 9 > A7 > 
+
+XS =
+S = A4: 17 > A7 > 6
+M =
+L = A4: 24 > A7 > 10
+XL = 
+XXl = 

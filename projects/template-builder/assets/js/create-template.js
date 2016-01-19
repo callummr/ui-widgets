@@ -534,37 +534,41 @@ _$(document).ready(function () {
                 blockSettings.isManditory = 'true' ? true : false;
 
                 // Convert the unit to its equivelant based on an A4
-                data._upperrightx = data._upperrightx / data.scale;
-                data._upperrighty = data._upperrighty / data.scale;
-                data._lowerleftx  = data._lowerleftx / data.scale;
-                data._lowerlefty  = data._lowerlefty / data.scale;
+                // data._upperrightx = data._upperrightx / data.scale;
+                // data._upperrighty = data._upperrighty / data.scale;
+                // data._lowerleftx  = data._lowerleftx / data.scale;
+                // data._lowerlefty  = data._lowerlefty / data.scale;
 
                 // console.log('Before Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
                 
                 // console.log('After Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
                 // Generic block settings
-                var canvasScale     = app.templateType === 'default' ? 2.0174 : 1,
-                    blockDimensions = {},                    
+
+                var stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1,
+                    blockDimensions  = {},
                     canvasWidth     = app._ct_canvas.width,
-                    canvasHeight    = app._ct_canvas.height;
+                    canvasHeight    = app._ct_canvas.height,
+                    upperX           = data._upperrightx / app.canvasScale,
+                    upperY           = data._upperrighty / app.canvasScale,
+                    lowerX           = data._lowerleftx / app.canvasScale,
+                    lowerY           = data._lowerlefty / app.canvasScale;
 
-                // Base of 15 at a3...
-                // 1. Convert a unit into its equivelant it would be in a4. || 15 / 1.4142 (10.60670343657191)
-                // 2. Convert the MM to its Pixel equivelant                || Math.ceil(10.60670343657191 * 3.779527559055) = 41
-                // 3. Convert the that unit to the relevant size based of the scale of the canvas || Math.ceil(41 / 2.0174)  = 21
+                // console.log(stageCanvasScale, data._upperrightx, upperX, app.utils.convertMMtoPX(upperX), app.utils.convertMMtoPX(upperX) / stageCanvasScale, Math.ceil(app.utils.convertMMtoPX(upperX) / stageCanvasScale))
 
-                blockDimensions.upperX = app.utils.convertMMtoPX(data._upperrightx, canvasScale);
-                blockDimensions.upperY = app.utils.convertMMtoPX(data._upperrighty, canvasScale);
-                blockDimensions.lowerX = app.utils.convertMMtoPX(data._lowerleftx, canvasScale);
-                blockDimensions.lowerY = app.utils.convertMMtoPX(data._lowerlefty, canvasScale);
-                
-                blockSettings.height = app.utils.validateHeight(canvasHeight, app.utils.calcHeight(blockDimensions));
-                blockSettings.width  = app.utils.validateWidth(canvasWidth, app.utils.calcWidth(blockDimensions));
+                // Base of 15mm at a3(1.4142 x bigger than A4...
+                // 1. Convert the unit to what it would be at when a4 > 15mm > (15 / 1.4142 = 10.60670343657191)
+                // 2. Convert the MM to its Pixel equivelant || Math.ceil(10.60670343657191 * 3.779527559055) = 41
+                // 3. Convert that unit to the relevant size based of the stageCanvasScale || Math.ceil(41 / 2.0174)  = 21
+
+                blockDimensions.upperX = Math.ceil(app.utils.convertMMtoPX(upperX) / stageCanvasScale);
+                blockDimensions.upperY = Math.ceil(app.utils.convertMMtoPX(upperY) / stageCanvasScale);
+                blockDimensions.lowerX = Math.ceil(app.utils.convertMMtoPX(lowerX) / stageCanvasScale);
+                blockDimensions.lowerY = Math.ceil(app.utils.convertMMtoPX(lowerY) / stageCanvasScale);            
+
+                blockSettings.height = app.utils.calcHeight(blockDimensions);
+                blockSettings.width  = app.utils.calcWidth(blockDimensions);
                 blockSettings.left   = app.utils.validateLeftPos(canvasWidth, blockDimensions.lowerX, blockSettings.width);
                 blockSettings.top    = app.utils.validateTopPos(canvasHeight, blockDimensions.upperY, blockSettings.height);
-                
-                // console.log(blockDimensions);
-                // console.log(blockSettings);
 
                 if (data.block === 'tbg') {
                     var listItems = '',

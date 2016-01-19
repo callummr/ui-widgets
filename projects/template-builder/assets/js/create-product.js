@@ -14,8 +14,6 @@ _$(document).ready(function () {
     app.activeImageBlockId;
     app.canvasScale;
 
-    app.defaultMaxCharLength = 2500;
-
     app._$productBlockList 	  = _$('#product-blocks-list');
     app._$blockAssetLibrary	  = _$('#block-asset-lib');
     app._$saveBlockAssetBtn   = _$('[data-action=save-block-assets]');
@@ -477,85 +475,7 @@ _$(document).ready(function () {
 	    **/
 
         createBlockDataFromXML: function (data) {
-            // console.log(data);
-            var blockType,
-		        blockSettings = {},
-		        blockSize;
-            if (data.block === 'ib') {
-                blockType = 'ib';
-                blockSettings.blocktype = 'new-image-block';
-                blockSettings.blockTitle = typeof (data._title) !== 'undefined' ? data._title : '';
-                blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : '';
-                blockSettings.imgSrc = typeof (data._lowresfilename) !== 'undefined' ? data._lowresfilename : null;
-                blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
-                blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
-                blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : '';
-            } else if (data.block == 'tb') {
-                blockType = 'tb';
-                blockSettings.blocktype = 'new-text-block';
-                blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : 'left';
-                blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
-                blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
-                blockSettings.lineHeight = typeof (data._leading) !== 'undefined' ? data._leading.toString().replace('%', '') : '100';
-                blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
-                // Text Block Specific
-                blockSettings.fontColor = app.utils.cmykToRGB(data._colour);
-                blockSettings.fontFamily = typeof (data['_font-family']) !== 'undefined' ? data['_font-family'] : 'FuturaBT-Book';
-                blockSettings.fontSize = typeof (data['_font-size']) !== 'undefined' ? data['_font-size'] : '12';
-                blockSettings.maxLength = typeof (data._maxlen) !== 'undefined' ? data._maxlen : 5000;
-                blockSettings['text-block-type'] = 'text';
-                if (typeof (data._source) !== 'undefined') {
-                    blockSettings.stringSrc = data._source;
-                } else {
-                    blockSettings.textVal = typeof (data.__text) !== 'undefined' ? data.__text : '';
-                }
-            } else if (data.block === 'tbg') {
-                blockSettings.blocktype = 'new-text-block-group';
-                blockSettings.blockTitle = typeof (data._title) !== 'undefined' ? data._title : '';
-                blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : 'left';
-                blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
-                blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
-                // console.log(data._spacing);
-                blockSettings.spacing = typeof (data._spacing) !== 'undefined' ? data._spacing : 'false';
-                blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
-            }
-            // Set parent id, to the root element
-            blockSettings.blockTitle = typeof (data._title) !== 'undefined' ? data._title : '';
-            // blockSettings.parentId    = typeof(data._id) !== 'undefined' ? data._id : '';
-            blockSettings.id = typeof (data._id) !== 'undefined' ? data._id : '';
-            // Convert to booleans
-            blockSettings.isEditable = 'true' ? true : false;
-            blockSettings.isManditory = 'true' ? true : false;
-
-            // Convert the unit to its equivelant based on an A4
-            // console.log(data);
-            // console.log('Before Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
-            data._upperrightx = data._upperrightx / data.scale;
-            data._upperrighty = data._upperrighty / data.scale;
-            data._lowerleftx = data._lowerleftx / data.scale;
-            data._lowerlefty = data._lowerlefty / data.scale;
-            // console.log('After Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
-            // Generic block settings
-            var canvasScale     = app.templateType === 'default' ? 2.0174 : 1,
-	            blockDimensions = {},
-                canvasWidth     = app._cp_canvas.width,
-                canvasHeight    = app._cp_canvas.height;
-
-            // Base of 15 at a3...
-            // 1. Convert a unit into its equivelant it would be in a4. || 15 / 1.4142 (10.60670343657191)
-            // 2. Convert the MM to its Pixel equivelant                || Math.ceil(10.60670343657191 * 3.779527559055) = 41
-            // 3. Convert the that unit to the relevant size based of the scale of the canvas || Math.ceil(41 / 2.0174)  = 21
-
-            blockDimensions.upperX = app.utils.convertMMtoPX(data._upperrightx, canvasScale);
-            blockDimensions.upperY = app.utils.convertMMtoPX(data._upperrighty,canvasScale);
-            blockDimensions.lowerX = app.utils.convertMMtoPX(data._lowerleftx, canvasScale);
-            blockDimensions.lowerY = app.utils.convertMMtoPX(data._lowerlefty,canvasScale);            
-
-            blockSettings.height = app.utils.calcHeight(blockDimensions);
-            blockSettings.width  = app.utils.calcWidth(blockDimensions);
-            blockSettings.left 	 = app.utils.validateLeftPos(canvasWidth, blockDimensions.lowerX, blockSettings.width);
-            blockSettings.top 	 = app.utils.validateTopPos(canvasHeight, blockDimensions.upperY, blockSettings.height);
-            // console.log(blockDimensions);
+            var blockSettings = app.utils.calcBlockCoords(data, app._cp_canvas.width, app._cp_canvas.height);
             // console.log(blockSettings);
 
             if (data.block === 'ib') {
@@ -576,99 +496,20 @@ _$(document).ready(function () {
                     parentWidth: blockSettings.width,
                     width: blockSettings.width,
                 });
-                // These needs reformatting so it does not get repeated.
+                
                 // This check is required if a textblock group only has 1 text block inside it.
-                var innerBlockSettings = {};
+                var innerBlockSettings;
                 if (typeof (data['text-block']).length !== 'undefined') {
-
                     data['text-block'].forEach(function (block, i) {
-                        // console.log(block);
-                        innerBlockSettings.blocktype = 'new-text-block';
-                        innerBlockSettings.blockTitle = typeof (block._title) !== 'undefined' ? block._title : '';
-                        innerBlockSettings.halign = blockSettings.halign;  // Take from the parent element
-                        innerBlockSettings.isEditable = typeof (block._editable) !== 'undefined' ? block._editable : 'false';
-                        innerBlockSettings.isManditory = typeof (block._mandatory) !== 'undefined' ? block._mandatory : 'false';
-                        innerBlockSettings.fontFamily = typeof (block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
-                        innerBlockSettings.fontColor = app.utils.cmykToRGB(block._colour);
-                        innerBlockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
-                        innerBlockSettings.lineHeight = typeof (block._leading) !== 'undefined' ? block._leading.toString().replace('%', '') : '100';
-                        innerBlockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
-                        innerBlockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
-                        innerBlockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : 5000;
-                        innerBlockSettings.valign = blockSettings.valign;  // Take from the parent element
-                        innerBlockSettings.top = blockSettings.top;     // Take from the parent element
-                        innerBlockSettings.width = blockSettings.width;   // Take from the parent element
-                        innerBlockSettings.left = blockSettings.left;    // Take from the parent element	            
-                        innerBlockSettings.spacing = blockSettings.spacing; // Take from the parent element 
-                        innerBlockSettings.groupPosId = i;
-
-                        // Settings need to pass through additional parent information
-                        innerBlockSettings.parentId = blockSettings.id;
-                        innerBlockSettings.parentTitle = blockSettings.blockTitle;
-                        innerBlockSettings.parentEditable = blockSettings.isEditable;
-                        innerBlockSettings.parentManditory = blockSettings.isManditory;
-                        innerBlockSettings.parentHalign = blockSettings.halign;
-                        innerBlockSettings.parentValign = blockSettings.valign;
-                        innerBlockSettings.parentHeight = blockSettings.height;
-                        innerBlockSettings.parentTop = blockSettings.top;
-                        innerBlockSettings.parentWidth = blockSettings.width;
-
-
-                        //console.log(block._source);
-                        if (typeof (block._source) !== 'undefined' && block._source !== '') {
-                            innerBlockSettings.stringSrc = block._source;
-                        }
-                        if (typeof (block.__text) !== 'undefined') {
-                            innerBlockSettings.textVal = block.__text;
-                        }
-                        // console.log(innerBlockSettings);
+                        innerBlockSettings = app.utils.createInnerTextBlock(block, blockSettings, i)
                         app.cp.createProductTextBlock(innerBlockSettings);
                     });
                 } else {
                     var block = data['text-block'];
-                    // console.log(block);
-                    innerBlockSettings.blocktype = 'new-text-block';
-                    innerBlockSettings.blockTitle = typeof (block._title) !== 'undefined' ? block._title : '';
-                    innerBlockSettings.halign = blockSettings.halign;  // Take from the parent element
-                    innerBlockSettings.isEditable = typeof (block._editable) !== 'undefined' ? block._editable : 'false';
-                    innerBlockSettings.isManditory = typeof (block._mandatory) !== 'undefined' ? block._mandatory : 'false';
-                    innerBlockSettings.fontFamily = typeof (block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
-                    innerBlockSettings.fontColor = app.utils.cmykToRGB(block._colour);
-                    innerBlockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
-                    innerBlockSettings.lineHeight = typeof (block._leading) !== 'undefined' ? block._leading.toString().replace('%', '') : '100';
-                    innerBlockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
-                    innerBlockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
-                    innerBlockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : '';
-                    innerBlockSettings.valign = blockSettings.valign;  // Take from the parent element
-                    innerBlockSettings.top = blockSettings.top;     // Take from the parent element
-                    innerBlockSettings.width = blockSettings.width;   // Take from the parent element
-                    innerBlockSettings.left = blockSettings.left;    // Take from the parent element	            
-                    innerBlockSettings.spacing = blockSettings.spacing; // Take from the parent element	
-
-                    // Settings need to pass through additional parent information
-                    innerBlockSettings.parentId = blockSettings.id;
-                    innerBlockSettings.parentTitle = blockSettings.blockTitle;
-                    innerBlockSettings.parentEditable = blockSettings.isEditable;
-                    innerBlockSettings.parentManditory = blockSettings.isManditory;
-                    innerBlockSettings.parentHalign = blockSettings.halign;
-                    innerBlockSettings.parentValign = blockSettings.valign;
-                    innerBlockSettings.parentHeight = blockSettings.height;
-                    innerBlockSettings.parentTop = blockSettings.top;
-                    innerBlockSettings.parentWidth = blockSettings.width;
-
-
-                    //console.log(block._source);
-                    if (typeof (block._source) !== 'undefined' && block._source !== '') {
-                        innerBlockSettings.stringSrc = block._source;
-                    }
-                    if (typeof (block.__text) !== 'undefined') {
-                        innerBlockSettings.textVal = block.__text;
-                    }
-                    // console.log(innerBlockSettings);
+                    innerBlockSettings = app.utils.createInnerTextBlock(block, blockSettings, 0);                    
                     app.cp.createProductTextBlock(innerBlockSettings);
                 }
             }
-            // console.log(blockSettings);
         },
         createProductImageBlock: function (blockSettings) {
             // Create the fabric js element on the canvas
@@ -734,7 +575,8 @@ _$(document).ready(function () {
             }            
 
             // Create Boolean to test if this block is from a source file or free text
-            var fromTextSrc = typeof (cTBSettings.stringSrc) === 'undefined' ? true : false,
+            var stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1,
+                fromTextSrc = typeof (cTBSettings.stringSrc) === 'undefined' ? true : false,
                 _ptblock;
 
             console.log(app.canvasScale);
@@ -743,7 +585,7 @@ _$(document).ready(function () {
                 editable: fromTextSrc, // If from a source the text cant be edited
                 fill: cTBSettings.fontColor,
                 fontFamily: cTBSettings.fontFamily,
-                fontSize: app.utils.convertPtToPx(cTBSettings.fontSize) * app.canvasScale, 
+                fontSize: Math.ceil(app.utils.convertPtToPx(cTBSettings.fontSize / app.canvasScale) / stageCanvasScale), 
                 hasBorders: true,
                 hasRotatingPoint: false,
                 height: cTBSettings.height,
@@ -776,6 +618,7 @@ _$(document).ready(function () {
             _ptblock['textVal'] = cTBSettings.textVal;
 
             if (typeof (cTBSettings.parentId) !== 'undefined') {
+                var stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1
                 // console.log(cTBSettings.parentHeight, cTBSettings.parentWidth)
                 _ptblock['groupPosId'] = cTBSettings.groupPosId,
                 _ptblock['parentId'] = cTBSettings.parentId.replace(/ /g, ''),
@@ -787,7 +630,7 @@ _$(document).ready(function () {
                 _ptblock['parentHeight'] = cTBSettings.parentHeight;
                 _ptblock['parentTop'] = cTBSettings.parentTop;
                 _ptblock['parentWidth'] = cTBSettings.parentWidth;
-                _ptblock['spacing'] = app.utils.convertMMtoPX(cTBSettings.spacing);
+                _ptblock['spacing'] = Math.ceil(app.utils.convertMMtoPX(cTBSettings.spacing / app.canvasScale) / stageCanvasScale);
             }
 
             if (typeof (cTBSettings.stringSrc) !== 'undefined') {
@@ -2212,8 +2055,6 @@ _$(document).ready(function () {
                 app.cp.isCreateNewTemplateRequired();
                 // Create JSON for each image block
                 app.cp.createImageBlockAssetJSON();
-                // // Change the lineheight to a percentage
-                // app.cp.convertObjectFontSettings(true);
                 // Generate the Canvas's JSON and then group any text block groups into groups.
                 var _flattenedCanvasData = app.utils.generateFlattendedJSON(app.utils.generateJSON(app._cp_canvas));
                 // Create a preview image on the page of what is on the canvas

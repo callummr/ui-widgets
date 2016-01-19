@@ -1,0 +1,87 @@
+/*
+	USER LANDING STYLES
+*/
+
+
+.panel-title a {
+    display: block;
+}
+img{
+	max-width: 100%;
+	height: auto;
+}
+
+
+/* PRODUCT STAGE CLASSES */
+#product-stage-master-container{	
+	background: green;
+}
+#product-stage-master-container.active-outlines .text-block-container,
+#product-stage-master-container.active-outlines .image-block-container{
+	outline: 1px dashed #CCC;
+}
+.product-stage-container{
+	position: relative;
+	margin: auto auto 50px auto;
+	background: #FFF;
+	overflow: hidden;
+	padding: 10px 0;
+	box-shadow: 0 0 10px 1px rgba(0,0,0,0.5)
+}
+.business-card-container{
+	width: 332px;
+	height: 207px;
+}
+.a4-portrait-container{
+	width: 396px;
+	height: 561px;
+}
+.a4-landscape-container{
+	width: 561px;
+	height: 396px;
+}
+
+.text-block-container,
+.image-block-container{
+	position: absolute;
+}
+
+
+.image-block-content-container{
+	position: relative;
+}
+.image-block-container{
+	position: absolute;
+}
+.image-block-content{
+	display: block;
+	position: absolute;
+}
+.image-block-assets-container{
+	max-height: 300px;
+	overflow: auto;
+}
+.uploaded-image{
+	display: none;
+	clear: both;
+}
+.remove-upload-btn{
+	margin-bottom: 10px;
+	display: none;
+	clear: both;
+	max-width: 100px;
+}
+.show-element{
+	display: block;
+}
+
+.text-block-content{
+	word-break: break-word;
+}
+
+[data-action=activate-block-control]:hover{
+	cursor: pointer;
+}
+[data-action=inactive-block-control]:hover{
+	cursor: no-drop;
+}

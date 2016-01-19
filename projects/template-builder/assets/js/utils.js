@@ -25,6 +25,7 @@ _$(document).ready(function(){
 	app.pxToPtSize		= 0.75; // 1px > 1pt
 
 	// Template Creation Settings/Values
+	app.defaultMaxCharLength = 2500;
 	app.orientation;
 	app.templateType    = 'default';
 	app.imagedata;
@@ -38,6 +39,10 @@ _$(document).ready(function(){
 	app.isCreateTemplate = false;
 	app.isCreateProduct  = false;
 	app.isUpdateProduct  = false;
+
+	// Temprory variable. Should be replaced by and Ajax request
+    app.termsAndConditionsString = 'Organised in aid of Macmillan Cancer Support, registered charity in England and Wales (261017), Scotland (SC039907) and the Isle of Man (604). Also operating in Northern Ireland.';
+
 
 	app.fontColours		=	[
 								{
@@ -245,26 +250,18 @@ _$(document).ready(function(){
 	    	return Math.floor(width * app.mmSize)
 	    },	    
 	    convertPtToPx: function(size){
-	    	console.log(size, app.ptToPxSize, size * app.ptToPxSize)
-	    	console.log( 'convertPtToPx: ' +  Math.round(parseInt(size) * app.ptToPxSize) )
+	    	// console.log(size, app.ptToPxSize, size * app.ptToPxSize)
+	    	// console.log( 'convertPtToPx: ' +  Math.round(parseInt(size) * app.ptToPxSize) )
 	    	return Math.round(parseInt(size) * app.ptToPxSize)
 	    },
 	    convertPxToPt: function(size){
 	    	console.log(Math.round((parseInt(size) * app.pxToPtSize) / app.canvasScale))
 	    	return Math.round((parseInt(size) * app.pxToPtSize) / app.canvasScale)
 	    },
-	    convertMMtoPX: function(unit, canvasScale){
+	    convertMMtoPX: function(unit){
 	    	// console.log(unit, canvasScale);
-	    	var pxUnit,
-	    		scale     = typeof(canvasScale) !== 'undefined' ? canvasScale : 1;
 	    	// Multiple the MM unit by it's the MMtoPxSize to get the pixel and then round it up
-	    	pxUnit = Math.ceil(parseInt(unit) * app.MMtoPxSize);
-	    	// console.log( pxUnit );
-	    	// Divide the MM pixel by the scale and then round up.
-	    	pxUnit = Math.ceil(pxUnit / scale);
-
-	    	// console.log(pxUnit, app.canvasMargins.bleed);
-	    	// console.log(pxUnit < app.canvasMargins.bleed);
+	    	var pxUnit = Math.ceil(parseInt(unit) * app.MMtoPxSize);
 
 		    if(pxUnit < 0){
 		        return 0
@@ -273,7 +270,6 @@ _$(document).ready(function(){
 		    }
 	    },
 	    convertLineheight: function(lineheight){
-
 	    	var wholeNumber = isNaN(lineheight) ? parseInt(lineheight) : lineheight;
 	    	// console.log((wholeNumber * 100).toString()  + '%')
 	    	return (wholeNumber * 100).toString() + '%'
@@ -416,7 +412,7 @@ _$(document).ready(function(){
 			}
 
 	    	// Set the width of the canvas based on asset type. All assets use an A4 as a base, except business cards
-			if(docWidth === 85 && docHeight === 55){        
+			if((docWidth >= 85 && docWidth <= 88) && docHeight === 55){        
 				app.templateType  = 'business';
 				settings.width    = 332;
 				settings.height   = 207;
@@ -457,9 +453,11 @@ _$(document).ready(function(){
 			} else if((docWidth === 74 && docHeight === 105) || (docHeight === 74 && docWidth === 105)){
 				// A7 = 74x105 or 105x74
 				app.canvasScale = 0.3536;
-			} else if(docWidth === 85 && docHeight === 55){
+			} else if((docWidth >= 85 && docWidth <= 88) && docHeight === 55){
 				// Business Card = 85x55
 				app.canvasScale = 1;
+			} else{
+                app.canvasScale = 1;
 			}
 			return settings;
 	    },
@@ -477,7 +475,6 @@ _$(document).ready(function(){
 
 	    dimensionlessDocSettings: function(docWidth, docHeight){
 	    	console.log(docWidth, docHeight)
-	    	debugger
 	    	// Set the level of scaling so the when converting the cooridinates to pixels that are accurate      
 			if((docWidth === 420 && docHeight === 594) || (docHeight=== 420 && docWidth === 594)){
 				// A2 = 420x594 or 594x420
@@ -498,10 +495,12 @@ _$(document).ready(function(){
 			} else if((docWidth === 74 && docHeight === 105) || (docHeight === 74 && docWidth === 105)){
 				// A7 = 74x105 or 105x74
 				return ['A7'];
-			} else if(docWidth === 85 && docHeight === 55){
+			} else if((docWidth >= 85 && docWidth <= 88) && docHeight === 55){
 				// Business Card = 85x55
 				return ['Business Card'];
-			}	
+			} else{
+				alert('Invalid dimension')
+			}
 	    },
 	    
 	    /**
@@ -791,7 +790,7 @@ _$(document).ready(function(){
 	    },
 
 	    /**
-      		Functions needed to prepare template for export
+      		Functions needed to prepare template/product for export
 	    **/
 	    generateJSON: function(_canvas){
 	      // Pass through additional attributes to generated JSON
@@ -1145,7 +1144,145 @@ _$(document).ready(function(){
 
 	    /**
 	    	COORDINATE UTIL FUNCTION
-	    **/ 
+	    **/
+	    calcBlockCoords: function (data, canvasWidth, canvasHeight) {
+            // console.log(data);
+            var blockType,
+                blockSettings = {},
+                blockSize;
+            if (data.block === 'ib') {
+                blockType = 'ib';
+                blockSettings.blocktype = 'new-image-block';
+                blockSettings.blockTitle = typeof (data._title) !== 'undefined' ? data._title : '';
+                blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : 'left';
+                blockSettings.imgSrc = typeof (data._lowresfilename) !== 'undefined' ? data._lowresfilename : null;
+                blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
+                blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
+                blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
+            } else if (data.block == 'tb') {
+                blockType = 'tb';
+                blockSettings.blocktype = 'new-text-block';
+                blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : 'left';
+                blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
+                blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
+                blockSettings.lineHeight = typeof (data._leading) !== 'undefined' ? data._leading.toString().replace('%', '') : '100';
+                blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
+                // Text Block Specific
+                blockSettings.fontColor = app.utils.cmykToRGB(data._colour);
+                blockSettings.fontFamily = typeof (data['_font-family']) !== 'undefined' ? data['_font-family'] : 'FuturaBT-Book';
+                blockSettings.fontSize = typeof (data['_font-size']) !== 'undefined' ? data['_font-size'] : '12';
+                blockSettings.maxLength = typeof (data._maxlen) !== 'undefined' ? data._maxlen : app.defaultMaxCharLength;
+                blockSettings['text-block-type'] = 'text';
+                if (typeof (data._source) !== 'undefined') {
+                    blockSettings.stringSrc = data._source;
+                    // Need to set the text value here...
+                    blockSettings.textVal = app.termsAndConditionsString;
+                } else {
+                    blockSettings.textVal = typeof (data.__text) !== 'undefined' ? data.__text : '';
+                }
+            } else if (data.block === 'tbg') {
+                blockSettings.blocktype = 'new-text-block-group';
+                blockSettings.blockTitle = typeof (data._title) !== 'undefined' ? data._title : '';
+                blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : 'left';
+                blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
+                blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
+                // console.log(data._spacing);
+                blockSettings.spacing = typeof (data._spacing) !== 'undefined' ? data._spacing : 'false';
+                blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
+            }
+            // Set parent id, to the root element
+            blockSettings.blockTitle = typeof (data._title) !== 'undefined' ? data._title : '';
+            // blockSettings.parentId    = typeof(data._id) !== 'undefined' ? data._id : '';
+            blockSettings.id     = typeof (data._id) !== 'undefined' ? data._id.replace(/ /g, '') : '';
+            blockSettings.origId = typeof (data._id) !== 'undefined' ? data._id : '';
+            // Convert to booleans
+            blockSettings.isEditable = 'true' ? true : false;
+            blockSettings.isManditory = 'true' ? true : false;
+
+            // Convert the unit to its equivelant based on an A4
+            // console.log(data);
+            // console.log('Before Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
+            // data._upperrightx = data._upperrightx / data.scale;
+            // data._upperrighty = data._upperrighty / data.scale;
+            // data._lowerleftx = data._lowerleftx / data.scale;
+            // data._lowerlefty = data._lowerlefty / data.scale;
+            // console.log('After Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
+            // Generic block settings
+            var stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1,
+                blockDimensions  = {},
+                upperX           = data._upperrightx / app.canvasScale,
+                upperY 			 = data._upperrighty / app.canvasScale,
+                lowerX 			 = data._lowerleftx / app.canvasScale,
+                lowerY 			 = data._lowerlefty / app.canvasScale;
+
+            // console.log(stageCanvasScale, data._upperrightx, upperX, app.utils.convertMMtoPX(upperX), app.utils.convertMMtoPX(upperX) / stageCanvasScale, Math.ceil(app.utils.convertMMtoPX(upperX) / stageCanvasScale))
+
+            // Base of 15mm at a3(1.4142 x bigger than A4...
+            // 1. Convert the unit to what it would be at when a4 > 15mm > (15 / 1.4142 = 10.60670343657191)
+            // 2. Convert the MM to its Pixel equivelant || Math.ceil(10.60670343657191 * 3.779527559055) = 41
+            // 3. Convert that unit to the relevant size based of the stageCanvasScale || Math.ceil(41 / 2.0174)  = 21
+
+            blockDimensions.upperX = Math.ceil(app.utils.convertMMtoPX(upperX) / stageCanvasScale);
+            blockDimensions.upperY = Math.ceil(app.utils.convertMMtoPX(upperY) / stageCanvasScale);
+            blockDimensions.lowerX = Math.ceil(app.utils.convertMMtoPX(lowerX) / stageCanvasScale);
+            blockDimensions.lowerY = Math.ceil(app.utils.convertMMtoPX(lowerY) / stageCanvasScale);            
+
+            console.log('CANVAS DIMENSONS: ' + canvasWidth + ' ' + canvasHeight)
+            blockSettings.height = app.utils.calcHeight(blockDimensions);
+            blockSettings.width  = app.utils.calcWidth(blockDimensions);
+            blockSettings.left   = app.utils.validateLeftPos(canvasWidth, blockDimensions.lowerX, blockSettings.width);
+            blockSettings.top    = app.utils.validateTopPos(canvasHeight, blockDimensions.upperY, blockSettings.height);
+            // console.log(blockDimensions);
+            // console.log(blockSettings);
+            // console.log(data)
+            return blockSettings;
+        },
+        createInnerTextBlock: function(block, blockSettings, i){
+            // console.log(block);
+            var innerBlockSettings = {};
+            innerBlockSettings.blocktype = 'new-text-block';
+            innerBlockSettings.blockTitle = typeof(block._title) !== 'undefined' ? block._title : '';
+            innerBlockSettings.halign = blockSettings.halign;  // Take from the parent element
+            innerBlockSettings.isEditable = typeof(block._editable) !== 'undefined' ? block._editable : 'false';
+            innerBlockSettings.isManditory = typeof(block._mandatory) !== 'undefined' ? block._mandatory : 'false';
+            innerBlockSettings.fontFamily = typeof(block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
+            innerBlockSettings.fontColor = app.utils.cmykToRGB(block._colour);
+            innerBlockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
+            innerBlockSettings.lineHeight = typeof (block._leading) !== 'undefined' ? block._leading.toString().replace('%', '') : '100';
+            innerBlockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
+            innerBlockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
+            innerBlockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : app.defaultMaxCharLength;
+            innerBlockSettings.valign = blockSettings.valign;  // Take from the parent element
+            innerBlockSettings.top = blockSettings.top;     // Take from the parent element
+            innerBlockSettings.width = blockSettings.width;   // Take from the parent element
+            innerBlockSettings.left = blockSettings.left;    // Take from the parent element                
+            innerBlockSettings.spacing = blockSettings.spacing; // Take from the parent element 
+            innerBlockSettings.groupPosId = i;
+
+            // Settings need to pass through additional parent information
+            innerBlockSettings.parentId = blockSettings.id;
+            innerBlockSettings.parentTitle = blockSettings.blockTitle;
+            innerBlockSettings.parentEditable = blockSettings.isEditable;
+            innerBlockSettings.parentManditory = blockSettings.isManditory;
+            innerBlockSettings.parentHalign = blockSettings.halign;
+            innerBlockSettings.parentValign = blockSettings.valign;
+            innerBlockSettings.parentHeight = blockSettings.height;
+            innerBlockSettings.parentTop = blockSettings.top;
+            innerBlockSettings.parentWidth = blockSettings.width;
+
+            //console.log(block._source);
+            if (typeof (block._source) !== 'undefined' && block._source !== '') {
+                innerBlockSettings.stringSrc = block._source;
+            }
+            if (typeof (block.__text) !== 'undefined') {
+                innerBlockSettings.textVal = block.__text;
+            } else{
+                 innerBlockSettings.textVal = '';
+            }
+            // console.log(innerBlockSettings)
+
+            return innerBlockSettings;
+        },
 	    calcLowerLeftX: function(elDimensions){
 	      // Width | Height | Top | Left | DocWidth | DocHeight
 	      return elDimensions[3]
@@ -1229,7 +1366,8 @@ _$(document).ready(function(){
 	    validateMaxLengthTextArea: function(textVal, maxLength, _$targetel){
 	    	// console.log(textVal, maxLength, typeof(maxLength), _$targetel);
 	    	// If a targetElement is set, then update the UI to show the characters remaining
-	    	console.log(typeof(_$targetel) !== 'undefined')
+	    	// console.log(_$targetel)
+	    	// console.log(typeof(_$targetel) !== 'undefined')
 	    	if(typeof(_$targetel) !== 'undefined'){
 	    		if(typeof(textVal.length) === 'undefined'){
 	    			_$targetel.html(maxLength);	
@@ -1266,8 +1404,11 @@ _$(document).ready(function(){
 				return ['A6'] // 105x148 or 148x105
 			} else if((docWidth === 74 && docHeight === 105) || (docHeight === 74 && docWidth === 105)){
 				return ['A7'] // 74x105 or 105x74
-			} else if(docWidth === 85 && docHeight === 55){
+			} else if((docWidth >= 85 || docWidth <= 88) && docHeight === 55){
 				return ['Business Card'] // 85x55
+			} else{
+				console.log('INVALD DOC DIMENSION')
+				return ['A4']
 			}
 	    },
 
