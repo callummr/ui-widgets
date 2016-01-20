@@ -12,7 +12,7 @@ _$(document).ready(function () {
     app._$productStage = _$('#product-stage-master-container');
     app.productStageSize;
     app.defaultImgBlockPath = 'white-block.jpg';
-
+    app.docAssetPath;
    
     // ucp = USER CREATE PRODUCT
     app.ucp = {
@@ -32,14 +32,19 @@ _$(document).ready(function () {
 
             if(app.isLocalEnv){
                 _$.ajax({
-                    url: 'assets/data/data.product1.txt',
+                    // url: 'assets/data/data.product1.txt',
                     // url: 'assets/data/data.product2.txt',
+                    url: 'assets/data/data.product3-a4.txt',
                     dataType: 'text'
                 })
                 .done(function (data) {
                     productData = JSON.parse(data);
                     // console.log(productData)
                     productJSON = x2js.xml_str2json(productData.XML);
+                    if(typeof(productJSON.doc._assetpath) !== 'undefined'){
+                        app.docAssetPath = productJSON.doc._assetpath;
+                    }
+                    console.log(productJSON)
                     productJSON = productJSON.doc.page;
 
                     // Set the products details
@@ -152,7 +157,7 @@ _$(document).ready(function () {
             }
         },
         createProductPageStages: function(counter){
-            app._$productStage.append('<div class="product-stage-container" id="product-stage-' + counter + '"> </div>');
+            app._$productStage.append('<div class="product-stage-container" id="product-stage-' + counter + '"></div>');
         },
         createProductHTMLBlocks: function(pageData, multiplePage){
 
@@ -165,6 +170,11 @@ _$(document).ready(function () {
             if(multiplePage){
                 app.pageCounter++;
                 blockListingString+= '<div><hr><h2>Page:' + app.pageCounter +'</h2><hr></div>';
+            }
+
+            // Set the stage background if one has been set
+            if(typeof(app.docAssetPath) !== 'undefined' && typeof(pageData.pdf._highresfilename) !== 'undefined'){
+                app.ucp.createStageBackgroundFromPDF(app.docAssetPath, pageData.pdf._highresfilename);
             }
 
             // console.log(pageData)
@@ -250,8 +260,9 @@ _$(document).ready(function () {
                         app.ucp.createProductCanvasStage(imgBlock);
                     });
                 }
-            }
+            } 
 
+            // Add the markup to the page 
             _$('#product-blocks-container').append(blockListingString);
         },
         createProductCanvasStage: function (data) {
@@ -327,6 +338,39 @@ _$(document).ready(function () {
 
             return innerBlockSettings;
         },
+        createStageBackgroundFromPDF:function(assetPath, assetName){
+            var imgData,
+                width  = app.productStageSize.width + 'px',
+                height = app.productStageSize.height + 'px',
+                pdfBackgroundString = '',
+                widthStyle = 'width:' + width + ';',
+                heightStyle = 'height:' + height + ';',
+                zIndexStyle = 'z-index:' + app.zIndexCounter + ';',
+                imgStyleString = widthStyle + heightStyle + zIndexStyle;
+
+            // Need to call and API to convert a PDF to an image.
+            // This can't be done server side due to browser support
+            // _$.ajax({
+            //     url: imgUrl
+            // })
+            // .done(function(data){
+            //     console.log(data)
+            // })
+            // .fail(function(data){
+            //     console.log(data)
+            // })
+            if(app.isLocalEnv){
+                pdfBackgroundString+= '<img src="assets/pdfs/' + assetName.replace('.pdf', '.jpg') + '" class="pdf-background" style="' + imgStyleString + '" />';
+            } else{
+                pdfBackgroundString+= '<img src="' + assetName.replace('.pdf', '.jpg') + '" class="pdf-background" style="' + imgStyleString + '" />';
+            }  
+
+            var stageId = app.pageCounter > 0 ? (app.pageCounter-1).toString() : '0';
+            console.log(pdfBackgroundString)
+            _$('#product-stage-' + stageId).append(pdfBackgroundString);
+            // Increment the zIndex counter
+            app.zIndexCounter++;
+        },
 
 
         // HTML TEMPLATES:
@@ -363,8 +407,6 @@ _$(document).ready(function () {
         },
         createImageBlockSettings: function(imageBlock){
             // console.log(imageBlock, imageBlock._highresfilename)
-
-
             var imgBlockString = '',
                 imgRef         = imageBlock._highresfilename,
                 hasImgSet      = typeof(imgRef) !== 'undefined' && imgRef !== 'null' && imgRef === 'string' ? true : false,

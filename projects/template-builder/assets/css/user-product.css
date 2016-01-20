@@ -14,7 +14,8 @@ img{
 
 /* PRODUCT STAGE CLASSES */
 #product-stage-master-container{	
-	background: green;
+	background: #F0F0F0;
+	padding: 30px 0;
 }
 #product-stage-master-container.active-outlines .text-block-container,
 #product-stage-master-container.active-outlines .image-block-container{
@@ -22,11 +23,13 @@ img{
 }
 .product-stage-container{
 	position: relative;
-	margin: auto auto 50px auto;
+	margin: auto;
 	background: #FFF;
 	overflow: hidden;
-	padding: 10px 0;
 	box-shadow: 0 0 10px 1px rgba(0,0,0,0.5)
+}
+.product-stage-container + .product-stage-container{
+	margin-top: 50px;
 }
 .business-card-container{
 	width: 332px;
@@ -39,6 +42,10 @@ img{
 .a4-landscape-container{
 	width: 561px;
 	height: 396px;
+}
+
+.pdf-background{
+	display: block;
 }
 
 .text-block-container,
