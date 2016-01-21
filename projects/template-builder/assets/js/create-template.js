@@ -402,8 +402,6 @@ _$(document).ready(function () {
         setTemplateDetails: function () {
             var _$orientationDetail = _$('#template-orientation');
             // Set the template name
-            // When validation is enabled, the below line can be uncommented.
-            // app._$templateName.text(app.templateName);
             app._$templateName.text(app.templateName);
 
             // Store the set document varaitions sizes to an array
@@ -508,13 +506,13 @@ _$(document).ready(function () {
                     blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : 'left';
                     blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
                     blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
-                    blockSettings.lineHeight = typeof (data._leading) !== 'undefined' ? String(data._leading).replace('%', '') : '100';
+                    blockSettings.lineHeight = typeof (data._leading) !== 'undefined' ? String(data._leading).replace('%', '') : app.defaultLineHeight;
                     blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
                     // Text Block Specific
                     blockSettings.fontColor = app.utils.cmykToRGB(data._colour);
-                    blockSettings.fontFamily = typeof (data['_font-family']) !== 'undefined' ? data['_font-family'] : 'FuturaBT-Heavy';
-                    blockSettings.fontSize = typeof (data['_font-size']) !== 'undefined' ? data['_font-size'] : '12';
-                    blockSettings.maxLength = typeof (data._maxlen) !== 'undefined' ? data._maxlen : '';
+                    blockSettings.fontFamily = typeof (data['_font-family']) !== 'undefined' ? data['_font-family'] : app.defaultFontFace;
+                    blockSettings.fontSize = typeof (data['_font-size']) !== 'undefined' ? data['_font-size'] : app.defaultFontSize;
+                    blockSettings.maxLength = typeof (data._maxlen) !== 'undefined' ? data._maxlen : app.defaultMaxCharLength;
                     if (typeof (data._source) !== 'undefined') {
                         blockSettings.stringSrc = data._source;
                     } else {
@@ -534,18 +532,12 @@ _$(document).ready(function () {
                 blockSettings.isManditory = 'true' ? true : false;
 
                 // Convert the unit to its equivelant based on an A4
-                // data._upperrightx = data._upperrightx / data.scale;
-                // data._upperrighty = data._upperrighty / data.scale;
-                // data._lowerleftx  = data._lowerleftx / data.scale;
-                // data._lowerlefty  = data._lowerlefty / data.scale;
-
-                // console.log('Before Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
-                
+                // console.log('Before Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);                
                 // console.log('After Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
-                // Generic block settings
 
-                var stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1,
-                    blockDimensions  = {},
+                // UPDATE 
+
+                var blockDimensions  = {},
                     canvasWidth     = app._ct_canvas.width,
                     canvasHeight    = app._ct_canvas.height,
                     upperX           = data._upperrightx / app.canvasScale,
@@ -553,17 +545,21 @@ _$(document).ready(function () {
                     lowerX           = data._lowerleftx / app.canvasScale,
                     lowerY           = data._lowerlefty / app.canvasScale;
 
-                // console.log(stageCanvasScale, data._upperrightx, upperX, app.utils.convertMMtoPX(upperX), app.utils.convertMMtoPX(upperX) / stageCanvasScale, Math.ceil(app.utils.convertMMtoPX(upperX) / stageCanvasScale))
+                if(typeof(app.stageCanvasScale) === 'undefined'){
+                    app.stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1
+                }
+
+                // console.log(app.stageCanvasScale, data._upperrightx, upperX, app.utils.convertMMtoPX(upperX), app.utils.convertMMtoPX(upperX) / app.stageCanvasScale, Math.ceil(app.utils.convertMMtoPX(upperX) / app.stageCanvasScale))
 
                 // Base of 15mm at a3(1.4142 x bigger than A4...
                 // 1. Convert the unit to what it would be at when a4 > 15mm > (15 / 1.4142 = 10.60670343657191)
                 // 2. Convert the MM to its Pixel equivelant || Math.ceil(10.60670343657191 * 3.779527559055) = 41
-                // 3. Convert that unit to the relevant size based of the stageCanvasScale || Math.ceil(41 / 2.0174)  = 21
+                // 3. Convert that unit to the relevant size based of the app.stageCanvasScale || Math.ceil(41 / 2.0174)  = 21
 
-                blockDimensions.upperX = Math.ceil(app.utils.convertMMtoPX(upperX) / stageCanvasScale);
-                blockDimensions.upperY = Math.ceil(app.utils.convertMMtoPX(upperY) / stageCanvasScale);
-                blockDimensions.lowerX = Math.ceil(app.utils.convertMMtoPX(lowerX) / stageCanvasScale);
-                blockDimensions.lowerY = Math.ceil(app.utils.convertMMtoPX(lowerY) / stageCanvasScale);            
+                blockDimensions.upperX = Math.ceil(app.utils.convertMMtoPX(upperX) / app.stageCanvasScale);
+                blockDimensions.upperY = Math.ceil(app.utils.convertMMtoPX(upperY) / app.stageCanvasScale);
+                blockDimensions.lowerX = Math.ceil(app.utils.convertMMtoPX(lowerX) / app.stageCanvasScale);
+                blockDimensions.lowerY = Math.ceil(app.utils.convertMMtoPX(lowerY) / app.stageCanvasScale);            
 
                 blockSettings.height = app.utils.calcHeight(blockDimensions);
                 blockSettings.width  = app.utils.calcWidth(blockDimensions);
@@ -581,13 +577,13 @@ _$(document).ready(function () {
                             // console.log(block);
                             blockSettings.isEditable = typeof (block._editable) !== 'undefined' ? block._editable : 'false';
                             blockSettings.isManditory = typeof (block._mandatory) !== 'undefined' ? block._mandatory : 'false';
-                            blockSettings.fface = typeof (block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
+                            blockSettings.fface = typeof (block['_font-family']) !== 'undefined' ? block['_font-family'] : app.defaultFontFace;
                             blockSettings.fontColor = app.utils.cmykToRGB(block._colour);
-                            blockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 20; // Default font size
-                            blockSettings.lineHeight = typeof (block._leading) !== 'undefined' ? String(block._leading).replace('%', '') : '100';
+                            blockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : app.app.defaultFontSize;
+                            blockSettings.lineHeight = typeof (block._leading) !== 'undefined' ? String(block._leading).replace('%', '') : app.defaultLineHeight;
                             blockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
                             blockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
-                            blockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : '';
+                            blockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : app.defaultMaxCharLength;
                             if (typeof (block._source) !== 'undefined') {
                                 blockSettings.stringSrc = block._source;
                             }
@@ -603,13 +599,13 @@ _$(document).ready(function () {
                         // console.log(block);
                         blockSettings.isEditable = typeof (singleBlock._editable) !== 'undefined' ? singleBlock._editable : 'false';
                         blockSettings.isManditory = typeof (singleBlock._mandatory) !== 'undefined' ? singleBlock._mandatory : 'false';
-                        blockSettings.fface = typeof (singleBlock['_font-family']) !== 'undefined' ? singleBlock['_font-family'] : 'FuturaBT-Book';
+                        blockSettings.fface = typeof (singleBlock['_font-family']) !== 'undefined' ? singleBlock['_font-family'] : app.defaultFontFace;
                         blockSettings.fontColor = app.utils.cmykToRGB(singleBlock._colour);
-                        blockSettings.fontSize = typeof (singleBlock['_font-size']) !== 'undefined' ? singleBlock['_font-size'] : 20; // Default font size
-                        blockSettings.lineHeight = typeof (singleBlock._leading) !== 'undefined' ? String(singleBlock._leading).replace('%', '') : '100';
+                        blockSettings.fontSize = typeof (singleBlock['_font-size']) !== 'undefined' ? singleBlock['_font-size'] : app.defaultFontSize;
+                        blockSettings.lineHeight = typeof (singleBlock._leading) !== 'undefined' ? String(singleBlock._leading).replace('%', '') : app.defaultLineHeight;
                         blockSettings.id = typeof (singleBlock._id) !== 'undefined' ? singleBlock._id : 'false';
                         blockSettings.label = typeof (singleBlock._title) !== 'undefined' ? singleBlock._title : 'false';
-                        blockSettings.maxLength = typeof (singleBlock._maxlen) !== 'undefined' ? singleBlock._maxlen : '';
+                        blockSettings.maxLength = typeof (singleBlock._maxlen) !== 'undefined' ? singleBlock._maxlen : app.defaultMaxCharLength;
                         if (typeof (singleBlock._source) !== 'undefined') {
                             blockSettings.stringSrc = singleBlock._source;
                         }
@@ -1418,16 +1414,17 @@ _$(document).ready(function () {
         /** 
           Validation
         **/
-        validateTemplateName: function () {
-            app._$newTempBtn.removeAttr('disabled');
-            app.templateName = _$.trim(_$(this).val());
-            // var $this = _$(this);
-            // if($this.val().length > 2){
-            //   app._$newTempBtn.removeAttr('disabled');
-            //   );
-            // }else{
-            //   app._$newTempBtn.attr('disabled', 'disabled');
-            // }
+        validateTemplateName: function () {            
+            var _$this = _$(this),
+                trimmedVal = _$.trim(_$this.val());
+
+            console.log(trimmedVal)
+            if(trimmedVal.length > 2){
+              app._$newTempBtn.removeAttr('disabled');
+            }else{
+              app._$newTempBtn.attr('disabled', 'disabled');
+            }
+            app.templateName = trimmedVal;
         },
         validateDocSize: function () {
             var $this = _$(this),
@@ -1475,21 +1472,28 @@ _$(document).ready(function () {
 
             // Bind to dom elements to functions
             app._$reserCreateTemp.on('click', app.ct.resetTemplate);
+
             app._$tempActionBtn.on('click', app.ct.createTempInit);
 
             app._$tmplToggleBtn = _$('.template-container [data-action=toggle-grid]');
+
             app._$tmplToggleBtn.on('click', function () {
                 app.utils.toggleCanvasGrid(_$(this), false, app._ct_canvas);
             });
+
             _$('.template-container [data-action=download-thumbnail]').on('click', function () {
                 console.log(app._ct_canvas);
                 app.utils.convertCanvasToImgDownload(_$(this), app._ct_canvas);
             });
+
             app._$documentSizeBtns.on('click', app.ct.validateDocSize);
+
             app._$newTempBtn.on('click', app.ct.createNewTemp);
+
             app._$stepBtns.on('click', function () {
                 app.utils.steppedOptionHandler(_$(this));
             });
+
             _$('.at-from-template').on('click', function () {
                 var $this = _$(this);
                 app.utils.steppedOptionHandler($this);
@@ -1498,29 +1502,41 @@ _$(document).ready(function () {
                 app.ct.loadExistingTemp();
             });
             app._$addTempArea.on('click', app.ct.createTempBlockData);
+
             app._$addBlockToGroup.on('click', function () {
                 app.ct.toggleTempGroupOpts();
                 app.ct.resetGroupTextBlock();
             });
+
             app._$saveBlockToGroup.on('click', app.ct.toggleTempGroupOpts);
+
             app._$updateTbBtn.on('click', app.ct.updateBlockFromGroup);
+
             app._$stopTbBtn.on('click', app.ct.stopBlockFromGroup);
+
             app._$exitBlockToGroup.on('click', function () {
                 app.ct.toggleTempGroupOpts(false);
                 app.ct.resetGroupTextBlock();
             });
             app._$body.on('click', '.text-editor-option button', app.utils.setSelectedOption);
-            app._$templateName.on('keyup blur', app.ct.validateTemplateName);
+
+            _$('#new-template-name').on('keyup blur', app.ct.validateTemplateName);
+
             app._$toggleElTriggers.on('click', app.ct.toggleElements);
+
             _$('#at-remove-component').on('click', app.ct.delTempBlock);
+
             _$('#at-update-component').on('click', app.ct.editTempBlock);
+
             _$('#at-stop-update-component').on('click', app.ct.stopTempBlock);
+
             app._$body.on('click', 'button[data-action=remove-tb-from-tbg]', function () {
                 _$(this).parent().remove();
                 if (_$('#at-text-block-group-list li').length > 0) {
                     _$('#at-text-block-group-list li').removeAttr('style');
                 }
             });
+
             app._$body.on('click', 'button[data-action=edit-tb-from-tbg]', function () {
                 // Passing true hides the parent's additional block
                 app.ct.handleTbgState(true);

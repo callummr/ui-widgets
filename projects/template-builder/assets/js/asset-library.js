@@ -3,78 +3,77 @@ var app = app || {};
 // Required to use _$ instead of $ to do a multiple versions of jquery being loaded.
 // jQueryConflict is set in the utils file
 
-_$(document).ready(function() {
+_$(document).ready(function () {
 
     app.Categories = null;
     app.tags = null;
     app.assetType = "S";
     app.assetTheme = null;
+    app.BaseUrl;
 
     app.al = {
-        initAssetLibrary: function() {
+        initAssetLibrary: function () {
             app.al.bindAssetLibraryDOMEvents();
-            var BaseUrl;
             if (!app.isLocalEnv && typeof(app.isLocalEnv) !== 'undefined') {
-                BaseUrl = globalUrls.assetBaseUrl;
+                app.BaseUrl = globalUrls.assetBaseUrl;
             }
         },
 
         /**
-        DOM MANIPULATION
+            DOM MANIPULATION
         **/
-        toggleAssetLibFeatures: function() {
+        toggleAssetLibFeatures: function () {
             var _$this = _$(this),
                 targetElId = _$this.data('targetid');
 
             _$('[data-id=' + targetElId + ']').removeClass('hidden').siblings('div').addClass('hidden');
         },
+
+
         /**
-        UI HANDLERS
+            UI HANDLERS
         **/
-        bindAssetLibraryDOMEvents: function() {
+        bindAssetLibraryDOMEvents: function () {
             _$('[data-action=toggle-asset-lib-functions]').on('click', app.al.toggleAssetLibFeatures);
-            _$('[data-action=search-asset-lib]').on('click', function(event) { app.al.searchAssets("lib"); });
-            _$('[data-action=search-asset-prod]').on('click', function(event) { app.al.searchAssets("prod"); });
+            _$('[data-action=search-asset-lib]').on('click', function (event) { app.al.searchAssets("lib"); });
+            _$('[data-action=search-asset-prod]').on('click', function (event) { app.al.searchAssets("prod"); });
             _$('[data-action=init-add-new-asset]').on('click', app.al.LoadPopup);
         },
-        SetThemes: function() {
+        SetThemes: function () {
 
             if (app.Categories == null) {
-                _$.get(BaseUrl + "AssetTheme.ashx", function(data, status) {
+                _$.get(app.BaseUrl + "AssetTheme.ashx", function (data, status) {
 
-                        app.Categories = app.al.ExtractJSON(data);
+                    app.Categories = app.al.ExtractJSON(data);
 
-                        var html = app.al.CreateDropDown(app.Categories, "AssetThemeId", "ThemeName");
+                    var html = app.al.CreateDropDown(app.Categories, "AssetThemeId", "ThemeName");
 
-                        app.assetTheme = app.Categories[0]["AssetThemeId"];
+                    app.assetTheme = app.Categories[0]["AssetThemeId"];
 
-                        _$("#themes").append(html);
-                    }
+                    _$("#themes").append(html);
+                }
                 );
             } else {
                 var html = app.al.CreateDropDown(app.Categories, "AssetThemeId", "ThemeName");
                 _$("#themes").append(html);
             }
         },
-        CreateDropDown: function(Vals, KeyField, ValueField) {
-            var Html = '<select class="form-control" id="themesList">';
-            var Option = "<option value={0}>{1}</option>";
+        CreateDropDown: function (Vals, KeyField, ValueField) {
+            var selectHTML = '<select class="form-control" id="themesList">',
+                optionHTML = "<option value={0}>{1}</option>";
 
             for (var i = 0; i < Vals.length; i++) {
-
-                Html += Option.replace("{0}", Vals[i][KeyField]).replace("{1}", Vals[i][ValueField]);
+                selectHTML += optionHTML.replace("{0}", Vals[i][KeyField]).replace("{1}", Vals[i][ValueField]);
             }
 
-            return Html += "</select>"
+            return selectHTML += "</select>"
         },
-        LoadPopup: function() {
-
+        LoadPopup: function () {
             console.log('load upload');
-
             _$.colorbox({
                 href: "AddAsset.html",
                 scrolling: false,
-                onOpen: function() {
+                onOpen: function () {
                     // make the overlay visible and re-add all it's original properties!
                     _$('#cboxOverlay').css({
                         'visibility': 'visible',
@@ -83,43 +82,40 @@ _$(document).ready(function() {
                     });
                     _$('#colorbox').css({ 'visibility': 'visible' }).fadeIn(1000);
                 },
-                onComplete: function() {
+                onComplete: function () {
                     _$(this).colorbox.resize();
                     app.al.SetupSave();
                 }
             });
-            //_$(".ajax").colorbox();
         },
-        ExtractJSON: function(value) {
-
+        ExtractJSON: function (value) {
             var JSONString = value.substring(0, value.lastIndexOf(']') + 1);
             return _$.parseJSON(JSONString);
         },
-        GetAssetTypeString: function(typeId) {
-
+        GetAssetTypeString: function (typeId) {
             if (typeId == "1") {
                 return "Silhouette";
             }
             return "Headline";
         },
-        LoadUsage: function(id) {
-
-            _$.ajax({
-                url: BaseUrl + "Asset.ashx",
+        LoadUsage: function (id) {
+             _$.ajax({
+                url: app.BaseUrl + "Asset.ashx",
                 type: "get", //send it through get method
-                data: { cmd: "assetUsage", assetId: id },
-                success: function(response) {
-
+                data: {
+                    cmd: "assetUsage",
+                    assetId: id
+                },
+                success: function (response) {
                     console.log("asset usage: " + response);
 
-                    var results = app.al.ExtractJSON(response);
-
-                    var htmlList = app.al.BuildAssetUsage(results);
+                    var results = app.al.ExtractJSON(response),
+                        htmlList = app.al.BuildAssetUsage(results);
 
                     _$.colorbox({
                         html: htmlList,
                         scrolling: false,
-                        onOpen: function() {
+                        onOpen: function () {
                             // make the overlay visible and re-add all it's original properties!
                             _$('#cboxOverlay').css({
                                 'visibility': 'visible',
@@ -128,7 +124,7 @@ _$(document).ready(function() {
                             });
                             _$('#colorbox').css({ 'visibility': 'visible' }).fadeIn(1000);
                         },
-                        onComplete: function() {
+                        onComplete: function () {
                             _$(this).colorbox.resize();
                             app.al.SetupSave();
                         }
@@ -138,13 +134,13 @@ _$(document).ready(function() {
 
             console.log("loading usage: " + id);
         },
-        BuildAssetUsage: function(data) {
+        BuildAssetUsage: function (data) {
 
             //    var thumbPath = '/be/SharedAssets/th1/';
             var resultsString = '<ul id="asset-lib-item-list" class="clearfix list-group">';
 
             // For each result, create a list item that can be used by the user to select the image asset
-            _$.each(data, function(key, value) {
+            _$.each(data, function (key, value) {
                 resultsString += '<li class="list-group-item">';
                 resultsString += '<label for="item_' + value.ItemId + '" class="asset-lib-label"></label>';
                 resultsString += '<span class="asset-lib-item-name">Product Item ' + value.Description + '</span>';
@@ -157,13 +153,13 @@ _$(document).ready(function() {
 
             return resultsString += "</ul>";
         },
-        BuildAssetQuickGrid: function(results) {
+        BuildAssetQuickGrid: function (results) {
 
             var thumbPath = globalUrls.smallThumbFolder;
             var resultsString = "";
 
             // For each result, create a list item that can be used by the user to select the image asset
-            _$.each(results, function(key, value) {
+            _$.each(results, function (key, value) {
                 resultsString += '<li class="list-group-item">';
                 resultsString += '<input type="checkbox" name="block-asset-item" id="asset_' + value.AssetId + '" ';
                 resultsString += 'class="hidden asset-lib-selection-checkbox" value="' + value.AssetId + '">';
@@ -176,7 +172,7 @@ _$(document).ready(function() {
 
             return resultsString;
         },
-        BuildAssetGrid: function(results) {
+        BuildAssetGrid: function (results) {
 
             console.log('in table build');
 
@@ -229,71 +225,128 @@ _$(document).ready(function() {
 
             return TableHeader + Html + '</table>';
         },
-        SetupSave: function() {
+        SetupSave: function () {
 
             app.al.SetThemes();
 
-            //***************     ASSET CREATE  ***************************
-            _$('#btnFileUpload').fileupload({
-                url: BaseUrl + "Asset.ashx",
-                dataType: 'json',
-                //formData: { tags: string },
-                add: function(e, data) {
-                    var that = this;
+            var files;
 
-                    _$.blueimp.fileupload.prototype.options.add.call(that, e, data);
-
-                    app._$body.on('click', '#btnSave', function() {
-
-                        data.submit();
-
-                    });
-                },
-                error: function(e) {
-                    console.log(e);
-                    if (e.status === 200) {
-                        alert('Asset Saved');
-                        /*
-                        Add a form reset function
-                        */
-                    } else {
-                        alert('Asset upload failed');
-                    }
-                },
-                success: function() {
-                    alert('Asset Saved');
-                    /*
-                    Add a form reset function
-                    */
-                }
-            }).bind('fileuploadsubmit', function(e, data) {
-                console.log('event has fired');
-                data.formData = { tags: app.tags, type: app.assetType, theme: app.assetTheme };
+            _$('#btnFileUpload').on('change', function (event) {
+                files = event.target.files;
             });
-            app._$body.on('keyup', '#txtTag', function() {
+
+            _$('#frmUplAsset').on('submit', function (e) {
+
+                e.stopPropagation();
+                e.preventDefault();
+
+                var xhr = new XMLHttpRequest();
+
+                // Open the connection.
+                xhr.open('POST', app.BaseUrl + 'Asset.ashx', true);
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        // File(s) uploaded.
+                        // uploadButton.innerHTML = 'Upload';
+                    } else {
+                        alert('An error occurred!');
+                    }
+                };
+
+                var formData = new FormData();
+
+                formData.append('tags', app.tags);
+                formData.append('type', app.assetType);
+                formData.append('theme', app.assetTheme);
+
+                _$.each(files, function (key, value) {
+                    formData.append(key, value);
+                });
+
+                xhr.send(formData);
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            alert('Asset Saved');
+                        } else {
+                            alert('Asset upload failed');
+                        }
+                    }
+                };
+            });
+
+            //***************     ASSET CREATE  ***************************
+            //_$('#btnFileUpload').fileupload({
+            //    url: app.BaseUrl + "Asset.ashx",
+            //    dataType: 'json',
+            //    //formData: { tags: string },
+            //    add: function (e, data) {
+            //        var that = this;
+
+            //        _$.blueimp.fileupload.prototype.options.add.call(that, e, data);
+
+            //        app._$body.on('click', '#btnSave', function () {
+
+            //            data.submit();
+
+            //        });
+            //    },
+            //    error: function (e) {
+            //        console.log(e);
+            //        if (e.status === 200) {
+            //            alert('Asset Saved');
+            //            //
+            //            //Add a form reset function
+            //            //
+            //        } else {
+            //            alert('Asset upload failed');
+            //        }
+            //    },
+            //    success: function () {
+            //        alert('Asset Saved');
+            //        //
+            //        //Add a form reset function
+            //        //
+            //    }
+            //})
+
+            //    .bind('fileuploadsubmit', function (e, data) {
+            //    console.log('event has fired');
+            //    data.formData = { tags: app.tags, type: app.assetType, theme: app.assetTheme };
+            //});
+
+            app._$body.on('keyup', '#txtTag', function () {
                 app.tags = _$(this).val();
             });
-            app._$body.on('change', 'input:radio[name=AssetType]', function() {
+
+            app._$body.on('change', 'input:radio[name=AssetType]', function () {
                 app.assetType = _$(this).val();
             });
-            app._$body.on('change', '#themes', function() {
+
+            app._$body.on('change', '#themes', function () {
                 app.assetTheme = _$(this).find('option:selected').val();
             });
         },
-        searchAssets: function(Populate) {
+        searchAssets: function (Populate) {
 
-            var SearchTitleTagID = _$('#search-text').val();
-            var SearchType = _$('#search-type').val();
-            var SearchCategory = _$('#searchCategory').val();
+            var SearchTitleTagID = _$('#search-text').val(),
+                SearchType = _$('#search-type').val(),
+                SearchCategory = _$('#searchCategory').val();
 
             if (SearchCategory === undefined)
                 SearchCategory = _$('#pdfItemAdmin1_searchCategory option:selected').val();
 
             _$.ajax({
-                url: BaseUrl + "Asset.ashx",
+                url: app.BaseUrl + "Asset.ashx",
                 type: "get", //send it through get method
-                data: { ttid: SearchTitleTagID, t: SearchType, c: SearchCategory },
-                success: function(response) {
+                data: {
+                    ttid: SearchTitleTagID,
+                    t: SearchType,
+                    c: SearchCategory
+                },
+                success: function (response) {
 
                     var results = app.al.ExtractJSON(response);
 

@@ -13,6 +13,7 @@ _$(document).ready(function () {
     app.productStageSize;
     app.defaultImgBlockPath = 'white-block.jpg';
     app.docAssetPath;
+    app.rotatedElements = [];
    
     // ucp = USER CREATE PRODUCT
     app.ucp = {
@@ -88,11 +89,10 @@ _$(document).ready(function () {
 
             // If the docDimensions is empty, then manually set it. The old templates do not have associated doc dimensions
             if(productDimension !== ''){
-                app.docDimensions = productDimension.replace(' ', '').split(',');
-                console.log()
+                app.docDimensions = productDimension.replace(' ', '').split(',');                
             } else{
                 app.docDimensions = app.utils.validateDocDimensions(pageWidth, pageHeight);
-            }                
+            }
 
             // Set Product Name
             _$('#product-name').html(productName);
@@ -121,6 +121,8 @@ _$(document).ready(function () {
                 if(pageWidth > pageHeight){
                     // Set the class on the product stage
                     app._$productStage.find('.product-stage-container').addClass('a4-landscape-container');
+                    // Set the page orientation to landscape
+                    app.orientation = 'l';
                     // Set the Stage Size
                     app.productStageSize =  {
                                                 width: 561,
@@ -129,15 +131,23 @@ _$(document).ready(function () {
                 } else{
                     // Set the class on the product stage
                     app._$productStage.find('.product-stage-container').addClass('a4-portrait-container');
+                    // Set the page orientation to portrait
+                    app.orientation = 'p';
                     // Set the Stage Size
                     app.productStageSize =  {
                                                 width: 396,
                                                 height: 561
                                             }
-                }                
+                }
+                // Set the stage to doucment size Scale
+                app.stageCanvasScale = 2.0174;
+                // Set the margins 
+                app.utils.setCanvasBleedSettings(10);
             } else{
-                 // Set the template type being used
+                // Set the template type being used
                 app.templateType = 'business';
+                // Set the page orientation to landscape
+                app.orientation = 'l';
                 // Set the class on the product stage
                 app._$productStage.find('.product-stage-container').addClass('business-card-container');
                 // Set the Stage Size
@@ -145,7 +155,15 @@ _$(document).ready(function () {
                                             width: 85,
                                             height: 55
                                         }
+                // Set the stage to doucment size Scale
+                app.stageCanvasScale = 1;
+                // Set the margins 
+                app.utils.setCanvasBleedSettings(5);
             }
+
+            // Set the canvasScale. Needs to be called after app.templateType & app.orientation have been set
+            app.canvasScale = app.utils.setDocumentSizeandScale()[2];
+            // console.log(app.canvasScale)   
 
             // Check if is a single page or multiple pages before creating HTML BLOCKS and PRODUCT STAGE
             if(isSinglePage){
@@ -159,11 +177,7 @@ _$(document).ready(function () {
         createProductPageStages: function(counter){
             app._$productStage.append('<div class="product-stage-container" id="product-stage-' + counter + '"></div>');
         },
-        createProductHTMLBlocks: function(pageData, multiplePage){
-
-            // This needs to be set dynamically / A3
-            app.canvasScale = 1.4142;
-
+        createProductHTMLBlocks: function(pageData, multiplePage){           
             var blockListingString = '',
                 productCanvasString = '';
 
@@ -191,17 +205,14 @@ _$(document).ready(function () {
                             textBlockGroup['text-block'].forEach(function(textBlock){
                                 // console.log(textBlock)
                                 textBlock['block'] = 'tb';
-                                textBlock['scale'] = app.canvasScale;
                                 blockListingString+= app.ucp.createTextBlockSettings(textBlock);
                             });
                         } else{
                             // console.log(textBlockGroup['text-block'])
                             pageData['text-block-group']['text-block']['block'] = 'tb';
-                            textBlockGroup['text-block']['scale'] = app.canvasScale;
                             blockListingString+= app.ucp.createTextBlockSettings(textBlockGroup['text-block']);                            
                         } 
                         textBlockGroup['block'] = 'tbg';
-                        textBlockGroup['scale'] = app.canvasScale;
                         app.ucp.createProductCanvasStage(textBlockGroup);                      
                     });                    
                 } else {                    
@@ -211,17 +222,15 @@ _$(document).ready(function () {
                         pageData['text-block-group']['text-block'].forEach(function (textBlock) {
                             // console.log(textBlock)
                             textBlock['block'] = 'tbg';
-                            textBlock['scale'] = app.canvasScale;
                             blockListingString+= app.ucp.createTextBlockSettings(textBlock);
                         });
                     } else{
                         // console.log(pageData['text-block-group']['text-block'])
                         pageData['text-block-group']['text-block']['block'] = 'tbg';
-                        pageData['text-block-group']['text-block']['scale'] = app.canvasScale;
+                        // pageData['text-block-group']['text-block']['scale'] = app.canvasScale;
                         blockListingString+= app.ucp.createTextBlockSettings(pageData['text-block-group']['text-block']);
                     }
                     pageData['text-block-group']['block'] = 'tbg';
-                    pageData['text-block-group']['scale'] = app.canvasScale;
                     app.ucp.createProductCanvasStage(pageData['text-block-group']);
                 }
             }
@@ -230,14 +239,12 @@ _$(document).ready(function () {
                 if (typeof (pageData['text-block'].length) === 'undefined') {
                     // Only a single text block
                     pageData['text-block']['block'] = 'tb';
-                    pageData['text-block']['scale'] = app.canvasScale;
                     blockListingString+= app.ucp.createTextBlockSettings(pageData['text-block']);
                     app.ucp.createProductCanvasStage(pageData['text-block']);
                 } else {
                     // Multiple text blocks
                     pageData['text-block'].forEach(function (textBlock) {
                         textBlock['block'] = 'tb';
-                        textBlock['scale'] = app.canvasScale;
                         blockListingString+= app.ucp.createTextBlockSettings(textBlock);
                         app.ucp.createProductCanvasStage(textBlock);
                     });
@@ -248,14 +255,12 @@ _$(document).ready(function () {
                 if (typeof (pageData['image'].length) === 'undefined') {
                     // Only a single image block
                     pageData['image']['block'] = 'ib';
-                    pageData['image']['scale'] = app.canvasScale;
                     blockListingString+= app.ucp.createImageBlockSettings(pageData['image']);
                     app.ucp.createProductCanvasStage(pageData['image']);
                 } else {
                     // Multiple image blocks
                     pageData['image'].forEach(function (imgBlock) {
                         imgBlock['block'] = 'ib';
-                        imgBlock['scale'] = app.canvasScale;
                         blockListingString+= app.ucp.createImageBlockSettings(imgBlock);
                         app.ucp.createProductCanvasStage(imgBlock);
                     });
@@ -264,9 +269,13 @@ _$(document).ready(function () {
 
             // Add the markup to the page 
             _$('#product-blocks-container').append(blockListingString);
+
+            // Rotate any items that need to be rotated
+            app.ucp.rotateDomElements();
         },
         createProductCanvasStage: function (data) {
             var blockSettings = app.utils.calcBlockCoords(data, app.productStageSize.width, app.productStageSize.height);
+            console.log(blockSettings)
             // console.log(data)
             if (data.block === 'ib') {
                 app.ucp.createProductStageImgBlock(blockSettings);
@@ -366,14 +375,16 @@ _$(document).ready(function () {
             }  
 
             var stageId = app.pageCounter > 0 ? (app.pageCounter-1).toString() : '0';
-            console.log(pdfBackgroundString)
+            // console.log(pdfBackgroundString)
             _$('#product-stage-' + stageId).append(pdfBackgroundString);
             // Increment the zIndex counter
             app.zIndexCounter++;
         },
 
 
-        // HTML TEMPLATES:
+        /**
+            HTML TEMPLATES:
+        **/
         createTextBlockSettings: function(textBlock){
             // console.log(textBlock)
             // TO DO: replace textvalue with an ajax request
@@ -395,8 +406,8 @@ _$(document).ready(function () {
                     textBlockString+= '<button type="button" class="btn btn-info pull-top-right" data-action="show-product-block" ';
                         textBlockString+= 'data-blockid="' + blockId + '">V</button>';
                     textBlockString+= '<div class="ucp-block-container hidden" data-blockid="' + blockId + '">';
-                        textBlockString+= '<textarea id="textarea_' + blockId +'" class="form-control" data-blockid="' + blockId + '" ';
-                            textBlockString+= 'data-action="update-text-block-control" maxlength="' + maxlength + '" >' + textValue +'</textarea>';
+                        textBlockString+= '<textarea id="textarea_' + blockId +'" class="form-control" data-blockid="' + blockId + '" data-originalid="' +  textBlock._id + '" ';
+                            textBlockString+= 'data-action="update-text-block-control" maxlength="' + maxlength + '">' + textValue +'</textarea>';
                         textBlockString+= '<p>Characters remaining: <span class="badge">' + charsRemaning +'</span></p>';
                         textBlockString+= '<hr><button type="button" class="btn btn-warning" data-action="close-product-block">Close</button>';
                     textBlockString+= '</div>';
@@ -438,7 +449,8 @@ _$(document).ready(function () {
                     if(hasImgSet){
                         imgBlockString+= '<div class="image-block-assets-container">';
                             imgBlockString+= '<a href="#" data-action="update-image-block-control" data-blockid="' + blockId + '" class="active-image-selection">';
-                                imgBlockString+= '<img src="' + imgUrl + '" alt="' + imageBlock._title + '- Image Asset" class="">';
+                                imgBlockString+= '<img src="' + imgUrl + '" alt="' + imageBlock._title + '- Image Asset" class="" ';
+                                    imgBlockString+= 'data-originalid="' + imageBlock._id + '">';
                             imgBlockString+= '</a>';
                             // HANDLE BLOCK ASSETS
                             if(typeof(app.userBlockAssets.length) !== 'undefined'){
@@ -511,7 +523,7 @@ _$(document).ready(function () {
             
             // Add ARIA ROLES
             stageImgBlockString+= '<div class="image-block-container" style="' + parentStyleString + '">';
-                stageImgBlockString+= '<div class="image-block-content-container" style="' + parentWidth + parentHeight +'">';
+                stageImgBlockString+= '<div class="image-block-content-container" style="' + parentWidth + parentHeight +'" data-rotationid="' + blockSettings.id + '">';
                     stageImgBlockString+= '<img src="' + imgUrl +'" alt="' + blockSettings.blockTitle + ' - Image" class="image-block-content" ';
                         stageImgBlockString+= 'data-action="activate-block-control" data-blockid="' + blockSettings.id + '" ';
                         stageImgBlockString+= 'style="' + childStyleString + '" />';
@@ -523,25 +535,32 @@ _$(document).ready(function () {
 
             // Increment the zIndex counter
             app.zIndexCounter++;
+
+            if(blockSettings.orientation !== 'undefined'){
+                app.rotatedElements.push({
+                    id: blockSettings.id, 
+                    orientation: blockSettings.orientation
+                })
+            }
         },
         createProductStageTextBlock: function(blockSettings){
             console.log(blockSettings)
             var stageTextBlockString = '',
-                stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1,
                 valign,
                 halign,
                 parentWidth,
                 parentHeight,
                 fontColor     = 'color:' + blockSettings.fontColor + ';',
-                fontUnit      = Math.ceil(app.utils.convertPtToPx(parseInt(blockSettings.fontSize)) / app.canvasScale) / stageCanvasScale,
+                fontUnit      = Math.ceil((app.utils.convertPtToPx(parseInt(blockSettings.fontSize)) / app.canvasScale) / app.stageCanvasScale),
                 fontSize      = 'font-size:' + fontUnit + 'px;',
                 fontFamily    = 'font-family:' + blockSettings.fontFamily + ';',
                 lineHeight    = 'line-height:' + parseInt(blockSettings.lineHeight) / 100 + ';',
+                marginBottom  = 'margin-bottom:0;',
                 zIndex        =  'z-index:' + app.zIndexCounter + ';',
-                styleString   = fontColor + fontSize + fontFamily + lineHeight + zIndex,
+                styleString   = fontColor + fontSize + fontFamily + lineHeight + marginBottom + zIndex,
                 isfromSrc     = typeof(blockSettings.stringSrc) !== 'undefined' ? true : false,
                 isNotEditable = typeof(blockSettings.isEditable) !== 'undefined' && blockSettings.isEditable.toString().toLowerCase() === 'false' ? true : false,
-                controlString = '';
+                controlString = '';                
 
             if(!isfromSrc && !isNotEditable){
                 controlString = 'data-action="activate-block-control"';
@@ -564,11 +583,13 @@ _$(document).ready(function () {
             }
 
             // Add ARIA ROLES
-            stageTextBlockString+= '<div class="text-block-container" ';
-                stageTextBlockString+= 'style="width:' + blockSettings.width + 'px;height:' + blockSettings.height + 'px;top:' + blockSettings.top + 'px;left:' + blockSettings.left + 'px;">';
-                stageTextBlockString+= '<div style="' + halign +'">';
-                    stageTextBlockString+= '<p ' + controlString +' data-blockid="' + blockSettings.id + '" ';
-                        stageTextBlockString+= 'class="text-block-content" style="' + styleString + valign + halign + '">' + blockSettings.textVal + '</p>';
+            stageTextBlockString+= '<div class="text-block-container" data-rotateparent="' + blockSettings.id + '" ';
+                    stageTextBlockString+= 'style="width:' + blockSettings.width + 'px;height:' + blockSettings.height + 'px;top:' + blockSettings.top + 'px;left:' + blockSettings.left + 'px;">';
+                stageTextBlockString+= '<div class="text-block-inner-wrapper">';
+                    stageTextBlockString+= '<div style="' + halign +'" data-rotationid="' + blockSettings.id + '">';
+                        stageTextBlockString+= '<p ' + controlString +' data-blockid="' + blockSettings.id + '" ';
+                            stageTextBlockString+= 'class="text-block-content" style="' + styleString + valign + halign + '">' + blockSettings.textVal + '</p>';
+                    stageTextBlockString+= '</div>';
                 stageTextBlockString+= '</div>';
             stageTextBlockString+= '</div>';
 
@@ -576,6 +597,13 @@ _$(document).ready(function () {
             _$('#product-stage-' + stageId).append(stageTextBlockString);
             // Increment the zIndex counter
             app.zIndexCounter++;
+
+            if(blockSettings.orientation !== 'undefined'){
+                app.rotatedElements.push({
+                    id: blockSettings.id, 
+                    orientation: blockSettings.orientation
+                })
+            }
         },
         createProductStageTextBlockFromGroup: function(blockSettings){
             // console.log(blockSettings);
@@ -613,11 +641,11 @@ _$(document).ready(function () {
                 });
             } else{
                 innerTextBlocksString+= app.ucp.createProductStageInnerTextBlock(blockSettings.textBlocks[0], blockSettings.spacing);
-            }   
+            }
 
             // Combine the parent container string and the inner textblocks string
             // Add ARIA ROLES
-            stageTextBlockString+= '<div class="text-block-container" style="' + parentStyleString +'">';
+            stageTextBlockString+= '<div class="text-block-container" style="' + parentStyleString +'" data-rotationid="' + blockSettings.id + '">';
                 stageTextBlockString+= innerTextBlocksString;
             stageTextBlockString+= '</div>';
 
@@ -626,16 +654,22 @@ _$(document).ready(function () {
 
             // Increment the zIndex counter
             app.zIndexCounter++;
+
+            if(blockSettings.orientation !== 'undefined'){
+                app.rotatedElements.push({
+                    id: blockSettings.id, 
+                    orientation: blockSettings.orientation
+                })
+            }
         },
         createProductStageInnerTextBlock: function(block, spacing){
             // console.log(spacing)
             var innerTextBlockString = '',
-                stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1,
                 display      = block.textVal.length ? 'display: block;' : 'display: none;',           
-                spacingUnit  = Math.ceil(app.utils.convertMMtoPX(parseInt(spacing) / app.canvasScale) / stageCanvasScale),
+                spacingUnit  = Math.ceil(app.utils.convertMMtoPX(parseInt(spacing) / app.canvasScale) / app.stageCanvasScale),
                 marginBottom = 'margin-bottom:' + spacingUnit + 'px;',
                 fontColor    = 'color:' + block.fontColor + ';',
-                fontUnit     = Math.ceil(app.utils.convertPtToPx(parseInt(block.fontSize) / app.canvasScale) / stageCanvasScale),
+                fontUnit     = Math.ceil((app.utils.convertPtToPx(parseInt(block.fontSize)) / app.canvasScale) / app.stageCanvasScale),
                 fontSize     = 'font-size:' + fontUnit + 'px;',
                 fontFamily   = 'font-family:' + block.fontFamily + ';',
                 lineHeight   = 'line-height:' + parseInt(block.lineHeight) / 100 + ';',
@@ -668,14 +702,20 @@ _$(document).ready(function () {
                 app._$productStage.addClass(activeClass)
                 _$this.addClass(activeClass);
             }
+            // Removes the highlighted text effect from any active text block
+            _$('p[data-action=activate-block-control').removeClass('hightlight-selected-text');
         },
         toggleProductBlock: function(blockId, openBlock){
             // console.log(blockId, openBlock)
             if(openBlock){
                 _$('.ucp-block-container').addClass('hidden');                
                 _$('.ucp-block-container[data-blockid='+ blockId +']').removeClass('hidden');
+                if(_$('.ucp-block-container[data-blockid='+ blockId +'] textarea').length){
+                    _$('.ucp-block-container[data-blockid='+ blockId +'] textarea').focus(); 
+                }
             } else{
-                _$('.ucp-block-container').addClass('hidden'); 
+                _$('.ucp-block-container').addClass('hidden');
+                _$('p[data-action=activate-block-control').removeClass('hightlight-selected-text');
             }
         },
         updateStageTextField: function(textVal, blockId){
@@ -759,7 +799,59 @@ _$(document).ready(function () {
             _$this.removeClass(activeClass);
             // Show the upload field again
            _$uploadField.show();
+        },
+        rotateDomElements: function(){
+            var rotationDeg;
 
+            app.rotatedElements.forEach(function(rotateEl){
+                var _$rotationEl = _$('[data-rotationid=' + rotateEl.id +']'),
+                    parentWidth  = _$rotationEl.closest('[data-rotateparent=' + rotateEl.id +']').width(),
+                    parentHeight = _$rotationEl.closest('[data-rotateparent=' + rotateEl.id +']').height(),
+                    cssSettings;
+
+                if(rotateEl.orientation === 'west'){
+                    rotationDeg = -90;
+                    cssSettings = {
+                        width: parentHeight,
+                        height: parentWidth,
+                        marginTop: parentHeight,
+                        position: 'absolute'
+                    }
+                } else if(rotateEl.orientation === 'east'){
+                    rotationDeg = 90;
+                    cssSettings = {
+                        width: parentHeight,
+                        height: parentWidth,
+                        marginTop: 0,
+                        marginLeft: parentWidth,
+                        position: 'absolute'
+                    }
+                } else if(rotateEl.orientation === 'south'){
+                    rotationDeg = 180;
+                    cssSettings = {
+                        width: parentWidth,
+                        height: parentHeight,
+                        marginTop: parentHeight,
+                        marginLeft: parentWidth,
+                        position: 'absolute'
+                    }
+                } else{
+                    rotationDeg = 0;
+                    cssSettings = {
+                        width: parentWidth,
+                        height: parentHeight,
+                        position: 'absolute'
+                    };
+                }
+                
+                _$rotationEl.rotate({
+                    angle: rotationDeg,
+                    center: [0,0]
+                });
+
+                // If the element has rotated vertically then the dimensions need to be updated
+                _$rotationEl.css(cssSettings)
+            });
         },
         
 
@@ -783,7 +875,9 @@ _$(document).ready(function () {
                     maxLength    = _$this.attr('maxlength'),
                     _$targetel   = _$this.next().find('.badge'),
                     blockId      = _$this.data('blockid'),
-                    isValidInput = app.utils.validateMaxLengthTextArea(textVal, maxLength, _$targetel);      
+                    isValidInput = app.utils.validateMaxLengthTextArea(textVal, maxLength, _$targetel);
+
+                _$('p[data-blockid=' + blockId + ']').addClass('hightlight-selected-text');     
 
                 // console.log(isValidInput, textVal.length)
                 if(isValidInput){
@@ -791,6 +885,11 @@ _$(document).ready(function () {
                 } else{
                     alert('Max character limit reached.')
                 }
+            });
+
+            app._$body.on('blur', '[data-action=update-text-block-control]', function(){
+                var blockId = _$(this).data('blockid');
+                _$('p[data-blockid=' + blockId + ']').removeClass('hightlight-selected-text');
             });
 
             app._$body.on('click', '[data-action=update-image-block-control]', app.ucp.updateStageImageBlock);
@@ -803,6 +902,12 @@ _$(document).ready(function () {
             app._$body.on('click', '[data-action=delete-uploaded-image]', app.ucp.removeImageUploadFile);
 
             app._$body.on('click', '[data-action=activate-block-control]', function(){
+                var _$this = _$(this);
+                if(_$this.hasClass('text-block-content')){
+                    var highlightedText = 'hightlight-selected-text';
+                    _$('p[data-action=activate-block-control').removeClass(highlightedText);
+                    _$this.addClass(highlightedText)
+                }
                 // Open block
                 app.ucp.toggleProductBlock(_$(this).data('blockid'), true);
             });

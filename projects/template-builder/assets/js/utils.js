@@ -13,6 +13,8 @@ _$(document).ready(function(){
 	app._ct_canvas;
 	app._cp_canvas;
 	app.canvasMargins = {}
+	app.canvasScale;
+	app.stageCanvasScale;
 
 	// Grid Squares
 	app.gridSquare      = 8;
@@ -26,6 +28,9 @@ _$(document).ready(function(){
 
 	// Template Creation Settings/Values
 	app.defaultMaxCharLength = 2500;
+	app.defaultLineHeight = 100;
+	app.defaultFontSize = 16;
+	app.defaultFontFace = 'FuturaBT-Book';
 	app.orientation;
 	app.templateType    = 'default';
 	app.imagedata;
@@ -131,6 +136,7 @@ _$(document).ready(function(){
 								{
 									lineHeight: 75									
 								},
+
 								{
 									lineHeight: 100,
 									isDefault: true // This setting is required for when creating a template we can set a default
@@ -222,8 +228,10 @@ _$(document).ready(function(){
 	      });
 	    },
 	    rgbToCMYK: function(color){
+	    	console.log(color)
 	    	var rgb  = color.replace('rgb(', '').replace(')', ''),
 	    		cmyk = '75,68,97,90'; // Black by default
+	    	console.log(rgb)	    		
 
 	    	app.fontColours.forEach(function(colorOpt){
 	    		if(rgb === colorOpt.rgb){
@@ -274,7 +282,7 @@ _$(document).ready(function(){
 	    	// console.log((wholeNumber * 100).toString()  + '%')
 	    	return (wholeNumber * 100).toString() + '%'
 	    },
-	    setDocumentSize: function(){
+	    setDocumentSizeandScale: function(){
 	      // X, Y, % of A4.
 	      // console.log(app.orientation);
 	      // console.log(app.docDimensions);
@@ -308,7 +316,10 @@ _$(document).ready(function(){
 	          return [74,105,0.3536]  // A7 Potrait
 	        } else if(app.orientation === 'l' && app.docDimensions[0] === 'A7'){
 	          return [105,74,0.3536]  // A7 Landscape
-	        } 
+	        } else{
+	        	alert('Ivalid Document Size');
+	        	return [210,297,1] // A4 Portrait as a default
+	        }
 	      }     
 	    },	    
         setProductDimensions: function(size){
@@ -337,8 +348,8 @@ _$(document).ready(function(){
 			UI DOM CHANGES
         **/
         setSelectedOption: function () {
-            var $this = _$(this);
-            $this.siblings().removeClass('option-selected').end()
+            var _$this = _$(this);
+            _$this.siblings().removeClass('option-selected').end()
                  .addClass('option-selected');
         },
 
@@ -416,10 +427,7 @@ _$(document).ready(function(){
 				app.templateType  = 'business';
 				settings.width    = 332;
 				settings.height   = 207;
-				// Set the canvas margin (5mm for Business Cards)
-                app.canvasMargins.bleed = Math.ceil(Math.ceil(5 * app.MMtoPxSize) / 2);
-                // Make the number a multiple of 8, so its fits to the grid properly
-                app.canvasMargins.bleed = Math.ceil(app.canvasMargins.bleed / 8) * 8;
+				app.utils.setCanvasBleedSettings(5);
 			} else{
 				if(docWidth < docHeight){
 				 	settings.width  = 396;
@@ -428,10 +436,7 @@ _$(document).ready(function(){
 				 	settings.width  = 561;
 				 	settings.height = 396;
 				}
-				// Set the canvas margin (10mm for standard A4 Documents) / Divided by the canvas scale
-                app.canvasMargins.bleed = Math.ceil(Math.ceil(10 * app.MMtoPxSize) / 2.0174);
-                // Make the number a multiple of 8, so its fits to the grid properly
-                app.canvasMargins.bleed = Math.ceil(app.canvasMargins.bleed / 8) * 8;
+				app.utils.setCanvasBleedSettings(10);
 			}
 
 			// Set the level of scaling so the when converting the cooridinates to pixels that are accurate      
@@ -460,6 +465,17 @@ _$(document).ready(function(){
                 app.canvasScale = 1;
 			}
 			return settings;
+	    },
+	    setCanvasBleedSettings: function(marginSize){
+	    	console.log(app.stageCanvasScale)
+	    	if(typeof(app.stageCanvasScale) === 'undefined'){
+	    		app.stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1;
+	    	}
+	    	// Set the canvas margin (10mm for standard A4 Documents) / Divided by the canvas scale
+	    	// Set the canvas margin (5mm for standard Business Cards) / Divided by the canvas scale
+            app.canvasMargins.bleed = Math.ceil(Math.ceil(10 * app.MMtoPxSize) / app.stageCanvasScale);
+            // Make the number a multiple of 8, so its fits to the grid properly
+            app.canvasMargins.bleed = Math.ceil(app.canvasMargins.bleed / 8) * 8;
 	    },
 	    setCanvasMaxMargins: function(_canvas){
 	    	var canvasWidth  = _canvas.width,
@@ -536,7 +552,7 @@ _$(document).ready(function(){
 		            break;
 		        case 'fc':
 		            return {
-		            	fontColour: 'rgb(' + updatedVal + ')',
+		            	fontColor: 'rgb(' + updatedVal + ')',
 		            	fill: 'rgb(' + updatedVal + ')'
 		            }
 		            break;
@@ -616,7 +632,7 @@ _$(document).ready(function(){
 		    		charsRemaining = 0;
 		    	}
 
-		    	_$blockTextArea.next().find('.badge').css('background', 'red');
+		    	// _$blockTextArea.next().find('.badge').css('background', 'red');
 
 		    	// Update the UI to show how many characters are left
 		    	_$blockTextArea.next().find('.badge').html(charsRemaining);
@@ -902,8 +918,8 @@ _$(document).ready(function(){
 	        assetPath = '@';
 	      }
 
-	      var docSettings     = app.utils.setDocumentSize(),
-	          canvasScale     = app.templateType === 'default' ? 2.0174 : 1,
+	      var docSettings     = app.utils.setDocumentSizeandScale(),
+	          canvasScale     = app.templateType === 'default' ? 2.0174 : 1, // This needs to be updated to use stageCanvasScale(this needs to be set somewhere in a template)
 	          cordData        = [],
 	          baseObj         = {},
 	          destDocWidth    = docSettings[0],
@@ -957,7 +973,8 @@ _$(document).ready(function(){
 
 	        if(el.blocktype === 'new-text-block-group'){
 	          // Check if it is a text block group
-	          var textBlockGroupName  = 'text-block-group_' + i;              
+	          var textBlockGroupName  = 'text-block-group_' + i,
+	          	  spacingSize = app.isCreateTemplate ? el.spacing : Math.ceil(app.utils.convertPxToMM(el.spacing * app.canvasScale) * app.stageCanvasScale);            
 	          // Create <text-block-group>
 	          baseObj[textBlockGroupName] = {
 	            '_align': el.halign,
@@ -967,7 +984,7 @@ _$(document).ready(function(){
 	            '_lowerlefty': app.utils.calcLowerLeftY(elDimensions),
 	            '_mandatory': 'False',
 	            '_orientate': 'north',
-	            '_spacing': app.utils.convertPxToMM(el.spacing),
+	            '_spacing': spacingSize,
 	            '_upperrightx': app.utils.calcUpperRightX(elDimensions),
 	            '_upperrighty': app.utils.calcUpperRightY(elDimensions),
 	            '_verticalalign': el.valign
@@ -976,7 +993,7 @@ _$(document).ready(function(){
 	            // console.log(tEl);
 	            // Create <text-block>
 	            var textBlockName  = 'text-block_' + i,
-	            	fontSize 	   = app.isCreateTemplate ? tEl.fontSize : app.utils.convertPxToPt(tEl.fontSize),
+	            	fontSize 	   = app.isCreateTemplate ? tEl.fontSize : Math.floor((app.utils.convertPxToPt(tEl.fontSize) * app.canvasScale) * app.stageCanvasScale),
 	            	lineHeight     = app.isCreateTemplate ? tEl.lineHeight + '%' : app.utils.convertLineheight(tEl.lineHeight);
 	            	console.log(fontSize, lineHeight);
 	            baseObj[textBlockGroupName][textBlockName] = {
@@ -990,8 +1007,9 @@ _$(document).ready(function(){
 	                                                          '_textmode': 'multiline',
 	                                                          '_title': tEl.blockTitle                                                     
 	                                                        }
-	            if(tEl.maxLength >= 0 ){
-	              baseObj[textBlockGroupName]['_maxlen'] = tEl.maxLength;
+
+	            if(typeof(tEl.maxLength) !== 'undefined'){
+	              baseObj[textBlockGroupName][textBlockName]['_maxlen'] = tEl.maxLength;
 	            }
 	            if(typeof(tEl.stringSrc) !== 'undefined'){
 	              baseObj[textBlockGroupName][textBlockName]['_source'] = assetPath + tEl.stringSrc;             
@@ -1008,10 +1026,10 @@ _$(document).ready(function(){
 	          // Create <text-block>
 	          // console.log(el);
 	          var textBlockName  = 'text-block_' + i,
-	          	  fontSize 	     = app.isCreateTemplate ? el.fontSize : app.utils.convertPxToPt(el.fontSize),
+	          	  fontSize 	     = app.isCreateTemplate ? el.fontSize : Math.floor((app.utils.convertPxToPt(el.fontSize) * app.canvasScale) * app.stageCanvasScale),
 	          	  lineHeight     = app.isCreateTemplate ? el.lineHeight + '%' : app.utils.convertLineheight(el.lineHeight);
-	          	  console.log(fontSize, lineHeight);
-	          baseObj[textBlockName] = {
+
+	          	baseObj[textBlockName] = {
 	                                    '_align': el.halign,
 	                                    '_colour': app.utils.rgbToCMYK(el.fontColor),
 	                                    '_editable': el.isEditable,
@@ -1029,24 +1047,24 @@ _$(document).ready(function(){
 	                                    '_upperrighty': app.utils.calcUpperRightY(elDimensions),
 	                                    '_verticalalign': el.valign                       
 	                                  }
-	          if(el.maxLength > 0 ){
-	            baseObj[textBlockName]['_maxlen'] = el.maxLength;
-	          }
-	          if(typeof(el.stringSrc) !== 'undefined'){
-	            baseObj[textBlockName]['_source'] = assetPath + el.stringSrc;
-	          }
-	          if(typeof(el.textVal) !== 'undefined' && typeof(el.stringSrc) === 'undefined' ){
-	            baseObj[textBlockName]['__text']  = el.textVal;
-	            // app.dummyText.responseText.substr(0, el.maxLength); 
-	          }
+
+		        if(typeof(el.maxLength) !== 'undefined'){
+		            baseObj[textBlockName]['_maxlen'] = el.maxLength;
+		        }
+		        if(typeof(el.stringSrc) !== 'undefined'){
+		            baseObj[textBlockName]['_source'] = assetPath + el.stringSrc;
+		        }
+		        if(typeof(el.textVal) !== 'undefined' && typeof(el.stringSrc) === 'undefined' ){
+		        	baseObj[textBlockName]['__text']  = el.textVal;
+		        	// app.dummyText.responseText.substr(0, el.maxLength); 
+		        }
 	          
 	          cordData.push(baseObj);
-	        }
-	        // Otherwise it will be treated as an image block
-	        else{
-	          var imgBlockName = 'image_' + i,
-	          	  imgURL 	   =  typeof(el.imgSrc) !== 'undefined' || el.imgSrc !== null ? el.imgSrc : 'demo-800.jpg'
-	          baseObj[imgBlockName] = {
+	        } else{
+	        	// Otherwise it will be treated as an image block
+	          	var imgBlockName = 'image_' + i,
+	          	  	imgURL 	   =  typeof(el.imgSrc) !== 'undefined' || el.imgSrc !== null ? el.imgSrc : 'demo-800.jpg'
+	          	baseObj[imgBlockName] = {
 	                                    '_align': el.halign,
 	                                    '_editable': el.isEditable,
 	                                    '_fitmethod': 'auto',
@@ -1112,9 +1130,16 @@ _$(document).ready(function(){
 	            url: '/be/api/PDF/Template.ashx',
 	            type: 'POST',
 	            dataType: 'json',
-	            data: {tn : app.templateName,tx : xml, ti : app.imagedata, o : app.orientation, dim : app.docDimensions, id: app.templateId},
+	            data: {
+	            	tn : app.templateName,
+	            	tx : xml,
+	            	ti : app.imagedata,
+	            	o : app.orientation,
+	            	dim : app.docDimensions,
+	            	id: app.templateId
+	            },
 	            success: function (data) {
-	            	alert('Template Created. Please click "Add product" to use this template');
+	            	alert('Template created successfully.');
 	            	// Reset the template creation tool
 	            	if(app.isCreateTemplate){
 	            		app.ct.resetTemplate();
@@ -1126,7 +1151,7 @@ _$(document).ready(function(){
 	            error: function(data){
 	            	// This check is added because request is being successful, but triggering error state.
 	            	if(data.status === 200){
-	            		alert('Template Created. Please click "Add product" to use this template');
+	            		alert('Template created successfully.');
 	            		// Reset the template creation tool
 		            	if(app.isCreateTemplate){
 		            		app.ct.resetTemplate();
@@ -1165,12 +1190,13 @@ _$(document).ready(function(){
                 blockSettings.halign = typeof (data._align) !== 'undefined' ? data._align : 'left';
                 blockSettings.isEditable = typeof (data._editable) !== 'undefined' ? data._editable : 'false';
                 blockSettings.isManditory = typeof (data._mandatory) !== 'undefined' ? data._mandatory : 'false';
-                blockSettings.lineHeight = typeof (data._leading) !== 'undefined' ? data._leading.toString().replace('%', '') : '100';
+                blockSettings.lineHeight = typeof (data._leading) !== 'undefined' ? data._leading.toString().replace('%', '') : app.defaultLineHeight;
                 blockSettings.valign = typeof (data._verticalalign) !== 'undefined' ? data._verticalalign : 'top';
                 // Text Block Specific
                 blockSettings.fontColor = app.utils.cmykToRGB(data._colour);
-                blockSettings.fontFamily = typeof (data['_font-family']) !== 'undefined' ? data['_font-family'] : 'FuturaBT-Book';
-                blockSettings.fontSize = typeof (data['_font-size']) !== 'undefined' ? data['_font-size'] : '12';
+                blockSettings.fontFamily = typeof (data['_font-family']) !== 'undefined' ? data['_font-family'] : app.defaultFontFace;
+                blockSettings.fontSize = typeof (data['_font-size']) !== 'undefined' ? data['_font-size'] : app.defaultFontSize;
+                // console.log(data._maxlen)
                 blockSettings.maxLength = typeof (data._maxlen) !== 'undefined' ? data._maxlen : app.defaultMaxCharLength;
                 blockSettings['text-block-type'] = 'text';
                 if (typeof (data._source) !== 'undefined') {
@@ -1192,44 +1218,46 @@ _$(document).ready(function(){
             }
             // Set parent id, to the root element
             blockSettings.blockTitle = typeof (data._title) !== 'undefined' ? data._title : '';
+            // Set the orientation if it is set
+            if(typeof(data._orientate) !== 'undefined'){
+            	blockSettings.orientation = data._orientate;
+            }
             // blockSettings.parentId    = typeof(data._id) !== 'undefined' ? data._id : '';
             blockSettings.id     = typeof (data._id) !== 'undefined' ? data._id.replace(/ /g, '') : '';
             blockSettings.origId = typeof (data._id) !== 'undefined' ? data._id : '';
+
             // Convert to booleans
             blockSettings.isEditable = 'true' ? true : false;
             blockSettings.isManditory = 'true' ? true : false;
 
             // Convert the unit to its equivelant based on an A4
-            // console.log(data);
-            // console.log('Before Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
-            // data._upperrightx = data._upperrightx / data.scale;
-            // data._upperrighty = data._upperrighty / data.scale;
-            // data._lowerleftx = data._lowerleftx / data.scale;
-            // data._lowerlefty = data._lowerlefty / data.scale;
             // console.log('After Conversion: ' + data._upperrightx, data._upperrighty, data._lowerleftx, data._lowerleftx, data._lowerlefty);
             // Generic block settings
-            var stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1,
-                blockDimensions  = {},
+            var blockDimensions  = {},
                 upperX           = data._upperrightx / app.canvasScale,
                 upperY 			 = data._upperrighty / app.canvasScale,
                 lowerX 			 = data._lowerleftx / app.canvasScale,
                 lowerY 			 = data._lowerlefty / app.canvasScale;
 
-            // console.log(stageCanvasScale, data._upperrightx, upperX, app.utils.convertMMtoPX(upperX), app.utils.convertMMtoPX(upperX) / stageCanvasScale, Math.ceil(app.utils.convertMMtoPX(upperX) / stageCanvasScale))
+            if(typeof(app.stageCanvasScale) === 'undefined'){
+            	app.stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1
+            }
+
+            // console.log(app.stageCanvasScale, data._upperrightx, upperX, app.utils.convertMMtoPX(upperX), app.utils.convertMMtoPX(upperX) / app.stageCanvasScale, Math.ceil(app.utils.convertMMtoPX(upperX) / app.stageCanvasScale))
 
             // Base of 15mm at a3(1.4142 x bigger than A4...
             // 1. Convert the unit to what it would be at when a4 > 15mm > (15 / 1.4142 = 10.60670343657191)
             // 2. Convert the MM to its Pixel equivelant || Math.ceil(10.60670343657191 * 3.779527559055) = 41
-            // 3. Convert that unit to the relevant size based of the stageCanvasScale || Math.ceil(41 / 2.0174)  = 21
+            // 3. Convert that unit to the relevant size based of the app.stageCanvasScale || Math.ceil(41 / 2.0174)  = 21
 
-            blockDimensions.upperX = Math.ceil(app.utils.convertMMtoPX(upperX) / stageCanvasScale);
-            blockDimensions.upperY = Math.ceil(app.utils.convertMMtoPX(upperY) / stageCanvasScale);
-            blockDimensions.lowerX = Math.ceil(app.utils.convertMMtoPX(lowerX) / stageCanvasScale);
-            blockDimensions.lowerY = Math.ceil(app.utils.convertMMtoPX(lowerY) / stageCanvasScale);            
+            blockDimensions.upperX = Math.ceil(app.utils.convertMMtoPX(upperX) / app.stageCanvasScale);
+            blockDimensions.upperY = Math.ceil(app.utils.convertMMtoPX(upperY) / app.stageCanvasScale);
+            blockDimensions.lowerX = Math.ceil(app.utils.convertMMtoPX(lowerX) / app.stageCanvasScale);
+            blockDimensions.lowerY = Math.ceil(app.utils.convertMMtoPX(lowerY) / app.stageCanvasScale);            
 
-            console.log('CANVAS DIMENSONS: ' + canvasWidth + ' ' + canvasHeight)
-            blockSettings.height = app.utils.calcHeight(blockDimensions);
-            blockSettings.width  = app.utils.calcWidth(blockDimensions);
+            // console.log('CANVAS DIMENSONS: ' + canvasWidth + ' ' + canvasHeight)
+            blockSettings.height = app.utils.validateHeight(canvasHeight, app.utils.calcHeight(blockDimensions));
+            blockSettings.width  = app.utils.validateWidth(canvasWidth, app.utils.calcWidth(blockDimensions));
             blockSettings.left   = app.utils.validateLeftPos(canvasWidth, blockDimensions.lowerX, blockSettings.width);
             blockSettings.top    = app.utils.validateTopPos(canvasHeight, blockDimensions.upperY, blockSettings.height);
             // console.log(blockDimensions);
@@ -1245,10 +1273,10 @@ _$(document).ready(function(){
             innerBlockSettings.halign = blockSettings.halign;  // Take from the parent element
             innerBlockSettings.isEditable = typeof(block._editable) !== 'undefined' ? block._editable : 'false';
             innerBlockSettings.isManditory = typeof(block._mandatory) !== 'undefined' ? block._mandatory : 'false';
-            innerBlockSettings.fontFamily = typeof(block['_font-family']) !== 'undefined' ? block['_font-family'] : 'FuturaBT-Book';
+            innerBlockSettings.fontFamily = typeof(block['_font-family']) !== 'undefined' ? block['_font-family'] : app.defaultFontFace;
             innerBlockSettings.fontColor = app.utils.cmykToRGB(block._colour);
-            innerBlockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : 12;
-            innerBlockSettings.lineHeight = typeof (block._leading) !== 'undefined' ? block._leading.toString().replace('%', '') : '100';
+            innerBlockSettings.fontSize = typeof (block['_font-size']) !== 'undefined' ? block['_font-size'] : app.defaultFontSize;
+            innerBlockSettings.lineHeight = typeof (block._leading) !== 'undefined' ? block._leading.toString().replace('%', '') : app.defaultLineHeight;
             innerBlockSettings.id = typeof (block._id) !== 'undefined' ? block._id : 'false';
             innerBlockSettings.label = typeof (block._title) !== 'undefined' ? block._title : 'false';
             innerBlockSettings.maxLength = typeof (block._maxlen) !== 'undefined' ? block._maxlen : app.defaultMaxCharLength;
@@ -1302,7 +1330,7 @@ _$(document).ready(function(){
 	      // docHeight - top 
 	      return elDimensions[5] - elDimensions[2]
 	    },
-	    calcWidth: function(elDimensions){
+	    calcWidth: function(elDimensions){	    	
 	      return elDimensions.upperX - elDimensions.lowerX
 	    },
 	    calcHeight: function(elDimensions){
@@ -1313,10 +1341,14 @@ _$(document).ready(function(){
 	    /**
 			Validation
 	    **/
-	    validateLeftPos: function(canvasWidth, leftPos, elWidth){	    	
-	    	// console.log('DEBUG: Left margin reached: ', app.canvasMargins.bleed)
-	    	// console.log('DEBUG: Right margin reached: ', canvasWidth - app.canvasMargins.bleed - elWidth)
-	    	// console.log('DEBUG: Current position ok: ', leftPos)
+	    validateLeftPos: function(canvasWidth, leftPos, elWidth){
+	    	console.log(canvasWidth, leftPos, elWidth, app.canvasMargins.bleed)  	
+	    	console.log('DEBUG: Left margin reached: ', app.canvasMargins.bleed)
+	    	console.log('DEBUG: Right margin reached: ', canvasWidth - app.canvasMargins.bleed - elWidth)
+	    	console.log('DEBUG: Current position ok: ', leftPos)
+
+	    	// console.log( leftPos < app.canvasMargins.bleed, leftPos + elWidth > canvasWidth - app.canvasMargins.bleed)
+	    	console.log( leftPos + elWidth,  canvasWidth - app.canvasMargins.bleed)
 
 	    	// This function checks whether the top position is valid
 	    	if(leftPos < app.canvasMargins.bleed){	    		

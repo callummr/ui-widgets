@@ -52,6 +52,9 @@ img{
 .image-block-container{
 	position: absolute;
 }
+.text-block-inner-wrapper{
+	position: relative;
+}
 
 
 .image-block-content-container{
@@ -84,6 +87,7 @@ img{
 
 .text-block-content{
 	word-break: break-word;
+	position: absolute;
 }
 
 [data-action=activate-block-control]:hover{
@@ -91,4 +95,7 @@ img{
 }
 [data-action=inactive-block-control]:hover{
 	cursor: no-drop;
+}
+.hightlight-selected-text{
+	background-color: #00f7dd;
 }

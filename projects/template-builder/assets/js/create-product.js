@@ -11,8 +11,7 @@ _$(document).ready(function () {
     app.blockScale = 1;
     app.textBlockGroups = [];
     app._activeEditEl = null;
-    app.activeImageBlockId;
-    app.canvasScale;
+    app.activeImageBlockId;    
 
     app._$productBlockList 	  = _$('#product-blocks-list');
     app._$blockAssetLibrary	  = _$('#block-asset-lib');
@@ -359,10 +358,11 @@ _$(document).ready(function () {
 	            imgBlockString += '<h2 class="block-item-heading">' + imgBlock._title + '</h2>';                
 	            imgBlockString += '<div class="cp-block-container hidden">';
                     imgBlockString += app.cp.createLayerSettings(blockId, false);
-		            imgBlockString += '<input type="text" class="form-control" ';
-                        imgBlockString += 'data-canvas-setting-type="bt" value="' + imgBlock._title + '" data-action="update-block-text" />';
+		            imgBlockString += '<input type="text" class="form-control" data-canvas-setting-type="bt" ';
+                        imgBlockString += 'data-canvas-setting-type="bt" value="' + imgBlock._title + '" data-action="update-canvas-control"/>';
 		            imgBlockString += '<div class="clearfix">';
 		            // V Align & H Align Settings
+                    console.log(imgBlock._verticalalign)
 		            imgBlockString += app.cp.createAlignmentSettings(blockId, imgBlock._align, imgBlock._verticalalign);
 		            imgBlockString += '</div>';
 		            imgBlockString += '<div class="clearfix">';
@@ -396,7 +396,7 @@ _$(document).ready(function () {
 	            tbgBlockString += app.cp.createSpacingSetting(blockId, tbgBlock._spacing);
 	            tbgBlockString += '<div class="clearfix">';
 		            // V Align & H Align Settings
-		            tbgBlockString += app.cp.createAlignmentSettings(blockId, tbgBlock._align, tbgBlock.__verticalalign);
+		            tbgBlockString += app.cp.createAlignmentSettings(blockId, tbgBlock._align, tbgBlock._verticalalign);
 	            tbgBlockString += '</div>';
 	            tbgBlockString += '<div class="clearfix">';
 		            // Editable & Manditory Settings
@@ -450,7 +450,7 @@ _$(document).ready(function () {
             if(fromTbg === false){
             	tBlockString += '<div class="clearfix">';
 		            // V Align & H Align Settings
-		            tBlockString += app.cp.createAlignmentSettings(blockId, tBlock._align, tBlock.__verticalalign, fromTbg);
+		            tBlockString += app.cp.createAlignmentSettings(blockId, tBlock._align, tBlock._verticalalign, fromTbg);
 	            tBlockString += '</div>';
             }
             
@@ -473,11 +473,10 @@ _$(document).ready(function () {
         /**
 	      CANVAS CONTROLS & EVENTS
 	    **/
-
         createBlockDataFromXML: function (data) {
-            var blockSettings = app.utils.calcBlockCoords(data, app._cp_canvas.width, app._cp_canvas.height);
-            // console.log(blockSettings);
+            app.stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1;
 
+            var blockSettings = app.utils.calcBlockCoords(data, app._cp_canvas.width, app._cp_canvas.height);
             if (data.block === 'ib') {
                 app.cp.createProductImageBlock(blockSettings);
             } else if (data.block == 'tb') {
@@ -574,18 +573,15 @@ _$(document).ready(function () {
                 cTBSettings.textVal = '';
             }            
 
-            // Create Boolean to test if this block is from a source file or free text
-            var stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1,
-                fromTextSrc = typeof (cTBSettings.stringSrc) === 'undefined' ? true : false,
+            // Create Boolean to test if this block is from a source file or free text            
+            var fromTextSrc = typeof (cTBSettings.stringSrc) === 'undefined' ? true : false,
                 _ptblock;
-
-            console.log(app.canvasScale);
 
             _ptblock = new fabric.Textbox(cTBSettings.textVal, {
                 editable: fromTextSrc, // If from a source the text cant be edited
                 fill: cTBSettings.fontColor,
                 fontFamily: cTBSettings.fontFamily,
-                fontSize: Math.ceil(app.utils.convertPtToPx(cTBSettings.fontSize / app.canvasScale) / stageCanvasScale), 
+                fontSize: Math.ceil(app.utils.convertPtToPx(cTBSettings.fontSize / app.canvasScale) / app.stageCanvasScale), 
                 hasBorders: true,
                 hasRotatingPoint: false,
                 height: cTBSettings.height,
@@ -618,7 +614,6 @@ _$(document).ready(function () {
             _ptblock['textVal'] = cTBSettings.textVal;
 
             if (typeof (cTBSettings.parentId) !== 'undefined') {
-                var stageCanvasScale = app.templateType === 'default' ? 2.0174 : 1
                 // console.log(cTBSettings.parentHeight, cTBSettings.parentWidth)
                 _ptblock['groupPosId'] = cTBSettings.groupPosId,
                 _ptblock['parentId'] = cTBSettings.parentId.replace(/ /g, ''),
@@ -630,7 +625,7 @@ _$(document).ready(function () {
                 _ptblock['parentHeight'] = cTBSettings.parentHeight;
                 _ptblock['parentTop'] = cTBSettings.parentTop;
                 _ptblock['parentWidth'] = cTBSettings.parentWidth;
-                _ptblock['spacing'] = Math.ceil(app.utils.convertMMtoPX(cTBSettings.spacing / app.canvasScale) / stageCanvasScale);
+                _ptblock['spacing'] = Math.ceil(app.utils.convertMMtoPX(cTBSettings.spacing / app.canvasScale) / app.stageCanvasScale);
             }
 
             if (typeof (cTBSettings.stringSrc) !== 'undefined') {
@@ -718,13 +713,17 @@ _$(document).ready(function () {
             }           
         },
         updateCanvasBlockText: function (_$el) {
-            // console.log(_$el)
+            console.log(_$el)
             var _$textarea = _$el,
 	    		newTextVal = _$textarea.val(),
 	    		canvasBlockId = _$textarea.parent().data('prodblockid') || _$textarea.parents('[data-prodblockid]').data('prodblockid');
 
+            console.log(canvasBlockId)
+
             // Set the active canvas obj
             app.cp.setActiveCanvasObj(canvasBlockId);
+
+            console.log(app._activeEditEl)
 
             // Validate if the new text value needs to wrap to a new line
             // app.utils.validateLeftPos(app._cp_canvas.width, app._activeEditEl.left, app._activeEditEl.width)
@@ -744,21 +743,25 @@ _$(document).ready(function () {
         },
         setActiveCanvasObj: function (id) {
             // This function sets the relevant canvas object to its active state
+            console.log(app._activeEditEl)
             if (app._activeEditEl === null) {
             	var _canvasObjs = app._cp_canvas._objects;
             	// console.log(_canvasObjs, _canvasObjs.length);           
-                _canvasObjs.forEach(function (obj, i) {
+                _canvasObjs.forEach(function (_obj, i) {
                 	// console.log(i);
-                	// console.log(obj);
+                	// console.log(_obj);
                 	// console.log(id);
-                    if (obj.id === id) {
-                        app._activeEditEl = obj;
+                    if (_obj.id === id) {
+                        app._activeEditEl = _obj;
                         app._cp_canvas.setActiveObject(_canvasObjs[i]);
                     }
                 });
+            } else if(app._activeEditEl.id !== id){
+                app._activeEditEl = null;
+                app.cp.setActiveCanvasObj(id);
+            } else{
+                console.log('Active object is set and it is the same as the item selected.')
             }
-            // console.log(app._cp_canvas);
-            // console.log(app._activeEditEl);
         },
         setBlockControlTextarea: function (activeObj) {
             var _activeObj = activeObj.target,
@@ -932,7 +935,8 @@ _$(document).ready(function () {
             // Update the width of group item
             _filterGroupObjs.forEach(function(_groupObjMember){
                 _groupObjMember.set({
-                    width: objNewWidth
+                    width: objNewWidth,
+                    parentWidth: objNewWidth
                 });
             });
             // After the width has been set, refromat the textblock groups.
@@ -1136,22 +1140,37 @@ _$(document).ready(function () {
         bindCreateProductCanvasEvents: function () {
             // This event handles whether to enter edit mode or not
             app._cp_canvas.on('object:selected', function (e) {
+                // if(typeof(app._cachedActiveObj) !== 'undefined'){
+                //     app._cachedActiveObj = null;
+                // }
+
                 // Get the id of the selected element 
                 var _obj = app._cp_canvas.getActiveObject();
-                console.log({
-                    objManditory: _obj.isManditory,
-                    objEditable: _obj.isEditable,
-                    parentManditory: _obj.parentManditory,
-                    parentEditable: _obj.parentEditable                    
-                })
+                    app._cachedActiveObj = _obj;
+                    app._activeEditEl    = _obj;
+                // console.log({
+                //     objManditory: _obj.isManditory,
+                //     objEditable: _obj.isEditable,
+                //     parentManditory: _obj.parentManditory,
+                //     parentEditable: _obj.parentEditable                    
+                // })
                 /**
                     FIX BUG, MULTIPLE OBJECTS ARE MOVING
                 **/
                 console.log(_obj);
+                // Show the relevant blocks' settings that has been selected
+                if(typeof(_obj.parentId) !== 'undefined'){
+                    // Open the parent                 
+                    _$('li[data-prodblockid=' + _obj.parentId + ']').find('[data-action=toggle-product-block]').click(); 
+                    // Open the child
+                    _$('li[data-prodblockid=' + _obj.parentId + '] [data-action=edit-text-block-defaults][data-blockid=' + _obj.id +']').click();
+
+                } else{
+                    _$('li[data-prodblockid=' + _obj.id + ']').find('[data-action=toggle-product-block]').click();   
+                }
                 // Allow a user to move elements on the canvas with keyboard arrows
                 // app.utils.activeKeyboardMovements(_obj, app._cp_canvas);
-                // Show the relevant blocks' settings that has been selected
-                // _$('[data-prodblockid=' + _obj.parentId + ']').find('[data-action=toggle-product-block]').click();
+                
             });
 
             app._cp_canvas.on('selection:cleared', function (e) {
@@ -1160,7 +1179,12 @@ _$(document).ready(function () {
                     app._cachedActiveObj.set({
                         lockMovementX: false,
                         lockMovementY: false
-                    });                
+                    });
+
+                    if(typeof(app._cachedActiveObj.parentId) !== 'undefined'){
+                        app.cp.setGroupMembersWidth(app._cachedActiveObj.parentId, app._cachedActiveObj.width);
+                    } 
+
                     app._cp_canvas.renderAll();
                     app._cachedActiveObj = null;
                 }
@@ -1617,7 +1641,7 @@ _$(document).ready(function () {
                     tbBlockList += '<li class="list-group-item" data-tbg-parent="tbg-' + id + '" id="tb-' + blockId + '">';
                     tbBlockList += tbBlock._title;
                     tbBlockList += '<button type="button" class="btn btn-sm btn-danger pull-right" data-action="remove-text-block-from-group">Delete</button>';
-                    tbBlockList += '<button type="button" class="btn btn-sm btn-info pull-right" data-action="edit-text-block-defaults">Edit</button>';
+                    tbBlockList += '<button type="button" class="btn btn-sm btn-info pull-right" data-blockid="' + blockId +'" data-action="edit-text-block-defaults">Edit</button>';
                     tbBlockList += '<div class="edit-tb-defaults-container hidden">';
                     tbBlockList += '<button type="button" class="btn btn-warning btn-sm pull-top-right" data-action="close-text-block-defaults">Back</button>'
                     tbBlockList += app.cp.createTextBlockBlockSettings(tbBlock, true, id);
@@ -1641,69 +1665,81 @@ _$(document).ready(function () {
 
             return tbBlockList;
         },
-        createFontColorSetting: function (id, colour, fromTbg) {            
+        createFontColorSetting: function (id, colour, fromTbg) {                    
             var fontColorString = '',
 	    		blockColour = typeof (colour) !== 'undefined' ? colour : '75,68,97,90', // CYMK BLACK
                 idGroupString = fromTbg ? 'Group' : '';
 
             // console.log(blockColour);
             fontColorString += '<h3 class="block-item-heading">Font Colour</h3>';
+            fontColorString += '<div>';
+
             app.fontColours.forEach(function (fontColour) {
-                // console.log(fontColour);
-                // console.log(blockColour);
-                var isChecked = blockColour === fontColour.rgb ? 'checked' : '';
-                fontColorString += '<input type="radio" class="hidden" ';
-                fontColorString += 'id="' + idGroupString + 'block-' + fontColour.rgb.replace(/,/g, '') + '" ';
-                fontColorString += 'name="color-default" data-action="update-canvas-control" data-canvas-setting-type="fc" ';
-                fontColorString += 'value="' + fontColour.rgb + '" ' + isChecked + '>';
-                fontColorString += '<label class="cp-control btn btn-default color-option ' + fontColour.className + '" ';
-                fontColorString += 'for="' + idGroupString + 'block-' + fontColour.rgb.replace(/,/g, '') + '"></label>';
+                var isMatch       = blockColour === fontColour.cmyk ? true : false,
+                    checkedAttr   = isMatch ? 'checked' : '',
+                    selectedClass = isMatch ? 'option-selected' : '';
+
+                    fontColorString += '<input type="radio" class="hidden" ';
+                    fontColorString += 'id="' + idGroupString + 'block-' + fontColour.rgb.replace(/,/g, '') + '" ';
+                    fontColorString += 'name="color-default" data-action="update-canvas-control" data-canvas-setting-type="fc" ';
+                    fontColorString += 'value="' + fontColour.rgb + '" ' + checkedAttr + '>';
+                    fontColorString += '<label class="' + selectedClass + ' cp-control btn btn-default color-option ' + fontColour.className + '" ';
+                    fontColorString += 'for="' + idGroupString + 'block-' + fontColour.rgb.replace(/,/g, '') + '"></label>';                
             });
+            fontColorString += '</div>';
 
             return fontColorString;
         },
         createFontFaceSetting: function (id, fface, fromTbg) {
             var fontFaceString = '',
-	    		blockFFace = typeof (fface) !== 'undefined' ? fface : 'FuturaBT-Book',
+	    		blockFFace = typeof (fface) !== 'undefined' ? fface : app.defaultFontFace,
                 idGroupString = fromTbg ? 'Group' : '';
 
             blockFFace = blockFFace.replace(' ', '-'); // The macmillan headline font contains a space that needs to be removed
 
             fontFaceString += '<h3 class="block-item-heading">Font Face</h3>';
+            fontFaceString += '<div>';
             app.fontFaces.forEach(function (font) {
-                var isChecked = blockFFace === font.ffname ? 'checked' : '';
-                // console.log(font);
-                // console.log(blockFFace);
-                fontFaceString += '<input type="radio" class="hidden" ';
-                fontFaceString += 'id="' + idGroupString + 'block-' + font.ffname.toLowerCase() + '-fface" ';
-                fontFaceString += 'name="ff-defualt" data-action="update-canvas-control" data-canvas-setting-type="ff"';
-                fontFaceString += 'value="' + font.ffname + '" ' + isChecked + '>';
-                fontFaceString += '<label class="cp-control btn btn-default" for="' + idGroupString + 'block-' + font.ffname.toLowerCase() + '-fface">' + font.fftitle + '</label>';
+                var isMatch       = blockFFace === font.ffname ? true : false,
+                    checkedAttr   = isMatch ? 'checked' : '',
+                    selectedClass = isMatch ? 'option-selected' : '';
+              
+                    fontFaceString += '<input type="radio" class="hidden" ';
+                    fontFaceString += 'id="' + idGroupString + 'block-' + font.ffname.toLowerCase() + '-fface" ';
+                    fontFaceString += 'name="ff-defualt" data-action="update-canvas-control" data-canvas-setting-type="ff"';
+                    fontFaceString += 'value="' + font.ffname + '" ' + checkedAttr + '>';
+                    fontFaceString += '<label class="' + selectedClass + ' cp-control btn btn-default" ';
+                        fontFaceString += 'for="' + idGroupString + 'block-' + font.ffname.toLowerCase() + '-fface">' + font.fftitle + '</label>';
             });
+            fontFaceString += '<div>';
 
             return fontFaceString;
         },
         createFontSizeSetting: function (id, size, fromTbg) {
             var fontSizeString = '',
-	    		blockFSize = typeof (size) !== 'undefined' ? size : '20', // Default fontsize                
+	    		blockFSize = typeof (size) !== 'undefined' ? size : app.defaultFontSize,               
                 idGroupString = fromTbg ? 'Group' : '';
 
             fontSizeString += '<h3 class="block-item-heading">Font Size</h3>';
+            fontSizeString += '<div>';
             app.fontSizes.forEach(function (fsize) {
-                var isChecked = blockFSize === fsize.ptSize ? 'checked' : '';
-                // console.log(fsize.size);
-                // console.log(blockFSize);
-                fontSizeString += '<input type="radio" class="hidden" id="' + idGroupString + 'block-' + fsize.ptSize + '-fsize" ';
-                    fontSizeString += 'name="fsize-default" data-action="update-canvas-control" data-canvas-setting-type="fs" ';
-                    fontSizeString += 'value="' + fsize.ptSize + '" ' + isChecked + '>';
-                fontSizeString += '<label class="cp-control btn btn-default" for="' + idGroupString + 'block-' + fsize.ptSize + '-fsize">' + fsize.sizeName + '</label>';
+                var isMatch       = parseInt(blockFSize) === fsize.ptSize ? true : false,
+                    checkedAttr   = isMatch ? 'checked' : '',
+                    selectedClass = isMatch ? 'option-selected' : '';
+                
+                    fontSizeString += '<input type="radio" class="hidden" id="' + idGroupString + 'block-' + fsize.ptSize + '-fsize" ';
+                        fontSizeString += 'name="fsize-default" data-action="update-canvas-control" data-canvas-setting-type="fs" ';
+                        fontSizeString += 'value="' + fsize.ptSize + '" ' + checkedAttr + '>';
+                    fontSizeString += '<label class="' + selectedClass + ' cp-control btn btn-default" ';
+                        fontSizeString += 'for="' + idGroupString + 'block-' + fsize.ptSize + '-fsize">' + fsize.sizeName + '</label>';
             });
+            fontSizeString += '<div>';
 
             return fontSizeString;
         },
         createlineHeightSetting: function (id, lineHeight, fromTbg) {
             var lineHeightString = '',
-	    		blockLineHeight = typeof (lineHeight) !== 'undefined' ? lineHeight.replace('%', '') : '',
+	    		blockLineHeight = typeof (lineHeight) !== 'undefined' ? lineHeight.replace('%', '') : app.defaultLineHeight,
                 idGroupString = fromTbg ? 'Group' : '';
 
             lineHeightString += '<div class="col-md-7">';
@@ -1728,6 +1764,7 @@ _$(document).ready(function () {
             return spacingString;
         },
         createAlignmentSettings: function (id, halign, valign, fromTbg) {
+            // console.log(halign, valign)
             var halign_lowerc = typeof (halign) !== 'undefined' ? halign.toLowerCase() : 'left',
 	    		valign_lowerc = typeof (valign) !== 'undefined' ? valign.toLowerCase() : 'top',
 	    		alignmentString = '',
@@ -1966,7 +2003,7 @@ _$(document).ready(function () {
 
             // Hide/Show the relevant block
             app._$body.on('click', '[data-action=toggle-product-block]', function () {
-                app.cp.deactiveCanvasObj();
+                // app.cp.deactiveCanvasObj();
                 app.cp.toggleOptions(_$(this), '.cp-block-container');
             });
 
@@ -1992,7 +2029,7 @@ _$(document).ready(function () {
                     maxLength = _$maxLengthTextarea.val(),
                     isValidInput = true;
 
-                console.log(_$maxLengthTextarea)
+                // console.log(_$maxLengthTextarea)
 
                 // Check if the maxlength has been set
                 if(maxLength !== ''){
@@ -2002,7 +2039,7 @@ _$(document).ready(function () {
 
                 // Check if the new inputted value is valid
                 isValidInput = app.utils.validateMaxLengthTextArea(textVal, maxLength, _$counter);
-                console.log(isValidInput)
+                // console.log(isValidInput)
                 // If it is valid... then update the canvas
                 if(isValidInput === true){
                     // Need to add Debounce
@@ -2013,7 +2050,7 @@ _$(document).ready(function () {
             });
             
             // After finishing editing a canvas objects's text, handle that event
-            app._$body.on('blur', '[data-action=update-block-text]', app.cp.deactiveCanvasObj);
+            // app._$body.on('blur', '[data-action=update-block-text]', app.cp.deactiveCanvasObj);
 
             // Listens for change and click events, and then updates the active canvas object with the new value
             app._$body.on('change keyup', '[data-action=update-canvas-control]', function(){
