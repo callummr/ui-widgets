@@ -1,31 +1,31 @@
-module.export = function(grunt){
+module.exports = function(grunt){
 	'use strict';
 
 	grunt.initConfig({
 		dirs: {
-			asset: '/assets/',
-			jsFile: '/js/',
-			jsLibs: asset + jsFile + 'libs/'
+			jsFile: './assets/js/',
+			jsLibs: './assets/js/libs/'
 		},
 		babel: {
 			options: {
 				sourceMaps: true
 			},
-			dist : {
-				 files: [{
-				    src: [
-				    		'<%= dirs.jsLibs %>/jquery-1.11.3.js',
-				    		'<%= dirs.jsLibs %>/xml2json.js',
-				    		'<%= dirs.jsLibs %>/jquery-rotate.js',
-				    		'<%= dirs.jsFile %>/utils.js',
-				    		'<%= dirs.jsFile %>/user-create-product.js'
-				    	 ],
-				    dest: 'assets/js/main.js',
-				}]
-			}
+			dist: {
+				files: [{
+					    src: [
+					    		'./assets/js/libs/jquery-1.11.3',
+					    		'./assets/js/libs/xml2json',
+					    		'./assets/js/libs/jquery-rotate',
+					    		'./assets/js/utils',
+					    		'./assets/js/user-create-product'
+					    	 ],
+					    dest: './assets/js/main',
+					    ext: '.js'
+					}]
+				}
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-babel');
-	grunt.registerTask('es6', ['babel']);
+	grunt.registerTask('default', ['babel']);
 };
