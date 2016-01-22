@@ -1,7 +1,6 @@
 var app = app || {};
 
-// Required to use _$ instead of $ to do a multiple versions of jquery being loaded.
-// jQueryConflict is set in the utils file
+_$ = jQuery.noConflict();
 
 _$(document).ready(function () {
     'use strict';

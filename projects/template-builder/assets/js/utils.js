@@ -1,6 +1,6 @@
 var app = app || {},
 // Need to add jquery no conflict as storefront already uses 1.3
-_$ = jQuery.noConflict(true);
+_$ = jQuery.noConflict();
 
 // Required to use _$ instead of $ to do a multiple versions of jquery being loaded.
 
@@ -152,7 +152,8 @@ _$(document).ready(function(){
 	app._$body 				= _$('body');
 
 	// Enviornment Check
-	app.isLocalEnv      = document.location.hostname ===  "widget.macmillan.org.uk";
+	var host = document.location.hostname;
+	app.isLocalEnv      = host ===  "widget.macmillan.org.uk" || host === "localhost";
 	app.templateDatURL  = '';
 	
 	// Sets the default templates and some example text for textblocks

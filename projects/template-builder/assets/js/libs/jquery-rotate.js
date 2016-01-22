@@ -15,7 +15,7 @@
     }
 
     // Bad eval to preven google closure to remove it from code o_O
-    eval('IE = "v"=="\v"');
+    var IE = "v"=="\v";
 
     jQuery.fn.extend({
         rotate:function(parameters)
@@ -63,7 +63,7 @@
 
     // Library agnostic interface
 
-    Wilq32=window.Wilq32||{};
+    var Wilq32=window.Wilq32||{};
     Wilq32.PhotoEffect=(function(){
 
       if (supportedCSS) {
